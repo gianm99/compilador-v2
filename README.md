@@ -6,7 +6,7 @@ Curso 2019-2020
 
 ## Enunciado de la práctica
 
-### Aspectes generals
+### Aspectos generales
 
 La práctica puede ser realizada en grupos de como mucho tres personas. La conformación de cada grupo se tendrá que hacer mediante el apartado correspondiente dentro de la página de la asignatura y en la herramienta Aula Digital.
 
