@@ -1,4 +1,4 @@
-package antlrprocesador;
+package procesador;
 
 public class Simbolo{
 	private String id;

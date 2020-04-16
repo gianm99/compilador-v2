@@ -1,4 +1,4 @@
-package antlrprocesador;
+package procesador;
 
 import java.util.Hashtable;
 import java.io.*;
