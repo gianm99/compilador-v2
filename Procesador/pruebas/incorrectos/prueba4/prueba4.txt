@@ -1,0 +1,7 @@
+var string b;
+const int a24=89;
+var int numero;
+proc main() {
+	a24=b;
+	numero=b;
+}

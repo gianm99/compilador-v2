@@ -1,0 +1,3 @@
+ERROR SEMANTICO - Línea: 5, a24 es una constante
+ERROR SEMANTICO - Línea: 6, asignación no permitida a numero 
+encontrado: STRING esperado: INT

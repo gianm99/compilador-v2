@@ -1,0 +1,18 @@
+var int a = 10;
+var boolean b = true;
+var string c = "casa";
+
+func function(int a, boolean b, string c) int{
+    int d = 10;
+    string e;
+    if(b){
+        d = a;
+        return d;
+    } else {
+        e = c;
+    }
+}
+
+proc main(){
+    int i = function(a,b,c);
+}

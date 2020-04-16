@@ -1,0 +1,11 @@
+func main() int{
+	boolean b = true &&(false||true+5);
+	int c = true;
+	string d = "false";
+	string e = false;
+	if(d){
+		int a = 10;
+	}
+
+	c = procedure();
+}

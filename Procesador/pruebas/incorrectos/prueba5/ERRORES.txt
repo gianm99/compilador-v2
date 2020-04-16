@@ -1,0 +1,13 @@
+ERROR SEMANTICO - tipos incompatibles
+encontrado: INT esperado: BOOLEAN
+ERROR SEMANTICO - Línea: 3, tipos incompatibles 
+encontrado: BOOLEAN esperado: INT
+ERROR SEMANTICO - Línea: 5, tipos incompatibles 
+encontrado: BOOLEAN esperado: STRING
+ERROR SEMANTICO - Línea: 6
+La expresión debe ser de tipo BOOLEAN
+ERROR SEMANTICO - Línea: 10, No se ha encontrado el símbolo procedure en la tabla de símbolos
+No se ha encontrado el símbolo procedure en la tabla de símbolos
+ERROR SEMANTICO - Línea: 10, asignación no permitida a c 
+encontrado: null esperado: INT
+ERROR SEMANTICO: falta return para la función main

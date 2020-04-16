@@ -1,0 +1,16 @@
+/*Esto es un comentario*/
+# Esto también es un comentario
+
+proc procedimiento1(int a, int b){
+	int c=a+b;
+	c=c-2;
+}
+
+proc main(){
+	int d = 3;
+	int e = 5;
+	int f = 1;
+	procedimiento1(d, e);
+	printINT(f);
+	boolean b = true && !(false || true);
+}
