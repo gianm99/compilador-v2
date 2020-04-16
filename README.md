@@ -24,7 +24,7 @@ El procesador que se tiene que desarrollar debe contemplar las siguientes funcio
   - Fichero de código ensamblador, optimizado. La idea es que el ejecutable obtenido con el código optimizado y el código sin optimizar hagan lo mismo pero que se pueda ver la diferencia en el rendimiento.
   - Errores: si se detectan errores se generará un documento con los errores detectados. Indicando por cada error, la línea en la que se ha detectado, el tipo y un mensaje explicativo.
 
-### Características del lenguaje y del procesador
+### Características del lenguaje y del procesador
 
 Si es necesario, se tendrá que revisar y completar el lenguaje para asegurar que:
 
