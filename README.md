@@ -1,6 +1,6 @@
 # Compilador: *front-end* y *back-end*
 
-Asignatura 21743 - Compiladores II
+Asignatura `21743 - Compiladores II`
 
 Curso 2019-2020
 
@@ -10,13 +10,13 @@ Curso 2019-2020
 
 La práctica puede ser realizada en grupos de como mucho tres personas. La conformación de cada grupo se tendrá que hacer mediante el apartado correspondiente dentro de la página de la asignatura y en la herramienta Aula Digital.
 
-La práctica consiste en el desarrollo de la parte *back-end* de un procesador para un lenguaje de programación. Las tareas que tendrá que realizar el procesador son las de generación de código intermedio, optimización y generación de código ensamblador. Se tendrá que partir del *front-end* que se ha desarrollado como práctica de la asignatura 21742 - Compiladores I.
+La práctica consiste en el desarrollo de la parte *back-end* de un procesador para un lenguaje de programación. Las tareas que tendrá que realizar el procesador son las de generación de código intermedio, optimización y generación de código ensamblador. Se tendrá que partir del *front-end* que se ha desarrollado como práctica de la asignatura `21742 - Compiladores I`.
 
 ### Funcionalidad del Procesador
 
 El procesador que se tiene que desarrollar debe contemplar las siguientes funcionalidades:
 
-- Tendrá que ser capaz de procesar el código fuente suministrado en un archivo de texto. El procesamiento se realizará a partir del módulo *front-end* desarrollado en la asignatura 21742 - Compiladores I. A partir de este desarrollo se procederá a generar el código intermedio, a optimizarlo y a generar el código ensamblador resultante.
+- Tendrá que ser capaz de procesar el código fuente suministrado en un archivo de texto. El procesamiento se realizará a partir del módulo *front-end* desarrollado en la asignatura `21742 - Compiladores I`. A partir de este desarrollo se procederá a generar el código intermedio, a optimizarlo y a generar el código ensamblador resultante.
 - Tendrá que generar una serie de ficheros como resultado de su ejecución:
   - Las tablas de variables y procedimientos, con tal de poder comprobar la corrección del código de tres direcciones.
   - Fichero de código intermedio: El código intermedio correspondiente al programa.
