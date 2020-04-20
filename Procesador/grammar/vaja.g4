@@ -15,11 +15,17 @@ grammar vaja;
 	boolean returnenc = false;
 	Simbolo.TipoSubyacente tiporeturn = null;
 	String errores="";
+        String directorio;
+        
+        public vajaParser(TokenStream input,String directorio){
+            this(input);
+            this.directorio=directorio;
+        } 
+
 
 	@Override
 	public void notifyErrorListeners(Token offendingToken, String msg, RecognitionException ex)
 	{
-		//Manipulam missatge original per mostrar la informació que dessitjam
 		String notificacion = "ERROR SINTACTICO - Línea " + offendingToken.getLine() + " Columna " + offendingToken.getCharPositionInLine() 
 		+ ": \n\t ";
 		String expected = msg;
@@ -48,13 +54,14 @@ grammar vaja;
 	{
 		throw new RuntimeException("ERROR LEXICO -  "+ex.getMessage()); 
 	}
-}
+
+ }
 
 programaPrincipal
 	:
 	{
 		try{
-			ts=new TablaSimbolos();
+			ts=new TablaSimbolos(directorio);
 			Simbolo operacionArg;
 			//Operación de entrada
 			ts.inserta("read",new Simbolo("read",null,Simbolo.Tipo.FUNC,Simbolo.TipoSubyacente.STRING));
@@ -664,7 +671,7 @@ literal returns [ Simbolo.TipoSubyacente tsub ]
 	|	LiteralString { $tsub=Simbolo.TipoSubyacente.STRING; }
 	;
 	
-// lexico
+// LÉXICO
 
 // Palabras reservadas
 VAR: 'var';

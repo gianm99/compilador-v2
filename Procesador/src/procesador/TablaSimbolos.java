@@ -16,13 +16,14 @@ public class TablaSimbolos {
         }
     }
 
-    public TablaSimbolos() {
+    public TablaSimbolos(String directorio) {
         niveltabla = 0;
         tabla = new Hashtable<String, Simbolo>();
         ant = null;
         try{
             //TS output
-            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("TABLADESIMBOLOS.html"), "utf-8"));
+            File tsFile = new File(directorio+"\\tablasimbolos.html");
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tsFile), "utf-8"));
 			writer.write("<!DOCTYPE html>\n<html>\n<head><style>\ntable, th, td {\nborder: 1px solid black;\nbackground-color: aqua;\n}</style>"+
 			"</head>\n<body>\n<table style=\"width:100%\">");
 			writer.write("\n<tr>\n<th>Nivel "+niveltabla+"</th>\n<td><table style=\"width:100%\">"+

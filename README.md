@@ -4,6 +4,10 @@ Asignatura `21743 - Compiladores II`
 
 Curso 2019-2020
 
+## Descripción
+
+Programa que procesa un archivo de texto escrito en el lenguaje inventado *Vaja* y genera código intermedio, código ensamblador sin optimizar y código ensamblador optimizado.
+
 ## Enunciado de la práctica
 
 ### Aspectos generales

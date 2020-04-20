@@ -12,14 +12,19 @@ options { tokenVocab=vajaLexer; }
 {
 	Writer writer;
 	int dot = 0;
+        String directorio;
+        public vajaDOT(TokenStream input,String directorio){
+            this(input);
+            this.directorio=directorio;
+        } 
 }
-//{try{writer.write('string'+"->'nombretoken'"+(dot++)+";\n");}catch(Exception e){}}
-//{try{writer.write('string'+"->"+$Identificador.getText() +(dot)+"[label="+$Identificador.getText() +"];\n");}catch(Exception e){}}
+
 programaPrincipal
     :  
     {
         try{
-            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("arbol.dot"), "utf-8"));
+            File arbolFile=new File(this.directorio+"\\arbol.dot");
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(arbolFile), "utf-8"));
             writer.write("digraph G {");
         }catch (Exception e){}
             String programaPrincipal="programaPrincipal"+(dot++);
@@ -84,16 +89,6 @@ tipo
         {try{writer.write(tipo+"->string"+(dot++)+";\n");}catch(Exception e){}}} STRING 
 	;
 
-/*
-declaracioVariable
-	:	{
-		String declaracioVAR="declaracioVariable"+(dot++);}
-		 Identificador 
-		 {try{writer.write($Identificador.text+(dot)+"[label="+$Identificador.text+"];\n");}catch(Exception e){}}
-		 {try{writer.write(declaracioVAR+"->"+$Identificador.text+(dot++)+";\n");}catch(Exception e){}} (
-		 	{try{writer.write(declaracioVAR+"->IGUAL"+(dot++)+";\n");}catch(Exception e){}} ASSIGN 
-		 	{try{writer.write(declaracioVAR+"->initVariable"+(dot)+";\n");}catch(Exception e){}} initVariable)?
-	;*/ 
 declaracionVar
 	:	
     {
