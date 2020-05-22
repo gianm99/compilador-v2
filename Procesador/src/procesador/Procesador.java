@@ -1,5 +1,6 @@
 package procesador;
 
+import procesador.antlr.*;
 import org.antlr.v4.runtime.*;
 import java.io.*;
 import org.apache.commons.io.*;
@@ -19,12 +20,12 @@ public class Procesador {
     public static void main(String[] args) throws Exception {
         String buildPath= "pruebas\\build\\"+FilenameUtils.getBaseName(args[0]);
         File buildDir = new File(buildPath);
-        if(!buildDir.mkdir()){
+        if(!buildDir.mkdirs()){
             // Si ya existe la carpeta, se vacía
             FileUtils.cleanDirectory(buildDir);
         }        
         // Stream del archivo pasado como argumento
-        CharStream stream = new ANTLRFileStream(args[0]);
+        CharStream stream = CharStreams.fromFileName(args[0]);
         // Se crea el lexer y el CommonTokenStream
         vajaLexer lexer = new vajaLexer(stream);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
