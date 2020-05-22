@@ -1,15 +1,17 @@
 package procesador;
 
-import java.util.Hashtable;
-import java.io.*;
+import java.util.Map;
 
 public class TablaVariables {
 
     private int profundidad;
-    private Hashtable<String, Variable> tabla;
-    
-    public void inserta(Variable var){
-        tabla.put(var.getNv(), var);
+    private Map<Integer, Variable> tabla;
+
+    TablaVariables() {
+        
+    }
+
+    public void inserta(Variable var) {
     }
 
 }
