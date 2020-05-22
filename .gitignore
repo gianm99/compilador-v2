@@ -2,6 +2,9 @@
 /Procesador/build/
 /Procesador/dist/
 /Procesador/pruebas/build/
+/Procesador/grammar/.antlr/
+/Procesador/src/procesador/antlr/
+/Procesador/.vscode
 TODO.md
 PREGUNTAS.md
 .vscode/settings.json
