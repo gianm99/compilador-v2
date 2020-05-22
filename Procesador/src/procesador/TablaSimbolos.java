@@ -19,7 +19,7 @@ public class TablaSimbolos {
 
     public TablaSimbolos(String directorio) {
         niveltabla = 0;
-        tabla = new Hashtable<String, Simbolo>();
+        tabla = new Hashtable<>();
         pre = null;
         try {
             //TS output
@@ -29,14 +29,14 @@ public class TablaSimbolos {
                     + "</head>\n<body>\n<table style=\"width:100%\">");
             writer.write("\n<tr>\n<th>Nivel " + niveltabla + "</th>\n<td><table style=\"width:100%\">"
                     + "\n<tr>\n<th>Id</th>\n<th>Tipo</th>\n<th>Tipo Subyacente</th>\n<th>Next</th>\n</tr>\n<tr>");
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.out.println("Error escribiendo la tabla de símbolos: " + e.getMessage());
         }
     }
 
     private TablaSimbolos(TablaSimbolos p, int n) {
         niveltabla = n;
-        tabla = new Hashtable<String, Simbolo>();
+        tabla = new Hashtable<>();
         pre = p;
     }
 
@@ -45,7 +45,7 @@ public class TablaSimbolos {
             //TS entre bloque output
             writer.write("\n</tr>\n</table>\n</td>\n</tr>\n<tr>\n<th>Nivel " + (niveltabla + 1) + "</th>\n<td><table>"
                     + "\n<tr>\n<th>Id</th>\n<th>Tipo</th>\n<th>Tipo Subyacente</th>\n<th>Next</th>\n</tr>\n<tr>");
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.out.println("Error escribiendo la tabla de símbolos: " + e.getMessage());
         }
         return new TablaSimbolos(this, niveltabla + 1);
@@ -63,7 +63,7 @@ public class TablaSimbolos {
                 writer.write("\n</tr>\n</table>\n</td>\n</tr>\n<tr>\n<th>Nivel " + niveltabla + "</th>\n<td><table style=\"width:100%\">"
                         + "\n<tr>\n<th>Id</th>\n<th>Tipo</th>\n<th>Tipo Subyacente</th>\n<th>Next</th>\n</tr>\n<tr>");
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.out.println("Error escribiendo la tabla de símbolos: " + e.getMessage());
         }
         return pre;
@@ -94,7 +94,7 @@ public class TablaSimbolos {
                 writer.write("\n<td>" + "null" + "</td>");
             }
             writer.write("</tr>\n<tr>");
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.out.println("Error escribiendo la tabla de símbolos: " + e.getMessage());
         }
 
