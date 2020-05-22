@@ -3,13 +3,11 @@ grammar vaja;
 // SINTAXIS
 
 @header {
-	package procesador;
-	import java.io.*;
-	import java.util.*;
+	package procesador.antlr;
+	import procesador.*;
 }
 
-@parser::members
-{
+@parser::members {
 	TablaSimbolos ts;
 	boolean returnreq = false;
 	boolean returnenc = false;
@@ -26,8 +24,8 @@ grammar vaja;
 	@Override
 	public void notifyErrorListeners(Token offendingToken, String msg, RecognitionException ex)
 	{
-		String notificacion = "ERROR SINTACTICO - Línea " + offendingToken.getLine() + " Columna " + offendingToken.getCharPositionInLine() 
-		+ ": \n\t ";
+		String notificacion = "ERROR SINTACTICO - Línea " + offendingToken.getLine() 
+		+ " Columna " + offendingToken.getCharPositionInLine() + ": \n\t ";
 		String expected = msg;
 		if(expected.contains("expecting")){
 			expected = expected.substring(expected.indexOf("expecting") + 10);
@@ -47,8 +45,7 @@ grammar vaja;
 
 }
 
-@lexer::members
-{
+@lexer::members {
 	@Override
 	public void recover(RecognitionException ex) 
 	{
@@ -57,28 +54,28 @@ grammar vaja;
 
  }
 
-programaPrincipal
-	:
+programaPrincipal:
 	{
 		try{
 			ts=new TablaSimbolos(directorio);
 			Simbolo operacionArg;
 			//Operación de entrada
-			ts.inserta("read",new Simbolo("read",null,Simbolo.Tipo.FUNC,Simbolo.TipoSubyacente.STRING));
+			ts.inserta("read",new Simbolo("read",null,Simbolo.Tipo.FUNC,
+				Simbolo.TipoSubyacente.STRING));
 			// Operaciones de salida
 			for(Simbolo.TipoSubyacente tsub : Simbolo.TipoSubyacente.values()){
 				if(tsub!=Simbolo.TipoSubyacente.NULL){
 					operacionArg=new Simbolo("print"+tsub+"Arg",null,Simbolo.Tipo.ARG,tsub);
-					ts.inserta("print"+tsub,new Simbolo("print"+tsub,operacionArg, Simbolo.Tipo.PROC,Simbolo.TipoSubyacente.NULL));
+					ts.inserta("print"+tsub,new Simbolo("print"+tsub,operacionArg, 
+						Simbolo.Tipo.PROC,Simbolo.TipoSubyacente.NULL));
 				}
 			}
 
 		}catch(Exception ex){
-			errores+=("ERROR SEMANTICO - error al crear la tabla de símbolos: "+ex.getMessage()+"\n");
+			errores+=("ERROR SEMANTICO - error al crear la tabla de símbolos: "
+				+ ex.getMessage()+"\n");
 		}
-	}
-	declaracion* EOF
-	{
+	} declaracion* EOF {
 		try{
 			ts.saleBloque();
 		}catch(Exception ex){
@@ -87,74 +84,71 @@ programaPrincipal
 		if(!errores.isEmpty()){
 			throw new RuntimeException(errores);
 		}
-	}
-	;
+	};
 
-declaracion
-	:	'var' tipo declaracionVar [$tipo.tsub]
-	|	'const' tipo declaracionConst [$tipo.tsub]
-	|	'func' declFunc
-	|	'proc' declProc
-	|	';'
-	;
+declaracion:
+	'var' tipo declaracionVar[$tipo.tsub]
+	| 'const' tipo declaracionConst[$tipo.tsub]
+	| 'func' declFunc
+	| 'proc' declProc
+	| ';';
 
-tipo returns [ Simbolo.TipoSubyacente tsub]
-	:	INT { $tsub=Simbolo.TipoSubyacente.INT;}
-	|	BOOLEAN { $tsub=Simbolo.TipoSubyacente.BOOLEAN;}
-	|	STRING { $tsub=Simbolo.TipoSubyacente.STRING;}
-	;
+tipo
+	returns[ Simbolo.TipoSubyacente tsub]:
+	INT { $tsub=Simbolo.TipoSubyacente.INT;}
+	| BOOLEAN { $tsub=Simbolo.TipoSubyacente.BOOLEAN;}
+	| STRING { $tsub=Simbolo.TipoSubyacente.STRING;};
 
 // Variables y constantes	
-declaracionVar [Simbolo.TipoSubyacente tsub]
-	:	Identificador{
+declaracionVar[Simbolo.TipoSubyacente tsub]:
+	Identificador {
 		try{
-			ts.inserta($Identificador.getText(), new Simbolo($Identificador.getText(),null,Simbolo.Tipo.VAR,$tsub));
+			ts.inserta($Identificador.getText(), 
+				new Simbolo($Identificador.getText(),
+				null,Simbolo.Tipo.VAR,$tsub));
 		}catch(Exception ex){
-			errores+=("ERROR SEMANTICO - Línea: "+$Identificador.getLine()+", la variable "+$Identificador.getText()+
-			" ya ha sido declarada\n");
+			errores+=("ERROR SEMANTICO - Línea: "+$Identificador.getLine()+", la variable "
+				+ $Identificador.getText()+" ya ha sido declarada\n");
 		}
-	 } ('=' initVar {
+	 } (
+		'=' initVar {
 		 if($initVar.tsub != $tsub){
 			errores+=("ERROR SEMANTICO - Línea: "+$Identificador.getLine()+", tipos incompatibles \n"+
 			"encontrado: "+$initVar.tsub+" esperado: "+$tsub+"\n");
 		 }
-	 })? ';'
-	;
+	 }
+	)? ';';
 
-declaracionConst [Simbolo.TipoSubyacente tsub]
-	:	Identificador {
+declaracionConst[Simbolo.TipoSubyacente tsub]:
+	Identificador {
 		try{
 			ts.inserta($Identificador.getText(), new Simbolo($Identificador.getText(),null,Simbolo.Tipo.CONST,$tsub));
 		}catch(Exception ex){
 			errores+=("ERROR SEMANTICO - Línea: "+$Identificador.getLine()+", la variable "+$Identificador.getText()+
 			" ya ha sido declarada\n");
 		}
-	 }
-	'=' initConst ';'{
+	 } '=' initConst ';' {
 		 if($initConst.tsub != $tsub){
 			errores+=("ERROR SEMANTICO - Línea: "+$Identificador.getLine()+", tipos incompatibles \n"+
 			"encontrado: "+$initConst.tsub+" esperado: "+$tsub+"\n");
 		 }
-	 }
-	;
+	 };
 
-initVar returns [Simbolo.TipoSubyacente tsub]
-	:	expr { $tsub = $expr.tsub;}
-	;
+initVar
+	returns[Simbolo.TipoSubyacente tsub]:
+	expr { $tsub = $expr.tsub;};
 
-initConst returns [Simbolo.TipoSubyacente tsub]
-	:	expr { $tsub = $expr.tsub; }
-	;
-
+initConst
+	returns[Simbolo.TipoSubyacente tsub]:
+	expr { $tsub = $expr.tsub; };
 
 // Funciones y procedimientos
-declFunc
-	:	encabezadoFunc cuerpoFunc [$encabezadoFunc.metodo]
-	;
+declFunc:
+	encabezadoFunc cuerpoFunc[$encabezadoFunc.metodo];
 
-encabezadoFunc returns [Simbolo metodo]
-	:	identificadorMetFunc tipo
-	{
+encabezadoFunc
+	returns[Simbolo metodo]:
+	identificadorMetFunc tipo {
 		try{
 			$identificadorMetFunc.metodo.setTs($tipo.tsub);
 			$metodo = $identificadorMetFunc.metodo;
@@ -162,71 +156,61 @@ encabezadoFunc returns [Simbolo metodo]
 		}catch (TablaSimbolos.exceptionTablaSimbolos e){
 			errores += ("ERROR SEMANTICO - Línea: " + $identificadorMetFunc.linea + ": " + e.getMessage()+"\n");
 		}
-	}
-	;
+	};
 
-cuerpoFunc [Simbolo metodo]
-	:	bloque[$metodo]
-	|	';'
-	;
+cuerpoFunc[Simbolo metodo]: bloque[$metodo] | ';';
 
-declProc
-	:	encabezadoProc cuerpoProc[$encabezadoProc.metodo]
-	;
+declProc:
+	encabezadoProc cuerpoProc[$encabezadoProc.metodo];
 
-encabezadoProc returns [Simbolo metodo]
-	:	identificadorMetProc
-	{
+encabezadoProc
+	returns[Simbolo metodo]:
+	identificadorMetProc {
 		try{
 			$metodo = $identificadorMetProc.metodo;
 			ts.inserta($identificadorMetProc.metodo.getId(), $identificadorMetProc.metodo);
 		}catch (TablaSimbolos.exceptionTablaSimbolos e){
 			errores += ("ERROR SEMANTICO - Línea: " + $identificadorMetProc.linea + ": " + e.getMessage()+"\n");
 		}
-	}
-	;
+	};
 
-cuerpoProc[Simbolo metodo]
-	:	bloque[$metodo]
-	|	';'
-	;
+cuerpoProc[Simbolo metodo]: bloque[$metodo] | ';';
 
-identificadorMetFunc returns [Simbolo metodo, int linea]
-	:	Identificador {
+identificadorMetFunc
+	returns[Simbolo metodo, int linea]:
+	Identificador {
 		$metodo = new Simbolo($Identificador.getText(), null, Simbolo.Tipo.FUNC, Simbolo.TipoSubyacente.NULL);
-	}'(' parametros[$metodo]? ')'
-	;
+	} '(' parametros[$metodo]? ')';
 
-identificadorMetProc returns [Simbolo metodo, int linea]
-	:	Identificador {
+identificadorMetProc
+	returns[Simbolo metodo, int linea]:
+	Identificador {
 		$metodo = new Simbolo($Identificador.getText(), null, Simbolo.Tipo.PROC, Simbolo.TipoSubyacente.NULL);
-	}'(' parametros[$metodo]? ')'
-	;
+	} '(' parametros[$metodo]? ')';
 
-parametros[Simbolo ant]
-	:	parametro ','{
+parametros[Simbolo ant]:
+	parametro ',' {
 		$ant.setNext($parametro.s);
-	}   parametros[$ant.getNext()]
-	|	parametro {
+	} parametros[$ant.getNext()]
+	| parametro {
 		$ant.setNext($parametro.s);
 		$parametro.s.setNext(null);
-	}
-	;
+	};
 
-parametro returns [Simbolo s]
-	: 	tipo identificadorVar{
+parametro
+	returns[Simbolo s]:
+	tipo identificadorVar {
 		$s = new Simbolo($identificadorVar.id, null, Simbolo.Tipo.ARG, $tipo.tsub);
-	}
-	;
+	};
 
-identificadorVar returns[String id]
-	:	Identificador{
+identificadorVar
+	returns[String id]:
+	Identificador {
 		$id = $Identificador.getText();
-	}	
-	;
+	};
 
-bloque[Simbolo met]
-	:{
+bloque[Simbolo met]:
+	{
 		ts=ts.entraBloque();
 		if($met != null){
 			if($met.getT() == Simbolo.Tipo.FUNC){
@@ -245,8 +229,7 @@ bloque[Simbolo met]
 				ps = ps.getNext();
 			}
 		}
-	}	'{' exprsBloque?'}'
-	{
+	} '{' exprsBloque? '}' {
 		ts = ts.saleBloque();
 		if($met != null){
 			if($met.getT() == Simbolo.Tipo.FUNC){
@@ -262,67 +245,49 @@ bloque[Simbolo met]
 			returnenc = false;
 			tiporeturn = null;
 		}
-	}
-	;
+	};
 
-exprsBloque
-	:	exprDeBloque+
-	;
+exprsBloque: exprDeBloque+;
 
-exprDeBloque
-	:	sentDeclVarLocal
-	|	sent
-	;
+exprDeBloque: sentDeclVarLocal | sent;
 
-sentDeclVarLocal
-	:	declaracionVarLocal [Simbolo.Tipo.VAR]
-	;
+sentDeclVarLocal:
+	declaracionVarLocal[Simbolo.Tipo.VAR];
 
-declaracionVarLocal [Simbolo.Tipo t]
-	:	tipo declaracionVar[$tipo.tsub]
-	;
+declaracionVarLocal[Simbolo.Tipo t]:
+	tipo declaracionVar[$tipo.tsub];
 
-sent
-	:	bloque[null]
-	|	sentVacia
-	|	sentExpr
-	|	sentIf
-	|	sentIfElse
-	|	sentWhile
-	|	sentReturn
-	;
+sent:
+	bloque[null]
+	| sentVacia
+	| sentExpr
+	| sentIf
+	| sentIfElse
+	| sentWhile
+	| sentReturn;
 
-sentVacia
-	:	';'
-	;
+sentVacia: ';';
 
-sentExpr
-	:	exprSent ';'
-	;
+sentExpr: exprSent ';';
 
-exprSent
-	:	asignacion
-	|	sentInvocaMet
-	;
+exprSent: asignacion | sentInvocaMet;
 
-sentIf
-	:	{
+sentIf:
+	{
 			boolean reqaux = returnreq;
 			boolean encaux = returnenc;
 			returnreq = false;
-		}
-		IF '(' expr ')' bloque[null] {
+		} IF '(' expr ')' bloque[null] {
 			if($expr.tsub != Simbolo.TipoSubyacente.BOOLEAN){
 				errores += ("ERROR SEMANTICO - Línea: " +$IF.getLine()+"\n"+
 				"La expresión debe ser de tipo BOOLEAN\n");
 			}
 			returnreq = reqaux;
 			returnenc = encaux;
-		}
-	;
+		};
 
-sentIfElse
-	:	IF '(' expr ')' bloque[null]{
+sentIfElse:
+	IF '(' expr ')' bloque[null]{
 		if($expr.tsub != Simbolo.TipoSubyacente.BOOLEAN){
 				errores += ("ERROR SEMANTICO - Línea: " +$IF.getLine()+"\n"+
 				"La expresión debe ser de tipo BOOLEAN\n");
@@ -334,27 +299,24 @@ sentIfElse
 		if(!(primerreturn && returnenc)){
 			returnenc = false;
 		}
-	}
-	;
+	};
 
-sentWhile
-	:	{
+sentWhile:
+	{
 			boolean reqaux = returnreq;
 			boolean encaux = returnenc;
 			returnreq = false;
-		}
-		WHILE '(' expr ')' bloque[null]{
+		} WHILE '(' expr ')' bloque[null]{
 			if($expr.tsub != Simbolo.TipoSubyacente.BOOLEAN){
 				errores += ("ERROR SEMANTICO - Línea: " +$WHILE.getLine()+"\n"+
 				"La expresión debe ser de tipo BOOLEAN\n");
 			}
 			returnreq = reqaux;
 			returnenc = encaux;
-		}
-	;
+		};
 
-sentReturn
-	:	RETURN expr ';'{
+sentReturn:
+	RETURN expr ';' {
 			try {
 				if($expr.tsub != tiporeturn){
 					errores += ("ERROR SEMANTICO - Línea: " +$RETURN.getLine()+"\n"+
@@ -366,12 +328,11 @@ sentReturn
 			} catch (NullPointerException e){
 				returnenc = true;
 			}
-	}
-	;
+	};
 
-sentInvocaMet returns [Simbolo.TipoSubyacente tsub]
-	:	Identificador '('
-	{
+sentInvocaMet
+	returns[Simbolo.TipoSubyacente tsub]:
+	Identificador '(' {
 		boolean argEnc=false;
 		try{
 			Simbolo s;
@@ -388,13 +349,11 @@ sentInvocaMet returns [Simbolo.TipoSubyacente tsub]
 		}catch(TablaSimbolos.exceptionTablaSimbolos e){
 			errores+=("ERROR SEMANTICO - Línea: " + $Identificador.getLine() +", "+ e.getMessage()+"\n");
 		}
-	}
-	(argumentos[$Identificador.getText(), $Identificador.getLine()]
-	{
+	} (
+		argumentos[$Identificador.getText(), $Identificador.getLine()] {
 		argEnc=true;
 	}
-	)? ')'
-	{
+	)? ')' {
 		try{
 			if(!argEnc && ($Identificador.getText().equals("print") || ts.consulta($Identificador.getText()).getNext()!= null)){
 				errores+=("ERROR SEMANTICO - Línea: "+$Identificador.getLine()+", faltan parámetros para "+$Identificador.getText()+"\n");
@@ -402,11 +361,9 @@ sentInvocaMet returns [Simbolo.TipoSubyacente tsub]
 		} catch(TablaSimbolos.exceptionTablaSimbolos e) {
 			errores += (e.getMessage()+"\n");
 		}
-	}
-	;
+	};
 
-argumentos [String nombre, int linea]
-	: 	
+argumentos[String nombre, int linea]:
 	{
 		Simbolo metodo=null;
 		boolean demasiadosArg=false;
@@ -415,9 +372,7 @@ argumentos [String nombre, int linea]
 		}catch(TablaSimbolos.exceptionTablaSimbolos ex){
 			errores+=("ERROR SEMANTICO - Línea: "+$linea+", error con la tabla de símbolos: "+ex.getMessage()+"\n");
 		}		
-	}
-	expr 
-	{
+	} expr {
 		if($nombre.equals("print")){
 			String print = "print" + $expr.tsub;
 			try{
@@ -442,9 +397,8 @@ argumentos [String nombre, int linea]
 				metodo=metodo.getNext();
 			}
 		}
- 	}
-	(',' expr 
-	{
+ 	} (
+		',' expr {
 		if(metodo == null || $nombre.equals("print")){
 			if(!demasiadosArg){
 				errores+=("ERROR SEMANTICO - Línea: "+$linea+", "+ $nombre +"tiene demasiados argumentos" + "\n");
@@ -458,16 +412,15 @@ argumentos [String nombre, int linea]
 			metodo = metodo.getNext();
 		}
 	}
-	)* 
-	{
+	)* {
 		if(metodo != null){
 		errores+=("ERROR SEMANTICO - Línea: "+$linea+", a "+ $nombre +"le faltan argumentos" + "\n");
 		}
-	}
-	;
+	};
 
-asignacion returns [ Simbolo.TipoSubyacente tsub ]
-	:	Identificador '=' expr { 
+asignacion
+	returns[ Simbolo.TipoSubyacente tsub ]:
+	Identificador '=' expr { 
 		Simbolo.TipoSubyacente idTsub = null;
 		Simbolo.Tipo idT = null;
 		try{
@@ -483,17 +436,16 @@ asignacion returns [ Simbolo.TipoSubyacente tsub ]
 			" \nencontrado: "+$expr.tsub+" esperado: "+idTsub+"\n");
 		}
 		$tsub=idTsub;
-	}
-	;
+	};
 
+expr
+	returns[ Simbolo.TipoSubyacente tsub]:
+	exprCondOr { $tsub=$exprCondOr.tsub;}
+	| asignacion { $tsub=$asignacion.tsub;};
 
-expr returns [ Simbolo.TipoSubyacente tsub]
-	:	exprCondOr { $tsub=$exprCondOr.tsub;}
-	|	asignacion { $tsub=$asignacion.tsub;}
-	;
-
-exprCondOr returns [ Simbolo.TipoSubyacente tsub]
-	:	exprCondAnd exprCondOr_ { 
+exprCondOr
+	returns[ Simbolo.TipoSubyacente tsub]:
+	exprCondAnd exprCondOr_ { 
 		if($exprCondOr_.tsub!=null){
 			if($exprCondAnd.tsub!=$exprCondOr_.tsub){
 				errores+=("ERROR SEMANTICO - tipo incorrecto\n"+
@@ -504,22 +456,22 @@ exprCondOr returns [ Simbolo.TipoSubyacente tsub]
 		}else{
 			$tsub=$exprCondAnd.tsub;
 		}
-	}
-	;
+	};
 
-exprCondOr_ returns [ Simbolo.TipoSubyacente tsub]
-	:	OR exprCondAnd exprCondOr_ { 
+exprCondOr_
+	returns[ Simbolo.TipoSubyacente tsub]:
+	OR exprCondAnd exprCondOr_ { 
 		if($exprCondAnd.tsub!=Simbolo.TipoSubyacente.BOOLEAN){
 			errores+=("ERROR SEMANTICO - tipo incorrecto\n"+
 			"encontrado: "+$exprCondAnd.tsub+" esperado: "+Simbolo.TipoSubyacente.BOOLEAN+"\n");
 		}
 		$tsub=Simbolo.TipoSubyacente.BOOLEAN;
 	}
-	|	//lambda
-	;
+	|; //lambda
 
-exprCondAnd returns [ Simbolo.TipoSubyacente tsub]
-	: exprComp exprCondAnd_ { 
+exprCondAnd
+	returns[ Simbolo.TipoSubyacente tsub]:
+	exprComp exprCondAnd_ { 
 		if($exprCondAnd_.tsub!=null){
 			if($exprComp.tsub!=$exprCondAnd_.tsub){
 				errores+=("ERROR SEMANTICO - tipo incorrecto\n"+
@@ -530,22 +482,22 @@ exprCondAnd returns [ Simbolo.TipoSubyacente tsub]
 		}else{
 			$tsub=$exprComp.tsub;
 		}
-	}
-	;
+	};
 
-exprCondAnd_ returns [ Simbolo.TipoSubyacente tsub]
-	:	AND exprComp exprCondAnd_ {
+exprCondAnd_
+	returns[ Simbolo.TipoSubyacente tsub]:
+	AND exprComp exprCondAnd_ {
 		if($exprComp.tsub!=Simbolo.TipoSubyacente.BOOLEAN){
 			errores+=("ERROR SEMANTICO - tipo incorrecto\n"+
 			"encontrado: "+$exprComp.tsub+" esperado: "+Simbolo.TipoSubyacente.BOOLEAN+"\n");
 		}
 		$tsub=Simbolo.TipoSubyacente.BOOLEAN;
 	}
-	|	//lambda
-	;
+	|; //lambda
 
-exprComp returns [ Simbolo.TipoSubyacente tsub]
-	:	exprSuma exprComp_ { 
+exprComp
+	returns[ Simbolo.TipoSubyacente tsub]:
+	exprSuma exprComp_ { 
 		if($exprComp_.tsub!=null){
 			if($exprSuma.tsub!=$exprComp_.tsub){
 				errores+=("ERROR SEMANTICO - comparación de tipos incompatibles\n"+
@@ -555,11 +507,11 @@ exprComp returns [ Simbolo.TipoSubyacente tsub]
 		}else{
 			$tsub=$exprSuma.tsub;
 		}
-	}
-	;
+	};
 
-exprComp_ returns [ Simbolo.TipoSubyacente tsub]
-	:	Comparador exprSuma exprComp_ {
+exprComp_
+	returns[ Simbolo.TipoSubyacente tsub]:
+	Comparador exprSuma exprComp_ {
 		if($exprSuma.tsub==Simbolo.TipoSubyacente.BOOLEAN && !($Comparador.getText().equals("==") || $Comparador.getText().equals("!="))){
 			errores+=("ERROR SEMANTICO - Línea: "+$Comparador.getLine()+", comparación incompatible con tipo BOOLEAN\n");
 		}
@@ -569,85 +521,83 @@ exprComp_ returns [ Simbolo.TipoSubyacente tsub]
 		}
 		$tsub=$exprSuma.tsub;
 	}
-	|	//lambda
-	;
+	|; //lambda
 
-exprSuma returns [ Simbolo.TipoSubyacente tsub]
-	:	exprMult exprSuma_ {
+exprSuma
+	returns[ Simbolo.TipoSubyacente tsub]:
+	exprMult exprSuma_ {
 		if($exprSuma_.tsub!=null && $exprMult.tsub!=$exprSuma_.tsub){
 			errores+=("ERROR SEMANTICO - tipos incompatibles\n"+
 			"encontrado: "+$exprSuma_.tsub+" esperado: "+$exprMult.tsub+"\n");
 		}
 		$tsub=$exprMult.tsub;
-	}
-	;
+	};
 
-exprSuma_ returns [ Simbolo.TipoSubyacente tsub]
-	:	OpBinSum exprMult exprSuma_ { 
+exprSuma_
+	returns[ Simbolo.TipoSubyacente tsub]:
+	OpBinSum exprMult exprSuma_ { 
 		if($exprMult.tsub!=Simbolo.TipoSubyacente.INT){
 			errores+=("ERROR SEMANTICO - tipos incompatibles\n"+
 			"encontrado: "+$exprMult.tsub+" esperado: "+Simbolo.TipoSubyacente.INT+"\n");
 		}
 		$tsub=$exprMult.tsub;
 	}
-	| 	//lambda
-	;
+	|; //lambda
 
-exprMult returns [ Simbolo.TipoSubyacente tsub ]
-	:	exprUnaria exprMult_ {
+exprMult
+	returns[ Simbolo.TipoSubyacente tsub ]:
+	exprUnaria exprMult_ {
 		if($exprMult_.tsub!=null && $exprUnaria.tsub!=$exprMult_.tsub){
 			errores+=("ERROR SEMANTICO - tipos incompatibles\n"+
 			"encontrado: "+$exprMult_.tsub+" esperado: "+$exprUnaria.tsub+"\n");
 		}
 		$tsub=$exprUnaria.tsub;
-	}
-	;
+	};
 
-exprMult_ returns [ Simbolo.TipoSubyacente tsub ]
-	:	MULT exprUnaria exprMult_ {
+exprMult_
+	returns[ Simbolo.TipoSubyacente tsub ]:
+	MULT exprUnaria exprMult_ {
 		if($exprUnaria.tsub!=Simbolo.TipoSubyacente.INT){
 			errores+=("ERROR SEMANTICO - Línea: "+$MULT.getLine()+", tipos incompatibles\n"+
 			"encontrado: "+$exprUnaria.tsub+" esperado: "+Simbolo.TipoSubyacente.INT+"\n");
 		}
 		$tsub=$exprUnaria.tsub;
 	}
-	|	DIV exprUnaria exprMult_ {
+	| DIV exprUnaria exprMult_ {
 		if($exprUnaria.tsub!=Simbolo.TipoSubyacente.INT){
 			errores+=("ERROR SEMANTICO - Línea: "+$DIV.getLine()+", tipos incompatibles\n"+
 			"encontrado: "+$exprUnaria.tsub+" esperado: "+Simbolo.TipoSubyacente.INT+"\n");
 		}
 		$tsub=$exprUnaria.tsub;
 	}
-	|	//lambda
-	;
+	|; //lambda
 
-exprUnaria returns [ Simbolo.TipoSubyacente tsub ]
-	:	OpBinSum exprNeg {
+exprUnaria
+	returns[ Simbolo.TipoSubyacente tsub ]:
+	OpBinSum exprNeg {
 		if($exprNeg.tsub!=Simbolo.TipoSubyacente.INT){
 			errores+=("ERROR SEMANTICO - tipos incompatibles\n"+
 			"encontrado: "+$exprNeg.tsub+" esperado: "+Simbolo.TipoSubyacente.INT+"\n");
 		}
 		$tsub=$exprNeg.tsub;
 	}
-	|	exprNeg { $tsub=$exprNeg.tsub; }
-	;
-	
+	| exprNeg { $tsub=$exprNeg.tsub; };
 
-exprNeg returns [ Simbolo.TipoSubyacente tsub ]
-	:	NOT exprUnaria {
+exprNeg
+	returns[ Simbolo.TipoSubyacente tsub ]:
+	NOT exprUnaria {
 		if($exprUnaria.tsub!=Simbolo.TipoSubyacente.BOOLEAN){
 			errores+=("ERROR SEMANTICO - tipos incompatibles\n"+
 			"encontrado: "+$exprUnaria.tsub+" esperado: "+Simbolo.TipoSubyacente.BOOLEAN+"\n");
 		}
 		$tsub=$exprUnaria.tsub;
 	}
-	|	exprPostfija { $tsub=$exprPostfija.tsub; }
-	;
+	| exprPostfija { $tsub=$exprPostfija.tsub; };
 
-exprPostfija returns [ Simbolo.TipoSubyacente tsub ]
-	:	primario { $tsub=$primario.tsub; }
-	|	Identificador 
-	{
+exprPostfija
+	returns[ Simbolo.TipoSubyacente tsub ]:
+	primario { $tsub=$primario.tsub; }
+	| Identificador {
 		try{
 			Simbolo s=ts.consulta($Identificador.getText());
                         if(s!=null){
@@ -657,20 +607,19 @@ exprPostfija returns [ Simbolo.TipoSubyacente tsub ]
 			errores+=("ERROR SEMANTICO - "+ex.getMessage()+"\n");
 		}
 	}
-	|	sentInvocaMet { $tsub=$sentInvocaMet.tsub; }
-	;
+	| sentInvocaMet { $tsub=$sentInvocaMet.tsub; };
 
-primario returns [ Simbolo.TipoSubyacente tsub ]
-	:	'(' expr ')' { $tsub=$expr.tsub; }
-	|	literal { $tsub=$literal.tsub; }
-	;
+primario
+	returns[ Simbolo.TipoSubyacente tsub ]:
+	'(' expr ')' { $tsub=$expr.tsub; }
+	| literal { $tsub=$literal.tsub; };
 
-literal returns [ Simbolo.TipoSubyacente tsub ]
-	:	LiteralInteger { $tsub=Simbolo.TipoSubyacente.INT; }
-	|	LiteralBoolean { $tsub=Simbolo.TipoSubyacente.BOOLEAN; }
-	|	LiteralString { $tsub=Simbolo.TipoSubyacente.STRING; }
-	;
-	
+literal
+	returns[ Simbolo.TipoSubyacente tsub ]:
+	LiteralInteger { $tsub=Simbolo.TipoSubyacente.INT; }
+	| LiteralBoolean { $tsub=Simbolo.TipoSubyacente.BOOLEAN; }
+	| LiteralString { $tsub=Simbolo.TipoSubyacente.STRING; };
+
 // LÉXICO
 
 // Palabras reservadas
@@ -691,41 +640,21 @@ IF: 'if';
 ELSE: 'else';
 
 // Enteros
-LiteralInteger
-	:	DecimalLiteral
-	;
+LiteralInteger: DecimalLiteral;
 
-fragment
-DecimalLiteral
-	:	DecimalPositivo
-	|	'0'
-	;
+fragment DecimalLiteral: DecimalPositivo | '0';
 
-fragment
-DecimalPositivo
-	:	[1-9][0-9]*
-	;
+fragment DecimalPositivo: [1-9][0-9]*;
 
 // Booleans
-LiteralBoolean
-	:	'true'
-	|	'false'
-	;
+LiteralBoolean: 'true' | 'false';
 
 // Cadenas
-LiteralString
-	:	'"' LetrasString? '"'
-	;
+LiteralString: '"' LetrasString? '"';
 
-fragment
-LetrasString
-	:	LetraString+
-	;
+fragment LetrasString: LetraString+;
 
-fragment
-LetraString
-	:	~["\\\r\n]
-	;
+fragment LetraString: ~["\\\r\n];
 // Separadores
 LPAREN: '(';
 RPAREN: ')';
@@ -735,19 +664,9 @@ COMMA: ',';
 SEMI: ';';
 
 // Operadores
-Comparador
-	:	EQUAL
-	|	NOTEQUAL
-	|	GT
-	|	LT
-	|	GE
-	|	LE
-	;
+Comparador: EQUAL | NOTEQUAL | GT | LT | GE | LE;
 
-OpBinSum
-	:	ADD
-	|	SUB
-	;
+OpBinSum: ADD | SUB;
 
 ASSIGN: '=';
 EQUAL: '==';
@@ -765,28 +684,15 @@ OR: '||';
 NOT: '!';
 
 // Identificador
-Identificador
-	:	LETRA LETRADIGITO*
-	;
+Identificador: LETRA LETRADIGITO*;
 
-fragment
-LETRA
-	:	[a-zA-Z$_]
-	;
+fragment LETRA: [a-zA-Z$_];
 
-fragment
-LETRADIGITO
-	:	[a-zA-Z$_0-9]
-	;
+fragment LETRADIGITO: [a-zA-Z$_0-9];
 
 // Comentarios y espacios en blanco
-WS	:	[ \r\n\t]+ -> skip
-	;
+WS: [ \r\n\t]+ -> skip;
 
-BLOCK_COMMENT
-	:	'/*' .*? '*/' -> skip
-	;
+BLOCK_COMMENT: '/*' .*? '*/' -> skip;
 
-LINE_COMMENT
-	:	'#' ~[\r\n]* -> skip
-	;
+LINE_COMMENT: '#' ~[\r\n]* -> skip;
