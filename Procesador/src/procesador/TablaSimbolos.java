@@ -19,7 +19,7 @@ public class TablaSimbolos {
 
     public TablaSimbolos(String directorio) {
         niveltabla = 0;
-        tabla = new Hashtable<String, Simbolo>();
+        tabla = new Hashtable<>();
         pre = null;
         try {
             //TS output
@@ -36,7 +36,7 @@ public class TablaSimbolos {
 
     private TablaSimbolos(TablaSimbolos p, int n) {
         niveltabla = n;
-        tabla = new Hashtable<String, Simbolo>();
+        tabla = new Hashtable<>();
         pre = p;
     }
 
