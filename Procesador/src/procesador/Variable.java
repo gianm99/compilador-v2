@@ -10,7 +10,4 @@ public class Variable {
         VAR, CONST, ARG
     }
 
-    public Variable getNv(){
-        return this.nv;
-    }
 }
