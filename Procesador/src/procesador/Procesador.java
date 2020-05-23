@@ -7,9 +7,8 @@ import java.io.*;
 import org.apache.commons.io.*;
 
 /**
- * Procesador. Programa que procesa un archivo de texto escrito en el lenguaje
- * inventado "vaja" y genera código intermedio, código ensamblador sin 
- * optimizar y código ensamblador optimizado.
+ * Procesador. Programa que procesa un archivo de texto escrito en el lenguaje inventado "vaja" y
+ * genera código intermedio, código ensamblador sin optimizar y código ensamblador optimizado.
  *
  * @author Gian Lucas Martín Chamorro
  * @author Jordi Antoni Sastre Moll
@@ -20,8 +19,7 @@ public class Procesador {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws Exception {
-        String buildPath = "pruebas/build/" 
-            + FilenameUtils.getBaseName(args[0]);
+        String buildPath = "pruebas/build/" + FilenameUtils.getBaseName(args[0]);
         File buildDir = new File(buildPath);
         if (!buildDir.mkdirs()) {
             // Si ya existe la carpeta, se vacía

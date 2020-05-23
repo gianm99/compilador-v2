@@ -4,8 +4,7 @@ import java.util.Hashtable;
 import java.io.*;
 
 /**
- * TablaSimbolos. Clase que sirve para gestionar los símbolos que aparecen en 
- * el código fuente.
+ * TablaSimbolos. Clase que sirve para gestionar los símbolos que aparecen en el código fuente.
  * 
  * @author Gian Lucas Martín Chamorro
  * @author Jordi Antoni Sastre Moll
@@ -15,7 +14,7 @@ public class TablaSimbolos {
     private Hashtable<String, Simbolo> tabla;
     private int niveltabla;
     private TablaSimbolos pre;
-    private static Writer writer;
+    private static Writer buffer;
 
     public class exceptionTablaSimbolos extends Exception {
 
@@ -29,13 +28,15 @@ public class TablaSimbolos {
         tabla = new Hashtable<>();
         pre = null;
         try {
-            //TS output
+            // TS output
             File tsFile = new File(directorio + "\\tablasimbolos.html");
-            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tsFile), "utf-8"));
-            writer.write("<!DOCTYPE html>\n<html>\n<head><style>\ntable, th, td {\nborder: 1px solid black;\nbackground-color: aqua;\n}</style>"
-                    + "</head>\n<body>\n<table style=\"width:100%\">");
-            writer.write("\n<tr>\n<th>Nivel " + niveltabla + "</th>\n<td><table style=\"width:100%\">"
-                    + "\n<tr>\n<th>Id</th>\n<th>Tipo</th>\n<th>Tipo Subyacente</th>\n<th>Next</th>\n</tr>\n<tr>");
+            buffer = new BufferedWriter(new FileWriter(tsFile));
+            buffer.write("<!DOCTYPE html>" + "<html>" + "<head>" + "<style>"
+                    + "table, th, td {border: 1px solid black;background-color: aqua;}" + "</style>"
+                    + "</head>" + "<body>" + "<table style='width:100%'>" + "<tr>" + "<th>Nivel "
+                    + niveltabla + "</th>" + "<td>" + "<table style='width:100%'>" + "<tr>"
+                    + "<th>Id</th>" + "<th>Tipo</th>" + "<th>Tipo Subyacente</th>" + "<th>Next</th>"
+                    + "</tr>" + "<tr>");
         } catch (IOException e) {
             System.out.println("Error escribiendo la tabla de símbolos: " + e.getMessage());
         }
@@ -49,9 +50,11 @@ public class TablaSimbolos {
 
     public TablaSimbolos entraBloque() {
         try {
-            //TS entre bloque output
-            writer.write("\n</tr>\n</table>\n</td>\n</tr>\n<tr>\n<th>Nivel " + (niveltabla + 1) + "</th>\n<td><table>"
-                    + "\n<tr>\n<th>Id</th>\n<th>Tipo</th>\n<th>Tipo Subyacente</th>\n<th>Next</th>\n</tr>\n<tr>");
+            // TS entre bloque output
+            buffer.write("</tr>" + "</table>" + "</td>" + "</tr>" + "<tr>" + "<th>Nivel "
+                    + (niveltabla + 1) + "</th>" + "<td>" + "<table>" + "<tr>" + "<th>Id</th>"
+                    + "<th>Tipo</th>" + "<th>Tipo Subyacente</th>" + "<th>Next</th>" + "</tr>"
+                    + "<tr>");
         } catch (IOException e) {
             System.out.println("Error escribiendo la tabla de símbolos: " + e.getMessage());
         }
@@ -62,13 +65,16 @@ public class TablaSimbolos {
         niveltabla--;
         try {
             if (niveltabla == -1) {
-                //TS acaba de escribir
-                writer.write("\n</tr>\n</table>\n</td>\n</tr>\n</table>\n</body>\n</html>");
-                writer.close();
+                // TS acaba de escribir
+                buffer.write("</tr>" + "</table>" + "</td>" + "</tr>" + "</table>" + "</body>"
+                        + "</html>");
+                buffer.close();
             } else {
-                //TS reduce un nivel en el bloque
-                writer.write("\n</tr>\n</table>\n</td>\n</tr>\n<tr>\n<th>Nivel " + niveltabla + "</th>\n<td><table style=\"width:100%\">"
-                        + "\n<tr>\n<th>Id</th>\n<th>Tipo</th>\n<th>Tipo Subyacente</th>\n<th>Next</th>\n</tr>\n<tr>");
+                // TS reduce un nivel en el bloque
+                buffer.write("</tr>" + "</table>" + "</td>" + "</tr>" + "<tr>" + "<th>Nivel "
+                        + niveltabla + "</th>" + "<td>" + "<table style='width:100%'>" + "<tr>"
+                        + "<th>Id</th>" + "<th>Tipo</th>" + "<th>Tipo Subyacente</th>"
+                        + "<th>Next</th>" + "</tr>" + "<tr>");
             }
         } catch (IOException e) {
             System.out.println("Error escribiendo la tabla de símbolos: " + e.getMessage());
@@ -82,25 +88,23 @@ public class TablaSimbolos {
         }
         tabla.put(id, s);
         try {
-            //TS poner elemento
-            writer.write("\n<td>" + s.getId() + "</td>"
-                    + "\n<td>" + s.getT() + "</td>"
-                    + "\n<td>" + s.getTs() + "</td>");
+            // TS poner elemento
+            buffer.write("<td>" + s.getId() + "</td>" + "<td>" + s.getT() + "</td>" + "<td>"
+                    + s.getTs() + "</td>");
             if (s.getNext() != null) {
                 Simbolo sn = s.getNext();
-                writer.write("\n<td><table style=\"width:100%\">"
-                        + "\n<tr>\n<th>Id</th>\n<th>Tipo</th>\n<th>Tipo Subyacente</th>\n</tr>\n<tr>");
+                buffer.write("<td>" + "<table style='width:100%'>" + "<tr>" + "<th>Id</th>"
+                        + "<th>Tipo</th>" + "<th>Tipo Subyacente</th>" + "</tr>" + "<tr>");
                 while (sn != null) {
-                    writer.write("\n<td>" + sn.getId() + "</td>"
-                            + "\n<td>" + sn.getT() + "</td>"
-                            + "\n<td>" + sn.getTs() + "</td>\n</tr>");
+                    buffer.write("<td>" + sn.getId() + "</td>" + "<td>" + sn.getT() + "</td>"
+                            + "<td>" + sn.getTs() + "</td></tr>");
                     sn = sn.getNext();
                 }
-                writer.write("\n</table>\n</td>");
+                buffer.write("</table>" + "</td>");
             } else {
-                writer.write("\n<td>" + "null" + "</td>");
+                buffer.write("<td>" + "null" + "</td>");
             }
-            writer.write("</tr>\n<tr>");
+            buffer.write("</tr>" + "<tr>");
         } catch (IOException e) {
             System.out.println("Error escribiendo la tabla de símbolos: " + e.getMessage());
         }
@@ -117,6 +121,7 @@ public class TablaSimbolos {
                 return ts.tabla.get(id);
             }
         }
-        throw new exceptionTablaSimbolos("No se ha encontrado el símbolo " + id + " en la tabla de símbolos");
+        throw new exceptionTablaSimbolos(
+                "No se ha encontrado el símbolo " + id + " en la tabla de símbolos");
     }
 }
