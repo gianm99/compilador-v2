@@ -3,8 +3,8 @@
 /Procesador/dist/
 /Procesador/pruebas/build/
 /Procesador/grammar/.antlr/
-/Procesador/src/procesador/antlr/
+/Procesador/src/antlr/
 /Procesador/.vscode
-TODO.md
-PREGUNTAS.md
 .vscode/settings.json
+/doc
+.vscode/launch.json
