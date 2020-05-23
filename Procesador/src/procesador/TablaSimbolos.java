@@ -3,6 +3,13 @@ package procesador;
 import java.util.Hashtable;
 import java.io.*;
 
+/**
+ * TablaSimbolos. Clase que sirve para gestionar los símbolos que aparecen en 
+ * el código fuente.
+ * 
+ * @author Gian Lucas Martín Chamorro
+ * @author Jordi Antoni Sastre Moll
+ */
 public class TablaSimbolos {
 
     private Hashtable<String, Simbolo> tabla;

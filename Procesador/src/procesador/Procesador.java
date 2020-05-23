@@ -7,10 +7,11 @@ import org.apache.commons.io.*;
 
 /**
  * Procesador. Programa que procesa un archivo de texto escrito en el lenguaje
- * inventado "vaja" y genera código intermedio, código ensamblador sin optimizar
- * y código ensamblador optimizado.
+ * inventado "vaja" y genera código intermedio, código ensamblador sin 
+ * optimizar y código ensamblador optimizado.
  *
- * @author Gian Lucas Martin y Jordi Sastre
+ * @author Gian Lucas Martín Chamorro
+ * @author Jordi Antoni Sastre Moll
  */
 public class Procesador {
 
