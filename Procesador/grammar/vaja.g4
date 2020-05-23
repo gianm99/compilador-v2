@@ -3,7 +3,7 @@ grammar vaja;
 // SINTAXIS
 
 @header {
-package procesador.antlr;
+package antlr;
 import procesador.*;
 }
 
