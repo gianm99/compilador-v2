@@ -1,7 +1,8 @@
 package procesador;
 
-import procesador.antlr.*;
+import antlr.*;
 import org.antlr.v4.runtime.*;
+
 import java.io.*;
 import org.apache.commons.io.*;
 
@@ -19,7 +20,8 @@ public class Procesador {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws Exception {
-        String buildPath = "pruebas/build/" + FilenameUtils.getBaseName(args[0]);
+        String buildPath = "pruebas/build/" 
+            + FilenameUtils.getBaseName(args[0]);
         File buildDir = new File(buildPath);
         if (!buildDir.mkdirs()) {
             // Si ya existe la carpeta, se vacía
@@ -32,18 +34,15 @@ public class Procesador {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         // Parser para el análisis sintáctico y semántico
         vajaParser parser = new vajaParser(tokens, buildPath);
-        // Se crea una carpeta con el mismo nombre que el archivo
-
         // Parser para crear el árbol sintáctico
         vajaDOT parserARBOL = new vajaDOT(tokens, buildPath);
-
         tokens.fill();
         File tokensFile = new File(buildPath + "\\tokens.txt");
-        try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tokensFile), "utf-8"))) {
+        try (Writer buffer = new BufferedWriter(new FileWriter(tokensFile))) {
             for (Token tok : tokens.getTokens()) {
-                writer.write(tok.getText() + '\n');
+                buffer.write(tok.getText() + '\n');
             }
-            writer.close();
+            buffer.close();
         }
 
         try {
@@ -55,9 +54,9 @@ public class Procesador {
         } catch (RuntimeException e) {
             System.out.println(e.getMessage());
             File erroresFile = new File(buildPath + "\\errores.txt");
-            Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(erroresFile), "utf-8"));
-            writer.write(e.getMessage());
-            writer.close();
+            Writer buffer = new BufferedWriter(new FileWriter(erroresFile));
+            buffer.write(e.getMessage());
+            buffer.close();
         }
     }
 }
