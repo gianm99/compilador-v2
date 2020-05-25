@@ -1,17 +1,25 @@
 package procesador;
 
-import java.util.Map;
+import java.util.ArrayList;
 
+/**
+ * TablaVariable. Clase que sirve para almacenar las variables que aparecen en el código.
+ * 
+ * @author Gian Lucas Martín Chamorro
+ */
 public class TablaVariables {
 
-    private int profundidad;
-    private Map<Integer, Variable> tabla;
+    private ArrayList<Variable> TV;
 
-    TablaVariables() {
+    public ArrayList<Variable> getTV() {
+        return TV;
+    }
+
+    public void setTV(ArrayList<Variable> tV) {
+        this.TV = tV;
+    }
+
+    public TablaVariables(){
         
     }
-
-    public void inserta(Variable var) {
-    }
-
 }

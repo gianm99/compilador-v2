@@ -18,6 +18,8 @@ public class TablaSimbolos {
 
     public class exceptionTablaSimbolos extends Exception {
 
+        private static final long serialVersionUID = 7706912154843705180L;
+
         public exceptionTablaSimbolos(String msg) {
             super(msg);
         }
