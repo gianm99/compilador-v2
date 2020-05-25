@@ -3,7 +3,7 @@ parser grammar vajaDOT;
 options { tokenVocab=vajaLexer; }
 
 @header {
-	package procesador.antlr;
+	package antlr;
     import procesador.*;
     import java.io.*;
     import java.util.*;
