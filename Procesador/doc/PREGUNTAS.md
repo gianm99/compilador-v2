@@ -4,16 +4,17 @@
 - ¿Cómo hacemos para usar la tabla de variables y la tabla de procedimientos si ya usamos una tabla de símbolos al compilar?
   - Como nosotros queramos, es información que se basa en la de la tabla de símbolos. La tabla de símbolos al ser orientada a objetos puede tener entradas que sean variables y otras que sean procedimientos. Si se construyen la tabla de variables y la de procedimientos al mismo tiempo que la tabla de símbolos se confía en que el programa esté bien hecho. Si se hace en dos pasos, es decir, primero se hace la parte front-end y después la parte de construcción de código, es mejor porque puedes decidir hacer esas tablas cuando ya sabes que el programa está bien escrito. Es lo mismo en términos de rendimiento. A parte de esto también habrá que hacer la estructura que necesitemos para escribir el programa en código intermedio.
 - ¿Qué es exactamente `pproc` y para qué sirve si, por ejemplo, no se pueden declarar procedimientos dentro de otros procedimientos?
+  - Podemos no necesitarlo por la manera.
 - ¿Cuál es la información que se tiene que guardar de una variable?
+  - La que sale en la primera página.
 - ¿Cuál es la información que se tiene que guardar de un procedimiento?
 - ¿Qué es realmente el `.r` que usamos cuando hablamos de una variable?
+  - Es el valor de la variable que tiene el valor de la expresión que se está reduciendo.
 - ¿Qué es realmente el `.d` que usamos cuando hablamos de una variable?
+  - Es el desplazamiento, que se usa para calcular la posición en un array en el que está algo. Si no lo necesitamos no hay que usarlo.
 - ¿Qué son las etiquetas, números de líneas?
+  - Sí, sirven para identificar posiciones en el código intermedio o en el código ensamblador.
 - ¿Hay que crear una clase etiqueta y guardarlas de alguna manera en concreto?
-- ¿Qué hace este código? Es parte del código de la rutina semántica para la gestión de arrays.
-    ```
-    dv = consulta(ts,id.id)
-    dt = consulta(ts,dv.td)
-    idx = primer_index(ts,dt)
-    ```
+  - Sí, hay que tenerlas guardadas en algún lado. Puede ser un hashtable, un array o lo que queramos.
 - ¿Qué estructura deberíamos usar para las tablas (símbolos, variables y procedimentos)?¿Arrays, listas enlazadas, HashTables?
+  - Basta con un hashtable porque las variables son únicas por cada nivel de profundidad.
