@@ -4,7 +4,7 @@
 - ¿Cómo hacemos para usar la tabla de variables y la tabla de procedimientos si ya usamos una tabla de símbolos al compilar?
   - Como nosotros queramos, es información que se basa en la de la tabla de símbolos. La tabla de símbolos al ser orientada a objetos puede tener entradas que sean variables y otras que sean procedimientos. Si se construyen la tabla de variables y la de procedimientos al mismo tiempo que la tabla de símbolos se confía en que el programa esté bien hecho. Si se hace en dos pasos, es decir, primero se hace la parte front-end y después la parte de construcción de código, es mejor porque puedes decidir hacer esas tablas cuando ya sabes que el programa está bien escrito. Es lo mismo en términos de rendimiento. A parte de esto también habrá que hacer la estructura que necesitemos para escribir el programa en código intermedio.
 - ¿Qué es exactamente `pproc` y para qué sirve si, por ejemplo, no se pueden declarar procedimientos dentro de otros procedimientos?
-  - Podemos no necesitarlo por la manera.
+  - Podemos no necesitarlo por la manera en la que hayamos definido nuestra gramática, pero sirve para identificar qué proceso se ejecuta en cada momento.
 - ¿Cuál es la información que se tiene que guardar de una variable?
   - La que sale en la primera página.
 - ¿Cuál es la información que se tiene que guardar de un procedimiento?
