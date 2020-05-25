@@ -8,6 +8,7 @@
 - ¿Cuál es la información que se tiene que guardar de una variable?
   - La que sale en la primera página.
 - ¿Cuál es la información que se tiene que guardar de un procedimiento?
+  - La que sale en la primera página.
 - ¿Qué es realmente el `.r` que usamos cuando hablamos de una variable?
   - Es el valor de la variable que tiene el valor de la expresión que se está reduciendo.
 - ¿Qué es realmente el `.d` que usamos cuando hablamos de una variable?
@@ -18,3 +19,5 @@
   - Sí, hay que tenerlas guardadas en algún lado. Puede ser un hashtable, un array o lo que queramos.
 - ¿Qué estructura deberíamos usar para las tablas (símbolos, variables y procedimentos)?¿Arrays, listas enlazadas, HashTables?
   - Basta con un hashtable porque las variables son únicas por cada nivel de profundidad.
+- ¿Hay que seguir generando el árbol en formato `.DOT` para los archivos de prueba?
+- ¿Las tablas de variables y las de procedimientos también tienen que hacer como las tablas de símbolos y poder anidarse?
