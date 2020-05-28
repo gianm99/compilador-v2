@@ -35,7 +35,7 @@ public class Procesador {
         // Parser para crear el árbol sintáctico
         vajaDOT parserARBOL = new vajaDOT(tokens, buildPath);
         tokens.fill();
-        File tokensFile = new File(buildPath + "\\tokens.txt");
+        File tokensFile = new File(buildPath + "/tokens.txt");
         try (Writer buffer = new BufferedWriter(new FileWriter(tokensFile))) {
             for (Token tok : tokens.getTokens()) {
                 buffer.write(tok.getText() + '\n');
@@ -51,7 +51,7 @@ public class Procesador {
             System.out.println("PROCESO COMPLETADO CON ÉXITO");
         } catch (RuntimeException e) {
             System.out.println(e.getMessage());
-            File erroresFile = new File(buildPath + "\\errores.txt");
+            File erroresFile = new File(buildPath + "/errores.txt");
             Writer buffer = new BufferedWriter(new FileWriter(erroresFile));
             buffer.write(e.getMessage());
             buffer.close();
