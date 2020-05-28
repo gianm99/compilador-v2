@@ -48,7 +48,7 @@ public class Procesador {
             parser.programaPrincipal();
             tokens.seek(0);
             parserARBOL.programaPrincipal();
-            System.out.println("Se ha completado el proceso de compilación");
+            System.out.println("PROCESO COMPLETADO CON ÉXITO");
         } catch (RuntimeException e) {
             System.out.println(e.getMessage());
             File erroresFile = new File(buildPath + "\\errores.txt");
