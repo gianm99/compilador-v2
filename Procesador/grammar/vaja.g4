@@ -80,7 +80,7 @@ programaPrincipal:
 		// DOT
 		try{
             File arbolFile=new File(this.directorio+"\\arbol.dot");
-            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(arbolFile), "utf-8"));
+			writer = new BufferedWriter(new FileWriter(arbolFile));
             writer.write("digraph G {");//}
         }catch (Exception e){}
             String programaPrincipal="programaPrincipal"+(dot++);
