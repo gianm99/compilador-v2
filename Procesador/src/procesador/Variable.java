@@ -10,11 +10,11 @@ public class Variable {
     private int nv; // Número de variable
     private int np; // Subprograma que la ha declarado. 0 -> ninguno
     private Tipo tipo; // Tipo: variable, constante o argumento
-    private static int numVar = 0; // Número de variables creadas
+    private static int cv = 0; // Cantidad de variables creadas
 
     public Variable(int np, Tipo tipo) {
-        numVar++; // Aumenta la cantidad de variables
-        this.nv = numVar;
+        cv++; // Aumenta la cantidad de variables
+        this.nv = cv;
         this.np = np;
         this.tipo = tipo;
     }
@@ -36,6 +36,6 @@ public class Variable {
     }
 
     public static int getNumVar() {
-        return numVar;
+        return cv;
     }
 }

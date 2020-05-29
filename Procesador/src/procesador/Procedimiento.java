@@ -11,14 +11,14 @@ public class Procedimiento {
     private int nivelDecl; // Nivel de la declaración
     private Etiqueta inicio; // Etiqueta de inicio
     private int numDecl; // Número de declaraciones o variables
-    private static int numProc = 0; // Número de procedimientos creados
+    private static int cp = 0; // Cantidad de procedimientos creados
 
     public int getNp() {
         return np;
     }
 
     public static int getNumProc() {
-        return numProc;
+        return cp;
     }
 
     public void setNp(int np) {
@@ -54,6 +54,6 @@ public class Procedimiento {
         this.nivelDecl = nivelDecl;
         this.inicio = inicio;
         this.numDecl = numDecl;
-        numProc++;
+        cp++;
     }
 }
