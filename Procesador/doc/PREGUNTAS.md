@@ -20,4 +20,3 @@
 - ¿Qué estructura deberíamos usar para las tablas (símbolos, variables y procedimentos)?¿Arrays, listas enlazadas, HashTables?
   - Basta con un hashtable porque las variables son únicas por cada nivel de profundidad.
 - ¿Hay que seguir generando el árbol en formato `.DOT` para los archivos de prueba?
-- ¿Las tablas de variables y las de procedimientos también tienen que hacer como las tablas de símbolos y poder anidarse?

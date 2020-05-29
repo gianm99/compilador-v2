@@ -8,9 +8,16 @@ package procesador;
 public class Variable {
 
     private int nv; // Número de variable
-    private int np; // Número de subprograma que la ha declarado
+    private int np; // Subprograma que la ha declarado. 0 -> ninguno
     private Tipo tipo; // Tipo: variable, constante o argumento
-    private static int numVar = 0; // Número de variables creadas
+    private static int cv = 0; // Cantidad de variables creadas
+
+    public Variable(int np, Tipo tipo) {
+        cv++; // Aumenta la cantidad de variables
+        this.nv = cv;
+        this.np = np;
+        this.tipo = tipo;
+    }
 
     public enum Tipo {
         VAR, CONST, ARG
@@ -20,35 +27,15 @@ public class Variable {
         return nv;
     }
 
-    public static int getNumVar() {
-        return numVar;
-    }
-
-    public void setNv(int nv) {
-        this.nv = nv;
-    }
-
     public int getNp() {
         return np;
-    }
-
-    public void setNp(int np) {
-        this.np = np;
     }
 
     public Tipo getTipo() {
         return tipo;
     }
 
-    public void setTipo(Tipo tipo) {
-        this.tipo = tipo;
+    public static int getNumVar() {
+        return cv;
     }
-
-    public Variable(int nv, int np, Tipo tipo) {
-        this.nv = nv;
-        this.np = np;
-        this.tipo = tipo;
-        numVar++;
-    }
-
 }

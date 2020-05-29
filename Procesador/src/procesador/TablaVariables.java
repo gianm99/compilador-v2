@@ -9,17 +9,17 @@ import java.util.ArrayList;
  */
 public class TablaVariables {
 
-    private ArrayList<Variable> TV;
+    private ArrayList<Variable> tv;
 
     public ArrayList<Variable> getTV() {
-        return TV;
+        return tv;
     }
 
-    public void setTV(ArrayList<Variable> tV) {
-        this.TV = tV;
+    public void setTV(ArrayList<Variable> tv) {
+        this.tv = tv;
     }
 
-    public TablaVariables(){
+    public TablaVariables(String directorio){
         
     }
 }

@@ -5,6 +5,8 @@ package procesador;
  */
 public class Etiqueta {
     private int nl; // Número de línea
+    private int ne; // Número de etiqueta
+    private static int ce = 0; // Cantidad de etiquetas
 
     public int getNl() {
         return nl;
