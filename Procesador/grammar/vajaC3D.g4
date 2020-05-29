@@ -1,5 +1,7 @@
 grammar vajaC3D;
 
+options { tokenVocab=vajaLexer; }
+
 @header {
 	package antlr;
 	import procesador.*;
@@ -13,83 +15,60 @@ grammar vajaC3D;
 	TablaProcedimientos procedimientos;
 }
 
-programaPrincipal:
-	declaracion[programaPrincipal]* EOF;
+programaPrincipal: declaracion* EOF;
 
-declaracion[String padre]:
-	'var' tipo declaracionVar[$tipo.tsub]
-	| 'const' tipo declaracionConst[$tipo.tsub]
+declaracion:
+	'var' tipo declaracionVar
+	| 'const' tipo declaracionConst
 	| 'func' declFunc
 	| 'proc' declProc
 	| ';';
 
-tipo
-	returns[ Simbolo.TipoSubyacente tsub]:
-	INT
-	| BOOLEAN
-	| STRING;
+tipo: INT | BOOLEAN | STRING;
 // Variables y constantes
-declaracionVar[Simbolo.TipoSubyacente tsub]:
-	Identificador ('=' initVar)? ';';
+declaracionVar: Identificador ('=' initVar)? ';';
 
-declaracionConst[Simbolo.TipoSubyacente tsub]:
-	Identificador '=' initConst ';';
+declaracionConst: Identificador '=' initConst ';';
 
-initVar
-	returns[Simbolo.TipoSubyacente tsub]: expr;
+initVar: expr;
 
-initConst
-	returns[Simbolo.TipoSubyacente tsub]: expr;
+initConst: expr;
 
 // Funciones y procedimientos
-declFunc:
-	encabezadoFunc cuerpoFunc[$encabezadoFunc.metodo];
+declFunc: encabezadoFunc cuerpoFunc;
 
-encabezadoFunc
-	returns[Simbolo metodo]: identificadorMetFunc tipo;
+encabezadoFunc: identificadorMetFunc tipo;
 
-cuerpoFunc[Simbolo metodo]: bloque[$metodo] | ';';
+cuerpoFunc: bloque | ';';
 
-declProc:
-	encabezadoProc cuerpoProc[$encabezadoProc.metodo];
+declProc: encabezadoProc cuerpoProc;
 
-encabezadoProc
-	returns[Simbolo metodo]: identificadorMetProc;
+encabezadoProc: identificadorMetProc;
 
-cuerpoProc[Simbolo metodo]: bloque[$metodo] | ';';
+cuerpoProc: bloque | ';';
 
-identificadorMetFunc
-	returns[Simbolo metodo, int linea]:
-	Identificador '(' parametros[$metodo]? ')';
+identificadorMetFunc: Identificador '(' parametros? ')';
 
-identificadorMetProc
-	returns[Simbolo metodo, int linea]:
-	Identificador '(' parametros[$metodo]? ')';
+identificadorMetProc: Identificador '(' parametros? ')';
 
-parametros[Simbolo ant]:
-	parametro ',' parametros[$ant.getNext()]
-	| parametro;
+parametros: parametro ',' parametros | parametro;
 
-parametro
-	returns[Simbolo s]: tipo identificadorVar;
+parametro: tipo identificadorVar;
 
-identificadorVar
-	returns[String id]: Identificador;
+identificadorVar: Identificador;
 
-bloque[Simbolo met]: '{' exprsBloque? '}';
+bloque: '{' exprsBloque? '}';
 
 exprsBloque: exprDeBloque+;
 
 exprDeBloque: sentDeclVarLocal | sent;
 
-sentDeclVarLocal:
-	declaracionVarLocal[Simbolo.Tipo.VAR];
+sentDeclVarLocal: declaracionVarLocal;
 
-declaracionVarLocal[Simbolo.Tipo t]:
-	tipo declaracionVar[$tipo.tsub];
+declaracionVarLocal: tipo declaracionVar;
 
 sent:
-	bloque[null]
+	bloque
 	| sentVacia
 	| sentExpr
 	| sentIf
@@ -103,97 +82,51 @@ sentExpr: exprSent ';';
 
 exprSent: asignacion | sentInvocaMet;
 
-sentIf: IF '(' expr ')' bloque[null];
+sentIf: IF '(' expr ')' bloque;
 
-sentIfElse:
-	IF '(' expr ')' bloque[null] ELSE bloque[null];
+sentIfElse: IF '(' expr ')' bloque ELSE bloque;
 
-sentWhile: WHILE '(' expr ')' bloque[null];
+sentWhile: WHILE '(' expr ')' bloque;
 
 sentReturn: RETURN expr ';';
 
-sentInvocaMet
-	returns[Simbolo.TipoSubyacente tsub]:
-	Identificador '(' (
-		argumentos[$Identificador.getText(), $Identificador.getLine()]
-	)? ')';
+sentInvocaMet: Identificador '(' ( argumentos)? ')';
 
-argumentos[String nombre, int linea]: expr (',' expr)*;
+argumentos: expr (',' expr)*;
 
-asignacion
-	returns[ Simbolo.TipoSubyacente tsub ]:
-	Identificador '=' expr;
+asignacion: Identificador '=' expr;
 
-expr
-	returns[ Simbolo.TipoSubyacente tsub]:
-	exprCondOr
-	| asignacion;
+expr: exprCondOr | asignacion;
 
-exprCondOr
-	returns[ Simbolo.TipoSubyacente tsub]:
-	exprCondAnd exprCondOr_;
+exprCondOr: exprCondAnd exprCondOr_;
 
-exprCondOr_
-	returns[ Simbolo.TipoSubyacente tsub]:
-	OR exprCondAnd exprCondOr_
-	|; //lambda
+exprCondOr_: OR exprCondAnd exprCondOr_ |; //lambda
 
-exprCondAnd
-	returns[ Simbolo.TipoSubyacente tsub]: exprComp exprCondAnd_;
+exprCondAnd: exprComp exprCondAnd_;
 
-exprCondAnd_
-	returns[ Simbolo.TipoSubyacente tsub]:
-	AND exprComp exprCondAnd_
-	|; //lambda
+exprCondAnd_: AND exprComp exprCondAnd_ |; //lambda
 
-exprComp
-	returns[ Simbolo.TipoSubyacente tsub]: exprSuma exprComp_;
+exprComp: exprSuma exprComp_;
 
-exprComp_
-	returns[ Simbolo.TipoSubyacente tsub]:
-	Comparador exprSuma exprComp_
-	|; //lambda
+exprComp_: Comparador exprSuma exprComp_ |; //lambda
 
-exprSuma
-	returns[ Simbolo.TipoSubyacente tsub]: exprMult exprSuma_;
+exprSuma: exprMult exprSuma_;
 
-exprSuma_
-	returns[ Simbolo.TipoSubyacente tsub]:
-	OpBinSum exprMult exprSuma_
-	|; //lambda
+exprSuma_: OpBinSum exprMult exprSuma_ |; //lambda
 
-exprMult
-	returns[ Simbolo.TipoSubyacente tsub ]: exprUnaria exprMult_;
+exprMult: exprUnaria exprMult_;
 
-exprMult_
-	returns[ Simbolo.TipoSubyacente tsub ]:
+exprMult_:
 	MULT exprUnaria exprMult_
 	| DIV exprUnaria exprMult_
 	|; //lambda
 
-exprUnaria
-	returns[ Simbolo.TipoSubyacente tsub ]:
-	OpBinSum exprNeg
-	| exprNeg;
+exprUnaria: OpBinSum exprNeg | exprNeg;
 
-exprNeg
-	returns[ Simbolo.TipoSubyacente tsub ]:
-	NOT exprUnaria
-	| exprPostfija;
+exprNeg: NOT exprUnaria | exprPostfija;
 
-exprPostfija
-	returns[ Simbolo.TipoSubyacente tsub ]:
-	primario
-	| Identificador
-	| sentInvocaMet;
+exprPostfija: primario | Identificador | sentInvocaMet;
 
-primario
-	returns[ Simbolo.TipoSubyacente tsub ]:
-	'(' expr ')'
-	| literal;
+primario: '(' expr ')' | literal;
 
-literal
-	returns[ Simbolo.TipoSubyacente tsub ]:
-	LiteralInteger
-	| LiteralBoolean
-	| LiteralString;
+literal: LiteralInteger | LiteralBoolean | LiteralString;
