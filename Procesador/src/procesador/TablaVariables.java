@@ -19,7 +19,7 @@ public class TablaVariables {
         this.tv = tv;
     }
 
-    public TablaVariables(){
+    public TablaVariables(String directorio){
         
     }
 }
