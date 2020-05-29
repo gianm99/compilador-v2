@@ -1,8 +1,8 @@
 package procesador;
-
+// Utilidades específicas de antlr
 import antlr.*;
 import org.antlr.v4.runtime.*;
-
+// Utilidades generales
 import java.io.*;
 import org.apache.commons.io.*;
 
@@ -32,8 +32,6 @@ public class Procesador {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         // Parser para el análisis sintáctico y semántico
         vajaParser parser = new vajaParser(tokens, buildPath);
-        // Parser para crear el árbol sintáctico
-        vajaDOT parserARBOL = new vajaDOT(tokens, buildPath);
         tokens.fill();
         File tokensFile = new File(buildPath + "/tokens.txt");
         try (Writer buffer = new BufferedWriter(new FileWriter(tokensFile))) {
@@ -42,12 +40,9 @@ public class Procesador {
             }
             buffer.close();
         }
-
         try {
             tokens.seek(0);
             parser.programaPrincipal();
-            tokens.seek(0);
-            parserARBOL.programaPrincipal();
             System.out.println("PROCESO COMPLETADO CON ÉXITO");
         } catch (RuntimeException e) {
             System.out.println(e.getMessage());
