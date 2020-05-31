@@ -13,6 +13,7 @@ options { tokenVocab=vajaLexer; }
 @parser::members {
 	TablaVariables variables;
 	TablaProcedimientos procedimientos;
+	String directorio;
 }
 
 // TODO Jordi
