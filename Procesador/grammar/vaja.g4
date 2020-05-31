@@ -10,7 +10,7 @@ grammar vaja;
 }
 
 @parser::members {
-	TablaSimbolos ts;
+	public TablaSimbolos ts;
 	boolean returnreq = false;
 	boolean returnenc = false;
 	Simbolo.TipoSubyacente tiporeturn = null;

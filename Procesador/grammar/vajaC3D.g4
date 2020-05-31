@@ -11,9 +11,16 @@ options { tokenVocab=vajaLexer; }
 }
 
 @parser::members {
+	TablaSimbolos simbolos;
 	TablaVariables variables;
 	TablaProcedimientos procedimientos;
 	String directorio;
+
+	public vajaC3D(TokenStream input, String directorio, TablaSimbolos simbolos){
+		this(input);
+		this.directorio=directorio;
+		this.simbolos=simbolos;
+	}
 }
 
 // TODO Jordi
