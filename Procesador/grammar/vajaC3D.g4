@@ -1,6 +1,9 @@
 parser grammar vajaC3D;
 
-options { tokenVocab=vajaLexer; }
+options
+{
+	tokenVocab = vajaLexer;
+}
 
 @header {
 	package antlr;
