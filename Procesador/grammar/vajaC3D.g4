@@ -24,10 +24,23 @@ options
 		this.directorio=directorio;
 		this.simbolos=simbolos;
 	}
+
+public void genera(String codigo){
+	try{
+		pc++;
+		writer.write(codigo);
+	}catch(IOException e){}
+}
 }
 
 // TODO Jordi
-programaPrincipal: declaracion* EOF;
+programaPrincipal:
+	{
+		try{
+			File c3dFile=new File(this.directorio+"/c3d.txt");
+			writer=new BufferedWriter(new FileWriter(c3dFile));
+		}catch(Exception e){}
+	} declaracion* EOF;
 
 declaracion:
 	'var' tipo declaracionVar
