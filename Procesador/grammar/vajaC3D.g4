@@ -15,6 +15,7 @@ options { tokenVocab=vajaLexer; }
 	TablaProcedimientos procedimientos;
 }
 
+// TODO Jordi
 programaPrincipal: declaracion* EOF;
 
 declaracion:
@@ -76,6 +77,7 @@ sent:
 	| sentWhile
 	| sentReturn;
 
+//TODO Gian
 sentVacia: ';';
 
 sentExpr: exprSent ';';
