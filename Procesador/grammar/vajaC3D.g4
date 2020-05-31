@@ -1,4 +1,4 @@
-grammar vajaC3D;
+parser grammar vajaC3D;
 
 options { tokenVocab=vajaLexer; }
 
