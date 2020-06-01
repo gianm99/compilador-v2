@@ -111,29 +111,29 @@ declaracion[String padre]:
 	} tipo {
 		try{writer.write(declaracion+"->declaracionVar"+(dot)+";\n");}catch(Exception e){}
 	} declaracionVar[$tipo.tsub]
-	| 
+	|
 	{
         dot++;
         String declaracion="declaracion"+(dot++);
         try{writer.write($padre+"->"+declaracion+";\n");}catch(Exception e){}
-        try{writer.write(declaracion+"->const"+(dot++)+";\n");}catch(Exception e){}}'const' 
-		{try{writer.write(declaracion+"->tipo"+(dot)+";\n");}catch(Exception e){}}tipo 
+        try{writer.write(declaracion+"->const"+(dot++)+";\n");}catch(Exception e){}}'const'
+		{try{writer.write(declaracion+"->tipo"+(dot)+";\n");}catch(Exception e){}}tipo
 		{try{writer.write(declaracion+"->declaracionConst"+(dot)+";\n");}catch(Exception e){}}declaracionConst[$tipo.tsub]
-	| 
+	|
 	{
         dot++;
         String declaracion="declaracion"+(dot++);
         try{writer.write($padre+"->"+declaracion+";\n");}catch(Exception e){}
-        try{writer.write(declaracion+"->func"+(dot++)+";\n");}catch(Exception e){}}'func' 
+        try{writer.write(declaracion+"->func"+(dot++)+";\n");}catch(Exception e){}}'func'
 		{try{writer.write(declaracion+"->declFunc"+(dot)+";\n");}catch(Exception e){}}declFunc
-	| 
+	|
 	{
         dot++;
         String declaracion="declaracion"+(dot++);
         try{writer.write($padre+"->"+declaracion+";\n");}catch(Exception e){}
-        try{writer.write(declaracion+"->proc"+(dot++)+";\n");}catch(Exception e){}}'proc' 
+        try{writer.write(declaracion+"->proc"+(dot++)+";\n");}catch(Exception e){}}'proc'
 		{try{writer.write(declaracion+"->declProc"+(dot)+";\n");}catch(Exception e){}}declProc
-	| 
+	|
 	';'
 	;
 
@@ -142,19 +142,19 @@ tipo
 	{
         String tipo ="tipo"+(dot++);
         {try{writer.write(tipo+"->int"+(dot++)+";\n");}catch(Exception e){}}}
-	INT 
+	INT
 		{$tsub=Simbolo.TipoSubyacente.INT;}
-	| 
+	|
 	{
         String tipo ="tipo"+(dot++);
         {try{writer.write(tipo+"->boolean"+(dot++)+";\n");}catch(Exception e){}}}
-	BOOLEAN 
+	BOOLEAN
 		{ $tsub=Simbolo.TipoSubyacente.BOOLEAN;}
-	| 
+	|
 	{
         String tipo ="tipo"+(dot++);
         {try{writer.write(tipo+"->string"+(dot++)+";\n");}catch(Exception e){}}}
-	STRING 
+	STRING
 		{ $tsub=Simbolo.TipoSubyacente.STRING;}
 	;
 
@@ -172,21 +172,21 @@ declaracionVar[Simbolo.TipoSubyacente tsub]:
 				+ $Identificador.getText()+" ya ha sido declarada\n");
 		}
 		// DOT
-		try{writer.write($Identificador.getText() +(dot)+"[label="+$Identificador.getText()+"];\n");}catch(Exception e){}} 
+		try{writer.write($Identificador.getText() +(dot)+"[label="+$Identificador.getText()+"];\n");}catch(Exception e){}}
         {try{writer.write(declaracionVar+"->"+$Identificador.getText() +(dot++)+";\n");}catch(Exception e){}
-	} 
+	}
 	(
 		{try{writer.write(declaracionVar+"->IGUAL"+(dot++)+";\n");}catch(Exception e){}}
-	'=' 
+	'='
 		{try{writer.write(declaracionVar+"->initVar"+(dot)+";\n");}catch(Exception e){}}
-	initVar 
+	initVar
 	{
 		if($initVar.tsub != $tsub){
 			errores+=("ERROR SEMANTICO - Línea: "+$Identificador.getLine()+", tipos incompatibles \n"+
 			"encontrado: "+$initVar.tsub+" esperado: "+$tsub+"\n");
 		}
 	}
-	)? 
+	)?
 		{try{writer.write(declaracionVar+"->PUNTOYCOMA"+(dot++)+";\n");}catch(Exception e){}}
 	';'
 	;
@@ -194,7 +194,7 @@ declaracionVar[Simbolo.TipoSubyacente tsub]:
 declaracionConst[Simbolo.TipoSubyacente tsub]:
 	{
         String declaracionConst="declaracionConst"+(dot++);}
-	Identificador 
+	Identificador
 	{
 		try{
 			ts.inserta($Identificador.getText(), new Simbolo($Identificador.getText(),null,Simbolo.Tipo.CONST,$tsub));
@@ -203,15 +203,15 @@ declaracionConst[Simbolo.TipoSubyacente tsub]:
 			" ya ha sido declarada\n");
 		}
 		// DOT
-		try{writer.write($Identificador.getText() +(dot)+"[label="+$Identificador.getText() +"];\n");}catch(Exception e){}} 
+		try{writer.write($Identificador.getText() +(dot)+"[label="+$Identificador.getText() +"];\n");}catch(Exception e){}}
         {try{writer.write(declaracionConst+"->"+$Identificador.getText() +(dot++)+";\n");}catch(Exception e){}}
         {try{writer.write(declaracionConst+"->IGUAL"+(dot++)+";\n");}catch(Exception e){}
-	} 
+	}
 	'='
 		{try{writer.write(declaracionConst+"->initConst"+(dot)+";\n");}catch(Exception e){}}
 	initConst
 		{try{writer.write(declaracionConst+"->PUNTOYCOMA"+(dot++)+";\n");}catch(Exception e){}}
-	';' 
+	';'
 	{
 		 if($initConst.tsub != $tsub){
 			errores+=("ERROR SEMANTICO - Línea: "+$Identificador.getLine()+", tipos incompatibles \n"+
@@ -225,7 +225,7 @@ initVar
 	{
         String initVar="initVar"+(dot++);}
         {try{writer.write(initVar+"->expr"+(dot)+";\n");}catch(Exception e){}}
-	expr 
+	expr
 		{$tsub = $expr.tsub;}
 	;
 
@@ -234,7 +234,7 @@ initConst
 	{
         String initConst="initConst"+(dot++);}
         {try{writer.write(initConst+"->expr"+(dot)+";\n");}catch(Exception e){}}
-	expr 
+	expr
 		{$tsub = $expr.tsub; }
 	;
 
@@ -243,7 +243,7 @@ declFunc:
 	{
         String declFunc="declFunc"+(dot++);}
         {try{writer.write(declFunc+"->encabezadoFunc"+(dot)+";\n");}catch(Exception e){}}
-	encabezadoFunc 
+	encabezadoFunc
 		{try{writer.write(declFunc+"->cuerpoFunc"+(dot)+";\n");}catch(Exception e){}}
 	cuerpoFunc[$encabezadoFunc.metodo]
 	;
@@ -253,9 +253,9 @@ encabezadoFunc
 	{
         String encabezadoFunc="encabezadoFunc"+(dot++);}
         {try{writer.write(encabezadoFunc+"->identificadorMetFunc"+(dot)+";\n");}catch(Exception e){}}
-	identificadorMetFunc 
+	identificadorMetFunc
 		{try{writer.write(encabezadoFunc+"->tipo"+(dot)+";\n");}catch(Exception e){}}
-	tipo 
+	tipo
 	{
 		try{
 			$identificadorMetFunc.metodo.setTs($tipo.tsub);
@@ -267,16 +267,16 @@ encabezadoFunc
 	}
 	;
 
-cuerpoFunc[Simbolo metodo]: 
+cuerpoFunc[Simbolo metodo]:
 {
 		String cuerpoFunc="cuerpoFunc"+(dot++);}
 		{try{writer.write(cuerpoFunc+"->bloque"+(dot)+";\n");}catch(Exception e){}}
-	bloque[$metodo] 
+	bloque[$metodo]
 	|
 	{
 		String cuerpoFunc="cuerpoFunc"+(dot++);
 		try{writer.write(cuerpoFunc+"->PUNTOYCOMA"+(dot++)+";\n");}catch(Exception e){}
-	}	
+	}
 	';'
 	;
 
@@ -285,7 +285,7 @@ declProc:
         String declProc="declProc"+(dot++);
         try{writer.write(declProc+"->encabezadoProc"+(dot)+";\n");}catch(Exception e){}
 	}
-	encabezadoProc 
+	encabezadoProc
 		{try{writer.write(declProc+"->cuerpoProc"+(dot)+";\n");}catch(Exception e){}}
 	cuerpoProc[$encabezadoProc.metodo]
 	;
@@ -296,7 +296,7 @@ encabezadoProc
         String encabezadoProc="encabezadoProc"+(dot++);
         try{writer.write(encabezadoProc+"->identificadorMetProc"+(dot)+";\n");}catch(Exception e){}
 	}
-	identificadorMetProc 
+	identificadorMetProc
 	{
 		try{
 			$metodo = $identificadorMetProc.metodo;
@@ -307,13 +307,13 @@ encabezadoProc
 	}
 	;
 
-cuerpoProc[Simbolo metodo]: 
+cuerpoProc[Simbolo metodo]:
 	{
         String cuerpoProc="cuerpoProc"+(dot++);
         try{writer.write(cuerpoProc+"->bloque"+(dot)+";\n");}catch(Exception e){}
 	}
-	bloque[$metodo] 
-	| 
+	bloque[$metodo]
+	|
 	{
         String cuerpoProc="cuerpoProc"+(dot++);
         try{writer.write(cuerpoProc+"->PUNTOYCOMA"+(dot++)+";\n");}catch(Exception e){}
@@ -327,15 +327,15 @@ identificadorMetFunc
 		String identificadorMetFunc="identificadorMetFunc"+(dot++);
 		try{writer.write(identificadorMetFunc+"->"+$Identificador.getText() +(dot)+"[label="+$Identificador.getText() +"];\n");}catch(Exception e){}
 	}
-	Identificador 
+	Identificador
 	{
 		$metodo = new Simbolo($Identificador.getText(), null, Simbolo.Tipo.FUNC, Simbolo.TipoSubyacente.NULL);
 		// DOT
 		try{writer.write(identificadorMetFunc+"->LPAREN"+(dot++)+";\n");}catch(Exception e){}
-	} 
-	'(' 
+	}
+	'('
 		{try{writer.write(identificadorMetFunc+"->parametros"+(dot)+";\n");}catch(Exception e){}}
-	parametros[$metodo]? 
+	parametros[$metodo]?
 		{try{writer.write(identificadorMetFunc+"->RPAREN"+(dot++)+";\n");}catch(Exception e){}}
 	')'
 	;
@@ -349,18 +349,18 @@ identificadorMetProc
 			+$Identificador.getText() +"];\n");
 		}
 		catch(Exception e){}
-	} 
-	Identificador 
+	}
+	Identificador
 	{
 		$metodo = new Simbolo($Identificador.getText(), null, Simbolo.Tipo.PROC, Simbolo.TipoSubyacente.NULL);
 		// DOT
 		try{writer.write(identificadorMetProc+"->LPAREN"+(dot++)+";\n");}catch(Exception e){}
-	} 
-	'(' 
+	}
+	'('
 	{
 		try{writer.write(identificadorMetProc+"->parametros"+(dot)+";\n");}catch(Exception e){}
 	}
-	parametros[$metodo]? 
+	parametros[$metodo]?
 	{
 		try{writer.write(identificadorMetProc+"->RPAREN"+(dot++)+";\n");}catch(Exception e){}
 	}
@@ -372,21 +372,21 @@ parametros[Simbolo ant]:
 		String parametros="parametros"+(dot++);
 		try{writer.write(parametros+"->parametro"+(dot)+";\n");}catch(Exception e){}
 	}
-	parametro 
+	parametro
 		{try{writer.write(parametros+"->COMMA"+(dot++)+";\n");}catch(Exception e){}}
-	',' 
+	','
 	{
 		$ant.setNext($parametro.s);
-		// DOT 
+		// DOT
 		try{writer.write(parametros+"->parametros"+(dot)+";\n");}catch(Exception e){}
-	} 
+	}
 	parametros[$ant.getNext()]
-	| 
+	|
 	{
 		String parametros="parametros"+(dot++);
 		try{writer.write(parametros+"->parametro"+(dot)+";\n");}catch(Exception e){}
 	}
-	parametro 
+	parametro
 	{
 		$ant.setNext($parametro.s);
 		$parametro.s.setNext(null);
@@ -401,7 +401,7 @@ parametro
 	}
 	tipo
 		{try{writer.write(parametro+"->identificadoVar"+(dot)+";\n");}catch(Exception e){}}
-	identificadorVar 
+	identificadorVar
 	{
 		$s = new Simbolo($identificadorVar.id, null, Simbolo.Tipo.ARG, $tipo.tsub);
 	}
@@ -416,7 +416,7 @@ identificadorVar
 			+$Identificador.getText() +"];\n");
 		}catch(Exception e){}
 	}
-	Identificador 
+	Identificador
 	{
 		$id = $Identificador.getText();
 	}
@@ -445,23 +445,23 @@ bloque[Simbolo met]:
 		// DOT
     	String bloque="bloque"+(dot++);
     	try{writer.write(bloque+"->BEGIN"+(dot++)+";\n");}catch(Exception e){}
-	} 
-	'{' 
+	}
+	'{'
 		{try{writer.write(bloque+"->exprsBloque"+(dot)+";\n");}catch(Exception e){}}
-	exprsBloque? 
+	exprsBloque?
 		{try{writer.write(bloque+"->END"+(dot++)+";\n");}catch(Exception e){}}
-	'}' 
+	'}'
 	{
 		ts = ts.saleBloque();
 		if($met != null){
 			if($met.getT() == Simbolo.Tipo.FUNC){
 				if(!returnenc){
-					errores += ("ERROR SEMANTICO: falta return para la función " 
+					errores += ("ERROR SEMANTICO: falta return para la función "
 					+ $met.getId() + "\n");
 				}
 			} else if ($met.getT() == Simbolo.Tipo.PROC){
 				if(returnenc){
-					errores += ("ERROR SEMANTICO: encontrado return para el procedimiento " 
+					errores += ("ERROR SEMANTICO: encontrado return para el procedimiento "
 					+ $met.getId() + "\n");
 				}
 			}
@@ -472,7 +472,7 @@ bloque[Simbolo met]:
 	}
 	;
 
-exprsBloque: 
+exprsBloque:
 	{
 		String exprsBloque="exprsBloque"+(dot++);
 		try{writer.write(exprsBloque+"->exprDeBloque"+(dot)+";\n");}catch(Exception e){}
@@ -480,13 +480,13 @@ exprsBloque:
 	exprDeBloque+
 	;
 
-exprDeBloque: 
+exprDeBloque:
 	{
 		String exprsDeBloque="exprsDeBloque"+(dot++);
 		try{writer.write(exprsDeBloque+"->sentDeclVarLocal"+(dot)+";\n");}catch(Exception e){}
 	}
-	sentDeclVarLocal 
-	| 
+	sentDeclVarLocal
+	|
 	{
 		String exprsDeBloque="exprsDeBloque"+(dot++);
 		try{writer.write(exprsDeBloque+"->sent"+(dot)+";\n");}catch(Exception e){}
@@ -507,12 +507,10 @@ declaracionVarLocal[Simbolo.Tipo t]:
 		String declaracionVarLocal="declaracionVarLocal"+(dot++);
 		try{writer.write(declaracionVarLocal+"->tipo"+(dot)+";\n");}catch(Exception e){}
 	}
-	tipo 
+	tipo
 		{try{writer.write(declaracionVarLocal+"->declaracionVar"+(dot)+";\n");}catch(Exception e){}}
 	declaracionVar[$tipo.tsub]
 	;
-
-sents: sents sent | sent;
 
 sent:
 	{
@@ -520,19 +518,19 @@ sent:
 		try{writer.write(sent+"->bloque"+(dot)+";\n");}catch(Exception e){}
 	}
 	bloque[null]
-	| 
+	|
 	{
 		String sent="sent"+(dot++);
-   		try{writer.write(sent+"->sentVacia"+(dot)+";\n");}catch(Exception e){}
+		try{writer.write(sent+"->PUNTOYCOMA"+(dot++)+";\n");}catch(Exception e){}
 	}
-	sentVacia
+	';'
 	|
 	{
 		String sent="sent"+(dot++);
     	try{writer.write(sent+"->sentExpr"+(dot)+";\n");}catch(Exception e){}
 	}
 	sentExpr
-	| 
+	|
 	{
 		boolean reqaux = returnreq;
 		boolean encaux = returnenc;
@@ -541,15 +539,15 @@ sent:
 		String sent="sent"+(dot++);
     	try{writer.write(sent+"->IF"+(dot++)+";\n");}catch(Exception e){}
 	}
-	IF 
+	IF
 		{try{writer.write(sent+"->LPAREN"+(dot++)+";\n");}catch(Exception e){}}
-	'(' 
+	'('
 		{try{writer.write(sent+"->expr"+(dot)+";\n");}catch(Exception e){}}
-	expr 
+	expr
 		{try{writer.write(sent+"->RPAREN"+(dot++)+";\n");}catch(Exception e){}}
-	')' 
+	')'
 		{try{writer.write(sent+"->bloque"+(dot)+";\n");}catch(Exception e){}}
-	bloque[null] 
+	bloque[null]
 	{
 		if($expr.tsub != Simbolo.TipoSubyacente.BOOLEAN){
 			errores += ("ERROR SEMANTICO - Línea: " +$IF.getLine()+"\n"+
@@ -561,24 +559,87 @@ sent:
 	|
 	{
 		String sent="sent"+(dot++);
-    	try{writer.write(sent+"->sentIfElse"+(dot)+";\n");}catch(Exception e){}
+		try{writer.write(sent+"->IF"+(dot++)+";\n");}catch(Exception e){}
 	}
-	sentIfElse
+	IF
+		{try{writer.write(sent+"->LPAREN"+(dot++)+";\n");}catch(Exception e){}}
+	'('
+		{try{writer.write(sent+"->expr"+(dot)+";\n");}catch(Exception e){}}
+	expr
+		{try{writer.write(sent+"->RPAREN"+(dot++)+";\n");}catch(Exception e){}}
+	')'
+		{try{writer.write(sent+"->bloque"+(dot)+";\n");}catch(Exception e){}}
+	bloque[null]
+	{
+		if($expr.tsub != Simbolo.TipoSubyacente.BOOLEAN){
+				errores += ("ERROR SEMANTICO - Línea: " +$IF.getLine()+"\n"+
+				"La expresión debe ser de tipo BOOLEAN\n");
+		}
+		boolean primerreturn = returnenc;
+		returnenc = false;
+		// DOT
+		try{writer.write(sent+"->ELSE"+(dot)+";\n");}catch(Exception e){}
+	}
+	ELSE
+		{try{writer.write(sent+"->bloque"+(dot)+";\n");}catch(Exception e){}}
+	bloque[null]
+	{
+		if(!(primerreturn && returnenc)){
+			returnenc = false;
+		}
+	}
+	|
+	{
+		boolean reqaux = returnreq;
+		boolean encaux = returnenc;
+		returnreq = false;
+		// DOT
+		String sent="sent"+(dot++);
+   		try{writer.write(sent+"->WHILE"+(dot++)+";\n");}catch(Exception e){}
+	}
+	WHILE
+		{try{writer.write(sent+"->LPAREN"+(dot++)+";\n");}catch(Exception e){}}
+	'('
+		{try{writer.write(sent+"->expr"+(dot)+";\n");}catch(Exception e){}}
+	expr
+		{try{writer.write(sent+"->RPAREN"+(dot++)+";\n");}catch(Exception e){}}
+	')'
+		{try{writer.write(sent+"->bloque"+(dot)+";\n");}catch(Exception e){}}
+	bloque[null]
+	{
+		if($expr.tsub != Simbolo.TipoSubyacente.BOOLEAN){
+			errores += ("ERROR SEMANTICO - Línea: " +$WHILE.getLine()+"\n"+
+			"La expresión debe ser de tipo BOOLEAN\n");
+		}
+		returnreq = reqaux;
+		returnenc = encaux;
+	}
 	|
 	{
 		String sent="sent"+(dot++);
-    	try{writer.write(sent+"->sentWhile"+(dot)+";\n");}catch(Exception e){}
+		try{writer.write(sent+"->RETURN"+(dot++)+";\n");}catch(Exception e){}
 	}
-	sentWhile
-	| 
-	{
-		String sent="sent"+(dot++);
-    	try{writer.write(sent+"->sentReturn"+(dot)+";\n");}catch(Exception e){}
+	RETURN
+		{try{writer.write(sent+"->expr"+(dot)+";\n");}catch(Exception e){}}
+	expr
+		{try{writer.write(sent+"->PUNTOYCOMA"+(dot++)+";\n");}catch(Exception e){}}
+	';'
+	 {
+			try {
+				if($expr.tsub != tiporeturn){
+					errores += ("ERROR SEMANTICO - Línea: " +$RETURN.getLine()+"\n"+
+					"Tipo en el return encontrado: "+$expr.tsub+"\n"+
+					"Tipo en el return esperado: "+tiporeturn+"\n");
+				} else {
+					returnenc = true;
+				}
+			} catch (NullPointerException e){
+				returnenc = true;
+			}
 	}
-	sentReturn
 	;
 
-sentVacia: 
+sentVacia:
 	{
 		String sentVacia="sentVacia"+(dot++);
 		try{writer.write(sentVacia+"->PUNTOYCOMA"+(dot++)+";\n");}catch(Exception e){}
@@ -591,18 +652,18 @@ sentExpr:
 		String sentExpr="sentExpr"+(dot++);
 		try{writer.write(sentExpr+"->exprSent"+(dot)+";\n");}catch(Exception e){}
 	}
-	exprSent 
+	exprSent
 		{try{writer.write(sentExpr+"->PUNTOYCOMA"+(dot++)+";\n");}catch(Exception e){}}
 	';'
 	;
 
-exprSent: 
+exprSent:
 	{
 		String exprSent="exprSent"+(dot++);
 		try{writer.write(exprSent+"->asignacion"+(dot)+";\n");}catch(Exception e){}
 	}
-	asignacion 
-	| 
+	asignacion
+	|
 	{
 		String exprSent="exprSent"+(dot++);
 		try{writer.write(exprSent+"->sentInvocaMet"+(dot)+";\n");}catch(Exception e){}
@@ -619,15 +680,15 @@ sentIf:
 		String sentIf="sentIf"+(dot++);
     	try{writer.write(sentIf+"->IF"+(dot++)+";\n");}catch(Exception e){}
 	}
-	IF 
+	IF
 		{try{writer.write(sentIf+"->LPAREN"+(dot++)+";\n");}catch(Exception e){}}
-	'(' 
+	'('
 		{try{writer.write(sentIf+"->expr"+(dot)+";\n");}catch(Exception e){}}
-	expr 
+	expr
 		{try{writer.write(sentIf+"->RPAREN"+(dot++)+";\n");}catch(Exception e){}}
-	')' 
+	')'
 		{try{writer.write(sentIf+"->bloque"+(dot)+";\n");}catch(Exception e){}}
-	bloque[null] 
+	bloque[null]
 	{
 		if($expr.tsub != Simbolo.TipoSubyacente.BOOLEAN){
 			errores += ("ERROR SEMANTICO - Línea: " +$IF.getLine()+"\n"+
@@ -640,17 +701,17 @@ sentIf:
 
 sentIfElse:
 	{
-		String sentIf="sentIf"+(dot++);
-		try{writer.write(sentIf+"->IF"+(dot++)+";\n");}catch(Exception e){}
+		String sentIfElse="sentIfElse"+(dot++);
+		try{writer.write(sentIfElse+"->IF"+(dot++)+";\n");}catch(Exception e){}
 	}
-	IF 
-		{try{writer.write(sentIf+"->LPAREN"+(dot++)+";\n");}catch(Exception e){}}
-	'(' 
-		{try{writer.write(sentIf+"->expr"+(dot)+";\n");}catch(Exception e){}}
-	expr 
-		{try{writer.write(sentIf+"->RPAREN"+(dot++)+";\n");}catch(Exception e){}} 
+	IF
+		{try{writer.write(sentIfElse+"->LPAREN"+(dot++)+";\n");}catch(Exception e){}}
+	'('
+		{try{writer.write(sentIfElse+"->expr"+(dot)+";\n");}catch(Exception e){}}
+	expr
+		{try{writer.write(sentIfElse+"->RPAREN"+(dot++)+";\n");}catch(Exception e){}}
 	')'
-		{try{writer.write(sentIf+"->bloque"+(dot)+";\n");}catch(Exception e){}}
+		{try{writer.write(sentIfElse+"->bloque"+(dot)+";\n");}catch(Exception e){}}
 	bloque[null]
 	{
 		if($expr.tsub != Simbolo.TipoSubyacente.BOOLEAN){
@@ -660,11 +721,11 @@ sentIfElse:
 		boolean primerreturn = returnenc;
 		returnenc = false;
 		// DOT
-		try{writer.write(sentIf+"->bloque"+(dot)+";\n");}catch(Exception e){}
-	} 
-	ELSE 
-		{try{writer.write(sentIf+"->bloque"+(dot)+";\n");}catch(Exception e){}}
-	bloque[null] 
+		try{writer.write(sentIfElse+"->bloque"+(dot)+";\n");}catch(Exception e){}
+	}
+	ELSE
+		{try{writer.write(sentIfElse+"->bloque"+(dot)+";\n");}catch(Exception e){}}
+	bloque[null]
 	{
 		if(!(primerreturn && returnenc)){
 			returnenc = false;
@@ -680,14 +741,14 @@ sentWhile:
 		// DOT
 		String sentWhile="sentWhile"+(dot++);
    		try{writer.write(sentWhile+"->WHILE"+(dot++)+";\n");}catch(Exception e){}
-	} 
-	WHILE 
+	}
+	WHILE
 		{try{writer.write(sentWhile+"->LPAREN"+(dot++)+";\n");}catch(Exception e){}}
-	'(' 
+	'('
 		{try{writer.write(sentWhile+"->expr"+(dot)+";\n");}catch(Exception e){}}
-	expr 
+	expr
 		{try{writer.write(sentWhile+"->RPAREN"+(dot++)+";\n");}catch(Exception e){}}
-	')' 
+	')'
 		{try{writer.write(sentWhile+"->bloque"+(dot)+";\n");}catch(Exception e){}}
 	bloque[null]
 	{
@@ -705,11 +766,11 @@ sentReturn:
 		String sentReturn="sentReturn"+(dot++);
 		try{writer.write(sentReturn+"->RETURN"+(dot++)+";\n");}catch(Exception e){}
 	}
-	RETURN 
+	RETURN
 		{try{writer.write(sentReturn+"->expr"+(dot)+";\n");}catch(Exception e){}}
 	expr
 		{try{writer.write(sentReturn+"->PUNTOYCOMA"+(dot++)+";\n");}catch(Exception e){}}
-	';' 
+	';'
 	 {
 			try {
 				if($expr.tsub != tiporeturn){
@@ -728,13 +789,13 @@ sentReturn:
 sentInvocaMet
 	returns[Simbolo.TipoSubyacente tsub]:
 		{String sentInvocaMet="sentInvocaMet"+(dot++);}
-	Identificador 
+	Identificador
 	{
-		try{writer.write($Identificador.getText() +(dot)+"[label="+$Identificador.getText() +"];\n");}catch(Exception e){} 
-   		try{writer.write(sentInvocaMet+"->"+$Identificador.getText() +(dot++)+";\n");}catch(Exception e){} 
+		try{writer.write($Identificador.getText() +(dot)+"[label="+$Identificador.getText() +"];\n");}catch(Exception e){}
+   		try{writer.write(sentInvocaMet+"->"+$Identificador.getText() +(dot++)+";\n");}catch(Exception e){}
     	try{writer.write(sentInvocaMet+"->LPAREN"+(dot++)+";\n");}catch(Exception e){}
 	}
-	'(' 
+	'('
 	{
 		boolean argEnc=false;
 		try{
@@ -758,12 +819,12 @@ sentInvocaMet
 	argumentos[$Identificador.getText(), $Identificador.getLine()] {
 		argEnc=true;
 	}
-	)? 
+	)?
 		{try{writer.write(sentInvocaMet+"->RPAREN"+(dot++)+";\n");}catch(Exception e){}}
-	')' 
+	')'
 	{
 		try{
-			if(!argEnc && ($Identificador.getText().equals("print") 
+			if(!argEnc && ($Identificador.getText().equals("print")
 			|| ts.consulta($Identificador.getText()).getNext()!= null)){
 				errores+=("ERROR SEMANTICO - Línea: "+$Identificador.getLine()
 				+", faltan parámetros para "+$Identificador.getText()+"\n");
@@ -787,15 +848,15 @@ argumentos[String nombre, int linea]:
 		// DOT
 		String argumentos="argumentos"+(dot++);
     	try{writer.write(argumentos+"->expr"+(dot)+";\n");}catch(Exception e){}
-	} 
-	expr 
+	}
+	expr
 	{
 		if($nombre.equals("print")){
 			String print = "print" + $expr.tsub;
 			try{
 				Simbolo.TipoSubyacente tprint = ts.consulta(print).getNext().getTs();
 			} catch (TablaSimbolos.exceptionTablaSimbolos e){
-				errores+=("ERROR SEMANTICO - Línea: "+$linea+", al invocar "+ $nombre 
+				errores+=("ERROR SEMANTICO - Línea: "+$linea+", al invocar "+ $nombre
 				+" no se esperaba un " + $expr.tsub + "\n");
 			}
 		}else {
@@ -806,7 +867,7 @@ argumentos[String nombre, int linea]:
 
 			if(metodo==null){
 				demasiadosArg=true;
-				errores+=("ERROR SEMANTICO - Línea: "+$linea+", "+ $nombre 
+				errores+=("ERROR SEMANTICO - Línea: "+$linea+", "+ $nombre
 				+"tiene demasiados argumentos" + "\n");
 			}else{
 				if(metodo.getTs()!=$expr.tsub){
@@ -816,32 +877,32 @@ argumentos[String nombre, int linea]:
 				metodo=metodo.getNext();
 			}
 		}
- 	} 
+ 	}
 	(
 		{try{writer.write(argumentos+"->COMMA"+(dot++)+";\n");}catch(Exception e){}}
-	',' 
+	','
 		{try{writer.write(argumentos+"->argumentos"+(dot)+";\n");}catch(Exception e){}}
-	expr 
+	expr
 	{
 		if(metodo == null || $nombre.equals("print")){
 			if(!demasiadosArg){
-				errores+=("ERROR SEMANTICO - Línea: "+$linea+", "+ $nombre 
+				errores+=("ERROR SEMANTICO - Línea: "+$linea+", "+ $nombre
 				+"tiene demasiados argumentos" + "\n");
 				demasiadosArg = true;
 			}
 		}
 		if(metodo != null){
 			if(metodo.getTs() != $expr.tsub){
-				errores+=("ERROR SEMANTICO - Línea: "+$linea+", al invocar"+ $nombre 
+				errores+=("ERROR SEMANTICO - Línea: "+$linea+", al invocar"+ $nombre
 				+"se esperaba un " + metodo.getTs() + " y se ha encontrado un " + $expr.tsub + "\n");
 			}
 			metodo = metodo.getNext();
 		}
 	}
-	)* 
+	)*
 	{
 		if(metodo != null){
-		errores+=("ERROR SEMANTICO - Línea: "+$linea+", a "+ $nombre +"le faltan argumentos" 
+		errores+=("ERROR SEMANTICO - Línea: "+$linea+", a "+ $nombre +"le faltan argumentos"
 		+ "\n");
 		}
 	}
@@ -852,7 +913,7 @@ asignacion
 	{
 		String asignacion="asignacion"+(dot++);
 	}
-	Identificador 
+	Identificador
 	{
 		try{
 			writer.write($Identificador.getText() +(dot)+"[label="+$Identificador.getText() +"];\n");
@@ -860,9 +921,9 @@ asignacion
 			writer.write(asignacion+"->IGUAL"+(dot++)+";\n");
 		}catch(Exception e){}
 	}
-	'=' 
+	'='
 		{try{writer.write(asignacion+"->expr"+(dot)+";\n");}catch(Exception e){}}
-	expr 
+	expr
 	{
 		Simbolo.TipoSubyacente idTsub = null;
 		Simbolo.Tipo idT = null;
@@ -888,14 +949,14 @@ expr
 		String expr="expr"+(dot++);
 		try{writer.write(expr+"->exprCondOr"+(dot)+";\n");}catch(Exception e){}
 	}
-	exprCondOr 
+	exprCondOr
 		{ $tsub=$exprCondOr.tsub;}
-	| 
+	|
 	{
    		String expr="expr"+(dot++);
   		try{writer.write(expr+"->asignacion"+(dot)+";\n");}catch(Exception e){}
 	}
-	asignacion 
+	asignacion
 		{ $tsub=$asignacion.tsub;}
 	;
 
@@ -905,9 +966,9 @@ exprCondOr
 		String exprCondOr="exprCondOr"+(dot++);
 		try{writer.write(exprCondOr+"->exprCondAnd"+(dot)+";\n");}catch(Exception e){}
 	}
-	exprCondAnd 
+	exprCondAnd
 		{try{writer.write(exprCondOr+"->exprCondOr_"+(dot)+";\n");}catch(Exception e){}}
-	exprCondOr_ 
+	exprCondOr_
 	{
 		if($exprCondOr_.tsub!=null){
 			if($exprCondAnd.tsub!=$exprCondOr_.tsub){
@@ -928,11 +989,11 @@ exprCondOr_
 		String exprCondOr_="exprCondOr_"+(dot++);
 		try{writer.write(exprCondOr_+"->OR"+(dot++)+";\n");}catch(Exception e){}
 	}
-	OR 
+	OR
 		{try{writer.write(exprCondOr_+"->exprCondAnd"+(dot)+";\n");}catch(Exception e){}}
 	exprCondAnd
 		{try{writer.write(exprCondOr_+"->exprCondOr_"+(dot)+";\n");}catch(Exception e){}}
-	exprCondOr_ 
+	exprCondOr_
 	{
 		if($exprCondAnd.tsub!=Simbolo.TipoSubyacente.BOOLEAN){
 			errores+=("ERROR SEMANTICO - tipo incorrecto\n"+
@@ -946,7 +1007,7 @@ exprCondOr_
 		try{writer.write("lambda"+(dot)+"[label=lambda];\n");}catch(Exception e){}
 		try{writer.write(exprCondOr_+"->lambda"+(dot++)+";\n");}catch(Exception e){}
 	}
-	; 
+	;
 
 exprCondAnd
 	returns[ Simbolo.TipoSubyacente tsub]:
@@ -955,8 +1016,8 @@ exprCondAnd
 		try{writer.write(exprCondAnd+"->exprComp"+(dot)+";\n");}catch(Exception e){}
 	}
 	exprComp
-		{try{writer.write(exprCondAnd+"->exprCondAnd_"+(dot)+";\n");}catch(Exception e){}} 
-	exprCondAnd_ 
+		{try{writer.write(exprCondAnd+"->exprCondAnd_"+(dot)+";\n");}catch(Exception e){}}
+	exprCondAnd_
 	{
 		if($exprCondAnd_.tsub!=null){
 			if($exprComp.tsub!=$exprCondAnd_.tsub){
@@ -981,7 +1042,7 @@ exprCondAnd_
 		{try{writer.write(exprCondAnd_+"->exprComp"+(dot)+";\n");}catch(Exception e){}}
 	exprComp
 		{try{writer.write(exprCondAnd_+"->exprCondAnd_"+(dot)+";\n");}catch(Exception e){}}
-	exprCondAnd_ 
+	exprCondAnd_
 	{
 		if($exprComp.tsub!=Simbolo.TipoSubyacente.BOOLEAN){
 			errores+=("ERROR SEMANTICO - tipo incorrecto\n"+
@@ -1004,7 +1065,7 @@ exprComp
 	}
 	exprSuma
 		{try{writer.write(exprComp+"->exprComp_"+(dot)+";\n");}catch(Exception e){}}
-	exprComp_ 
+	exprComp_
 	{
 		if($exprComp_.tsub!=null){
 			if($exprSuma.tsub!=$exprComp_.tsub){
@@ -1021,15 +1082,15 @@ exprComp
 exprComp_
 	returns[ Simbolo.TipoSubyacente tsub]:
 		{String exprComp_="exprComp_"+(dot++);}
-	Comparador 
+	Comparador
 	{
 		try{writer.write("Comparador"+(dot)+"[label=\""+$Comparador.getText() +"\"];\n");}catch(Exception e){}
-		try{writer.write(exprComp_+"->"+"Comparador"+(dot++)+";\n");}catch(Exception e){} 	  
+		try{writer.write(exprComp_+"->"+"Comparador"+(dot++)+";\n");}catch(Exception e){}
     	try{writer.write(exprComp_+"->exprSuma"+(dot)+";\n");}catch(Exception e){}
 	}
 	exprSuma
 		{try{writer.write(exprComp_+"->exprComp_"+(dot)+";\n");}catch(Exception e){}}
-	exprComp_ 
+	exprComp_
 	{
 		if($exprSuma.tsub==Simbolo.TipoSubyacente.BOOLEAN && !($Comparador.getText().equals("==") || $Comparador.getText().equals("!="))){
 			errores+=("ERROR SEMANTICO - Línea: "+$Comparador.getLine()+", comparación incompatible con tipo BOOLEAN\n");
@@ -1054,9 +1115,9 @@ exprSuma
 		String exprSuma="exprSuma"+(dot++);
 		try{writer.write(exprSuma+"->exprMult"+(dot)+";\n");}catch(Exception e){}
 	}
-	exprMult 
+	exprMult
 		{try{writer.write(exprSuma+"->exprSuma_"+(dot)+";\n");}catch(Exception e){}}
-	exprSuma_ 
+	exprSuma_
 	{
 		if($exprSuma_.tsub!=null && $exprMult.tsub!=$exprSuma_.tsub){
 			errores+=("ERROR SEMANTICO - tipos incompatibles\n"+
@@ -1069,15 +1130,15 @@ exprSuma
 exprSuma_
 	returns[ Simbolo.TipoSubyacente tsub]:
 		{String exprSuma="exprSuma"+(dot++);}
-	OpBinSum 
+	OpBinSum
 	{
 		try{writer.write("OpBinSum"+(dot)+"[label=\""+$OpBinSum.getText() +"\"];\n");}catch(Exception e){}
-   		try{writer.write(exprSuma+"->"+"OpBinSum"+(dot++)+";\n");}catch(Exception e){} 
+   		try{writer.write(exprSuma+"->"+"OpBinSum"+(dot++)+";\n");}catch(Exception e){}
     	try{writer.write(exprSuma+"->exprMult"+(dot)+";\n");}catch(Exception e){}
 	}
 	exprMult
 		{try{writer.write(exprSuma+"->exprSuma_"+(dot)+";\n");}catch(Exception e){}}
-	exprSuma_ 
+	exprSuma_
 	{
 		if($exprMult.tsub!=Simbolo.TipoSubyacente.INT){
 			errores+=("ERROR SEMANTICO - tipos incompatibles\n"+
@@ -1099,9 +1160,9 @@ exprMult
 		String exprMult="exprMult"+(dot++);
 		try{writer.write(exprMult+"->exprUnaria"+(dot)+";\n");}catch(Exception e){}
 	}
-	exprUnaria 
+	exprUnaria
 		{try{writer.write(exprMult+"->exprMult_"+(dot)+";\n");}catch(Exception e){}}
-	exprMult_ 
+	exprMult_
 	{
 		if($exprMult_.tsub!=null && $exprUnaria.tsub!=$exprMult_.tsub){
 			errores+=("ERROR SEMANTICO - tipos incompatibles\n"+
@@ -1114,15 +1175,15 @@ exprMult
 exprMult_
 	returns[ Simbolo.TipoSubyacente tsub ]:
 		{String exprMult_="exprMult_"+(dot++);}
-	MULT 
+	MULT
 	{
 		try{writer.write("MULT"+(dot)+"[label=\""+$MULT.getText() +"\"];\n");}catch(Exception e){}
 		try{writer.write(exprMult_+"->"+"MULT"+(dot++)+";\n");}catch(Exception e){}
 		try{writer.write(exprMult_+"->exprUnaria"+(dot)+";\n");}catch(Exception e){}
 	}
-	exprUnaria 
+	exprUnaria
 		{try{writer.write(exprMult_+"->exprMult_"+(dot)+";\n");}catch(Exception e){}}
-	exprMult_ 
+	exprMult_
 	{
 		if($exprUnaria.tsub!=Simbolo.TipoSubyacente.INT){
 			errores+=("ERROR SEMANTICO - Línea: "+$MULT.getLine()+", tipos incompatibles\n"+
@@ -1130,15 +1191,15 @@ exprMult_
 		}
 		$tsub=$exprUnaria.tsub;
 	}
-	| 
+	|
 		{String exprMult_="exprMult_"+(dot++);}
-	DIV 
+	DIV
 	{
-		try{writer.write("DIV"+(dot)+"[label=\""+$DIV.getText() +"\"];\n");}catch(Exception e){} 
+		try{writer.write("DIV"+(dot)+"[label=\""+$DIV.getText() +"\"];\n");}catch(Exception e){}
 		try{writer.write(exprMult_+"->"+"DIV"+(dot++)+";\n");}catch(Exception e){}
 		try{writer.write(exprMult_+"->exprUnaria"+(dot)+";\n");}catch(Exception e){}
 	}
-	exprUnaria 
+	exprUnaria
 		{try{writer.write(exprMult_+"->exprMult_"+(dot)+";\n");}catch(Exception e){}}
 	exprMult_
 	{
@@ -1159,13 +1220,13 @@ exprMult_
 exprUnaria
 	returns[ Simbolo.TipoSubyacente tsub ]:
 		{String exprUnaria="exprUnaria"+(dot++);}
-	OpBinSum 
+	OpBinSum
 	{
 		try{writer.write("OpBinSum"+(dot)+"[label=\""+$OpBinSum.getText() +"\"];\n");}catch(Exception e){}
 		try{writer.write(exprUnaria+"->"+"OpBinSum"+(dot++)+";\n");}catch(Exception e){}
 		try{writer.write(exprUnaria+"->exprNeg"+(dot)+";\n");}catch(Exception e){}
 	}
-	exprNeg 
+	exprNeg
 	{
 		if($exprNeg.tsub!=Simbolo.TipoSubyacente.INT){
 			errores+=("ERROR SEMANTICO - tipos incompatibles\n"+
@@ -1173,12 +1234,12 @@ exprUnaria
 		}
 		$tsub=$exprNeg.tsub;
 	}
-	| 
+	|
 	{
 		String exprUnaria="exprUnaria"+(dot++);
 		try{writer.write(exprUnaria+"->exprNeg"+(dot)+";\n");}catch(Exception e){}
 	}
-	exprNeg 
+	exprNeg
 		{ $tsub=$exprNeg.tsub; }
 	;
 
@@ -1188,9 +1249,9 @@ exprNeg
     	String exprNeg="exprNeg"+(dot++);
     	try{writer.write(exprNeg+"->NOT"+(dot++)+";\n");}catch(Exception e){}
 	}
-	NOT 
+	NOT
 		{try{writer.write(exprNeg+"->exprUnaria"+(dot)+";\n");}catch(Exception e){}}
-	exprUnaria 
+	exprUnaria
 	{
 		if($exprUnaria.tsub!=Simbolo.TipoSubyacente.BOOLEAN){
 			errores+=("ERROR SEMANTICO - tipos incompatibles\n"+
@@ -1198,12 +1259,12 @@ exprNeg
 		}
 		$tsub=$exprUnaria.tsub;
 	}
-	| 
+	|
 	{
 		String exprNeg="exprNeg"+(dot++);
 		try{writer.write(exprNeg+"->exprPostfija"+(dot)+";\n");}catch(Exception e){}
 	}
-	exprPostfija 
+	exprPostfija
 	{ $tsub=$exprPostfija.tsub; }
 	;
 
@@ -1213,11 +1274,11 @@ exprPostfija
 		String exprPostfija="exprPostfija"+(dot++);
 		try{writer.write(exprPostfija+"->primario"+(dot)+";\n");}catch(Exception e){}
 	}
-	primario 
+	primario
 		{ $tsub=$primario.tsub; }
-	| 
+	|
 		{String exprPostfija="exprPostfija"+(dot++);}
-	Identificador 
+	Identificador
 	{
 		try{
 			Simbolo s=ts.consulta($Identificador.getText());
@@ -1228,15 +1289,15 @@ exprPostfija
 			errores+=("ERROR SEMANTICO - "+ex.getMessage()+"\n");
 		}
 		// DOT
-		try{writer.write($Identificador.getText() +(dot)+"[label="+$Identificador.getText() +"];\n");}catch(Exception e){}	
+		try{writer.write($Identificador.getText() +(dot)+"[label="+$Identificador.getText() +"];\n");}catch(Exception e){}
     	try{writer.write(exprPostfija+"->"+$Identificador.getText() +(dot++)+";\n");}catch(Exception e){}
 	}
-	| 
+	|
 	{
 		String exprPostfija="exprPostfija"+(dot++);
 		try{writer.write(exprPostfija+"->sentInvocaMet"+(dot)+";\n");}catch(Exception e){}
 	}
-	sentInvocaMet 
+	sentInvocaMet
 	{ $tsub=$sentInvocaMet.tsub; }
 	;
 
@@ -1246,44 +1307,44 @@ primario
 		String primario="primario"+(dot++);
 		try{writer.write(primario+"->LPAREN"+(dot++)+";\n");}catch(Exception e){}
 	}
-	'(' 
+	'('
 		{try{writer.write(primario+"->expr"+(dot)+";\n");}catch(Exception e){}}
-	expr 
+	expr
 		{try{writer.write(primario+"->RPAREN"+(dot++)+";\n");}catch(Exception e){}}
-	')' 
+	')'
 	{ $tsub=$expr.tsub; }
-	| 
+	|
 	{
     	String primario="primario"+(dot++);
     	try{writer.write(primario+"->literal"+(dot)+";\n");}catch(Exception e){}
 	}
-	literal 
+	literal
 	{ $tsub=$literal.tsub; }
 	;
 
 literal
 	returns[ Simbolo.TipoSubyacente tsub ]:
 		{String literal="literal"+(dot++);}
-	LiteralInteger 
-	{ 
-		$tsub=Simbolo.TipoSubyacente.INT; 
+	LiteralInteger
+	{
+		$tsub=Simbolo.TipoSubyacente.INT;
 		// DOT
 		try{writer.write($LiteralInteger.getText() +(dot)+"[label="+$LiteralInteger.getText() +"];\n");}catch(Exception e){}
 		try{writer.write(literal+"->"+$LiteralInteger.getText() +(dot++)+";\n");}catch(Exception e){}
 	}
-	| 
-		{String literal="literal"+(dot++);}	
+	|
+		{String literal="literal"+(dot++);}
 	LiteralBoolean
-	{ 
-		$tsub=Simbolo.TipoSubyacente.BOOLEAN; 
+	{
+		$tsub=Simbolo.TipoSubyacente.BOOLEAN;
 		try{writer.write($LiteralBoolean.getText() +(dot)+"[label="+$LiteralBoolean.getText() +"];\n");}catch(Exception e){}
     	try{writer.write(literal+"->"+$LiteralBoolean.getText() +(dot++)+";\n");}catch(Exception e){}
 	}
-	| 
+	|
 		{String literal="literal"+(dot++);}
 	LiteralString
 	{
-		$tsub=Simbolo.TipoSubyacente.STRING; 
+		$tsub=Simbolo.TipoSubyacente.STRING;
 		try{writer.write($LiteralString.getText() +(dot)+"[label="+$LiteralString.getText() +"];\n");}catch(Exception e){}
     	try{writer.write(literal+"->"+$LiteralString.getText() +(dot++)+";\n");}catch(Exception e){}
 	}
