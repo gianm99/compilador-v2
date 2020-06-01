@@ -111,33 +111,47 @@ sentExpr: exprSent ';';
 exprSent: asignacion | sentInvocaMet;
 
 sentIf
-	returns[ ArrayList<Integer> seg]:
+	returns[ ArrayList<Integer> sig]:
 	IF '(' expr ')' {
 		Etiqueta e=new Etiqueta(pc);
-		genera("e"+e.getNe()+": skip\n");
+		genera(e+": skip\n");
 	} bloque {
 		//backpatch(expr.cierto, e);
-		$seg=new ArrayList();
-		// $seg.addAll(expr.falso);
-		// $seg.addAll(bloque.seg);
+		$sig=new ArrayList();
+		// $sig.addAll(expr.falso);
+		// $sig.addAll(bloque.sig);
 	};
 
-sentIfElse returns [ ArrayList<Integer> seg]:
+sentIfElse
+	returns[ ArrayList<Integer> sig]:
 	IF '(' expr ')' {
 		Etiqueta e1=new Etiqueta(pc);
-		genera("e"+e1.getNe()+": skip\n");
-} bloque ELSE {
-		// $seg=new ArrayList();
-		// $seg.addAll(bloque.seg); // concatenar bloque 1
+		genera(e1+": skip\n");
+	} bloque ELSE {
+		// $sig=new ArrayList();
+		// $sig.addAll(bloque.sig); // concatenar bloque 1
 		Etiqueta e2=new Etiqueta(pc);
-		genera("e"+e2.getNe()+": skip\n");
-}bloque{
-	// backpatch(expr.cierto,e1);
-	// backpatch(expr.falso,e2);
-	// $seg.addAll(bloque.seg); // concatenar bloque 2
+		genera(e2+": skip\n");
+	} bloque {
+		// backpatch(expr.cierto,e1);
+		// backpatch(expr.falso,e2);
+		// $sig.addAll(bloque.sig); // concatenar bloque 2
 };
 
-sentWhile: WHILE '(' expr ')' bloque;
+sentWhile
+	returns[ ArrayList<Integer> sig ]:
+	WHILE {
+	Etiqueta e1=new Etiqueta(pc);
+	genera("e"+e1.getNe()+": skip\n");
+} '(' expr ')' {
+	Etiqueta e2=new Etiqueta(pc);
+	genera("e"+e2.getNe()+": skip\n");
+} bloque {
+	// backpatch(expr.cierto,e2);
+	// backpatch(bloque.sig, e1);
+	// $sig=expr.falso;
+	genera("goto "+e1+"\n");
+};
 
 sentReturn: RETURN expr ';';
 
