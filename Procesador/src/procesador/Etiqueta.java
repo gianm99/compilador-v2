@@ -27,4 +27,9 @@ public class Etiqueta {
     public void setNl(int nl) {
         this.nl = nl;
     }
+
+    @Override
+    public String toString() {
+        return "e" + ne;
+    }
 }
