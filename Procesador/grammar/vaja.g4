@@ -512,6 +512,8 @@ declaracionVarLocal[Simbolo.Tipo t]:
 	declaracionVar[$tipo.tsub]
 	;
 
+sents: sents sent | sent;
+
 sent:
 	{
 		String sent="sent"+(dot++);
@@ -532,10 +534,30 @@ sent:
 	sentExpr
 	| 
 	{
+		boolean reqaux = returnreq;
+		boolean encaux = returnenc;
+		returnreq = false;
+		// DOT
 		String sent="sent"+(dot++);
-    	try{writer.write(sent+"->sentIf"+(dot)+";\n");}catch(Exception e){}
+    	try{writer.write(sent+"->IF"+(dot++)+";\n");}catch(Exception e){}
 	}
-	sentIf
+	IF 
+		{try{writer.write(sent+"->LPAREN"+(dot++)+";\n");}catch(Exception e){}}
+	'(' 
+		{try{writer.write(sent+"->expr"+(dot)+";\n");}catch(Exception e){}}
+	expr 
+		{try{writer.write(sent+"->RPAREN"+(dot++)+";\n");}catch(Exception e){}}
+	')' 
+		{try{writer.write(sent+"->bloque"+(dot)+";\n");}catch(Exception e){}}
+	bloque[null] 
+	{
+		if($expr.tsub != Simbolo.TipoSubyacente.BOOLEAN){
+			errores += ("ERROR SEMANTICO - Línea: " +$IF.getLine()+"\n"+
+			"La expresión debe ser de tipo BOOLEAN\n");
+		}
+		returnreq = reqaux;
+		returnenc = encaux;
+	}
 	|
 	{
 		String sent="sent"+(dot++);
