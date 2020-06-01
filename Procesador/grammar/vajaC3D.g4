@@ -6,24 +6,26 @@ options
 }
 
 @header {
-	package antlr;
-	import procesador.*;
-	import java.io.*;
-    import java.util.*;
-	import procesador.*;
+package antlr;
+import procesador.*;
+import java.io.*;
+import java.util.*;
+import procesador.*;
 }
 
 @parser::members {
-	TablaSimbolos simbolos;
-	TablaVariables variables;
-	TablaProcedimientos procedimientos;
-	String directorio;
+TablaSimbolos simbolos;
+TablaVariables variables;
+TablaProcedimientos procedimientos;
+String directorio;
+Writer writer;
+int pc = 0; // program counter
 
-	public vajaC3D(TokenStream input, String directorio, TablaSimbolos simbolos){
-		this(input);
-		this.directorio=directorio;
-		this.simbolos=simbolos;
-	}
+public vajaC3D(TokenStream input, String directorio, TablaSimbolos simbolos){
+	this(input);
+	this.directorio=directorio;
+	this.simbolos=simbolos;
+}
 
 public void genera(String codigo){
 	try{
@@ -108,9 +110,32 @@ sentExpr: exprSent ';';
 
 exprSent: asignacion | sentInvocaMet;
 
-sentIf: IF '(' expr ')' bloque;
+sentIf
+	returns[ ArrayList<Integer> seg]:
+	IF '(' expr ')' {
+		Etiqueta e=new Etiqueta(pc);
+		genera("e"+e.getNe()+": skip\n");
+	} bloque {
+		//backpatch(expr.cierto, e);
+		$seg=new ArrayList();
+		// $seg.addAll(expr.falso);
+		// $seg.addAll(bloque.seg);
+	};
 
-sentIfElse: IF '(' expr ')' bloque ELSE bloque;
+sentIfElse returns [ ArrayList<Integer> seg]:
+	IF '(' expr ')' {
+		Etiqueta e1=new Etiqueta(pc);
+		genera("e"+e1.getNe()+": skip\n");
+} bloque ELSE {
+		// $seg=new ArrayList();
+		// $seg.addAll(bloque.seg); // concatenar bloque 1
+		Etiqueta e2=new Etiqueta(pc);
+		genera("e"+e2.getNe()+": skip\n");
+}bloque{
+	// backpatch(expr.cierto,e1);
+	// backpatch(expr.falso,e2);
+	// $seg.addAll(bloque.seg); // concatenar bloque 2
+};
 
 sentWhile: WHILE '(' expr ')' bloque;
 
