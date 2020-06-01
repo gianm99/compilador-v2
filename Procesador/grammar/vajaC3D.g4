@@ -117,7 +117,7 @@ sentIf
 		genera(e+": skip\n");
 	} bloque {
 		//backpatch(expr.cierto, e);
-		$sig=new ArrayList();
+		$sig=new ArrayList<Integer>();
 		// $sig.addAll(expr.falso);
 		// $sig.addAll(bloque.sig);
 	};
@@ -128,7 +128,7 @@ sentIfElse
 		Etiqueta e1=new Etiqueta(pc);
 		genera(e1+": skip\n");
 	} bloque ELSE {
-		// $sig=new ArrayList();
+		// $sig=new ArrayList<Integer>();
 		// $sig.addAll(bloque.sig); // concatenar bloque 1
 		Etiqueta e2=new Etiqueta(pc);
 		genera(e2+": skip\n");
@@ -142,10 +142,10 @@ sentWhile
 	returns[ ArrayList<Integer> sig ]:
 	WHILE {
 	Etiqueta e1=new Etiqueta(pc);
-	genera("e"+e1.getNe()+": skip\n");
+	genera(e1+": skip\n");
 } '(' expr ')' {
 	Etiqueta e2=new Etiqueta(pc);
-	genera("e"+e2.getNe()+": skip\n");
+	genera(e2+": skip\n");
 } bloque {
 	// backpatch(expr.cierto,e2);
 	// backpatch(bloque.sig, e1);
@@ -159,7 +159,22 @@ sentInvocaMet: Identificador '(' ( argumentos)? ')';
 
 argumentos: expr (',' expr)*;
 
-asignacion: Identificador '=' expr;
+asignacion returns [ ArrayList<Integer> sig]:
+	Identificador '=' expr {
+	Etiqueta ec,ef,efin;
+	Simbolo.TipoSubyacente idTsub = null;
+	$sig=new ArrayList<Integer>();
+	try{
+		idTsub=simbolos.consulta($Identificador.getText()).getTs();
+		if(idTsub==Simbolo.TipoSubyacente.BOOLEAN){
+			ec=new Etiqueta(pc);
+			ef=new Etiqueta(pc);
+			efin=new Etiqueta(pc);
+			genera(ec+": skip");
+			// genera(Identificador);
+		}		
+	}catch(TablaSimbolos.exceptionTablaSimbolos ex){}
+ };
 
 expr: exprCondOr | asignacion;
 
