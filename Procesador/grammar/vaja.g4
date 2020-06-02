@@ -513,12 +513,6 @@ declaracionVarLocal[Simbolo.Tipo t]:
 sents: sents sent | sent;
 
 sent:
-	// {
-	// 	String sent="sent"+(dot++);
-	// 	try{writer.write(sent+"->bloque"+(dot)+";\n");}catch(Exception e){}
-	// }
-	// bloque[null]
-	// |
 	{
 		String sent="sent"+(dot++);
     	try{writer.write(sent+"->sentExpr"+(dot)+";\n");}catch(Exception e){}
