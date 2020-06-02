@@ -62,8 +62,7 @@ declaracion:
 	'var' tipo declaracionVar
 	| 'const' tipo declaracionConst
 	| 'func' declFunc
-	| 'proc' declProc
-	| ';';
+	| 'proc' declProc;
 
 tipo: INT | BOOLEAN | STRING;
 // Variables y constantes
@@ -114,10 +113,11 @@ sents: sents sent | sent;
 sent:
 	IF expr BEGIN sents END
 	| IF expr BEGIN sents END ELSE BEGIN sents END
-    | WHILE expr BEGIN sents END
-    | r ASSIGN expr;
+	| WHILE expr BEGIN sents END
+	| referencia ASSIGN expr
+	| RETURN expr ';';
 
-r: Identificador;
+referencia: Identificador;
 
 sentExpr: exprSent ';';
 
@@ -127,9 +127,9 @@ exprSent: asignacion | sentInvocaMet;
 
 // sentIfElse: IF '(' expr ')' bloque ELSE bloque;
 
-sentWhile: WHILE '(' expr ')' bloque;
+// sentWhile: WHILE '(' expr ')' bloque;
 
-sentReturn: RETURN expr ';';
+// sentReturn: RETURN expr ';';
 
 sentInvocaMet: Identificador '(' ( argumentos)? ')';
 
@@ -137,7 +137,19 @@ argumentos: expr (',' expr)*;
 
 asignacion: Identificador '=' expr;
 
-expr: exprCondOr | asignacion;
+// expr: exprCondOr | asignacion;
+expr:
+	expr OPREL expr
+	| NOT expr
+	| expr AND expr
+	| expr OR expr
+	| expr ADD expr
+	| expr SUB expr
+	| expr MULT expr
+	| expr DIV expr
+	| expr  expr
+	| LPAREN expr RPAREN
+	| literal;
 
 exprCondOr: exprCondAnd exprCondOr_;
 
@@ -149,7 +161,7 @@ exprCondAnd_: AND exprComp exprCondAnd_ |; //lambda
 
 exprComp: exprSuma exprComp_;
 
-exprComp_: Comparador exprSuma exprComp_ |; //lambda
+exprComp_: OPREL exprSuma exprComp_ |; //lambda
 
 exprSuma: exprMult exprSuma_;
 
@@ -216,7 +228,7 @@ COMMA: ',';
 SEMI: ';';
 
 // Operadores
-Comparador: EQUAL | NOTEQUAL | GT | LT | GE | LE;
+OPREL: EQUAL | NOTEQUAL | GT | LT | GE | LE;
 
 OpBinSum: ADD | SUB;
 
