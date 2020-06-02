@@ -39,7 +39,7 @@ grammar vaja;
 			expected = expected.substring(expected.indexOf("input") + 6);
 			notificacion += "no se reconoce " + expected;
 		}
-		notificacion = notificacion.replaceAll("Comparador","==, !=, <, >, <=, >=");
+		notificacion = notificacion.replaceAll("OPREL","==, !=, <, >, <=, >=");
 		notificacion = notificacion.replaceAll("OpBinSum","+, -");
 		throw new RuntimeException(notificacion);
 	}
@@ -133,8 +133,6 @@ declaracion[String padre]:
         try{writer.write($padre+"->"+declaracion+";\n");}catch(Exception e){}
         try{writer.write(declaracion+"->proc"+(dot++)+";\n");}catch(Exception e){}}'proc'
 		{try{writer.write(declaracion+"->declProc"+(dot)+";\n");}catch(Exception e){}}declProc
-	|
-	';'
 	;
 
 tipo
@@ -518,12 +516,6 @@ sent:
 		try{writer.write(sent+"->bloque"+(dot)+";\n");}catch(Exception e){}
 	}
 	bloque[null]
-	|
-	{
-		String sent="sent"+(dot++);
-		try{writer.write(sent+"->PUNTOYCOMA"+(dot++)+";\n");}catch(Exception e){}
-	}
-	';'
 	|
 	{
 		String sent="sent"+(dot++);
@@ -1082,21 +1074,21 @@ exprComp
 exprComp_
 	returns[ Simbolo.TipoSubyacente tsub]:
 		{String exprComp_="exprComp_"+(dot++);}
-	Comparador
+	OPREL
 	{
-		try{writer.write("Comparador"+(dot)+"[label=\""+$Comparador.getText() +"\"];\n");}catch(Exception e){}
-		try{writer.write(exprComp_+"->"+"Comparador"+(dot++)+";\n");}catch(Exception e){}
+		try{writer.write("OPREL"+(dot)+"[label=\""+$OPREL.getText() +"\"];\n");}catch(Exception e){}
+		try{writer.write(exprComp_+"->"+"OPREL"+(dot++)+";\n");}catch(Exception e){}
     	try{writer.write(exprComp_+"->exprSuma"+(dot)+";\n");}catch(Exception e){}
 	}
 	exprSuma
 		{try{writer.write(exprComp_+"->exprComp_"+(dot)+";\n");}catch(Exception e){}}
 	exprComp_
 	{
-		if($exprSuma.tsub==Simbolo.TipoSubyacente.BOOLEAN && !($Comparador.getText().equals("==") || $Comparador.getText().equals("!="))){
-			errores+=("ERROR SEMANTICO - Línea: "+$Comparador.getLine()+", comparación incompatible con tipo BOOLEAN\n");
+		if($exprSuma.tsub==Simbolo.TipoSubyacente.BOOLEAN && !($OPREL.getText().equals("==") || $OPREL.getText().equals("!="))){
+			errores+=("ERROR SEMANTICO - Línea: "+$OPREL.getLine()+", comparación incompatible con tipo BOOLEAN\n");
 		}
 		if($exprComp_.tsub!=null && $exprSuma.tsub!=$exprComp_.tsub){
-			errores+=("ERROR SEMANTICO - Línea: "+$Comparador.getLine()+", comparación de tipos incompatibles\n"+
+			errores+=("ERROR SEMANTICO - Línea: "+$OPREL.getLine()+", comparación de tipos incompatibles\n"+
 			"encontrado: "+$exprComp_.tsub+" esperado: "+$exprSuma.tsub+"\n");
 		}
 		$tsub=$exprSuma.tsub;
@@ -1394,7 +1386,7 @@ COMMA: ',';
 SEMI: ';';
 
 // Operadores
-Comparador: EQUAL | NOTEQUAL | GT | LT | GE | LE;
+OPREL: EQUAL | NOTEQUAL | GT | LT | GE | LE;
 
 OpBinSum: ADD | SUB;
 
