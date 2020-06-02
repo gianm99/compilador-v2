@@ -42,14 +42,13 @@ programaPrincipal:
 			File c3dFile=new File(this.directorio+"/c3d.txt");
 			writer=new BufferedWriter(new FileWriter(c3dFile));
 		}catch(Exception e){}
-	} declaracion* EOF;
+	} (declaracion | sents)* EOF;
 
 declaracion:
 	'var' tipo declaracionVar
 	| 'const' tipo declaracionConst
 	| 'func' declFunc
-	| 'proc' declProc
-	| ';';
+	| 'proc' declProc;
 
 tipo: INT | BOOLEAN | STRING;
 // Variables y constantes
@@ -94,25 +93,12 @@ sentDeclVarLocal: declaracionVarLocal;
 
 declaracionVarLocal: tipo declaracionVar;
 
-sent:
-	bloque
-	| sentVacia
-	| sentExpr
-	| sentIf
-	| sentIfElse
-	| sentWhile
-	| sentReturn;
+sents: sents sent | sent;
 
-//TODO Gian
-sentVacia: ';';
-
-sentExpr: exprSent ';';
-
-exprSent: asignacion | sentInvocaMet;
-
-sentIf
+sent
 	returns[ ArrayList<Integer> sig]:
-	IF '(' expr ')' {
+	sentExpr
+	| IF '(' expr ')' {
 		Etiqueta e=new Etiqueta(pc);
 		genera(e+": skip\n");
 	} bloque {
@@ -120,15 +106,12 @@ sentIf
 		$sig=new ArrayList<Integer>();
 		// $sig.addAll(expr.falso);
 		// $sig.addAll(bloque.sig);
-	};
-
-sentIfElse
-	returns[ ArrayList<Integer> sig]:
-	IF '(' expr ')' {
+	}
+	| IF '(' expr ')' {
 		Etiqueta e1=new Etiqueta(pc);
 		genera(e1+": skip\n");
 	} bloque ELSE {
-		// $sig=new ArrayList<Integer>();
+		$sig=new ArrayList<Integer>();
 		// $sig.addAll(bloque.sig); // concatenar bloque 1
 		Etiqueta e2=new Etiqueta(pc);
 		genera(e2+": skip\n");
@@ -136,30 +119,40 @@ sentIfElse
 		// backpatch(expr.cierto,e1);
 		// backpatch(expr.falso,e2);
 		// $sig.addAll(bloque.sig); // concatenar bloque 2
-};
+	}
+	| WHILE {
+		Etiqueta e1=new Etiqueta(pc);
+		genera(e1+": skip\n");
+	} '(' expr ')' {
+		Etiqueta e2=new Etiqueta(pc);
+		genera(e2+": skip\n");
+	} bloque {
+		// backpatch(expr.cierto,e2);
+		// backpatch(bloque.sig, e1);
+		// $sig=expr.falso;
+		genera("goto "+e1+"\n");
+	}
+	| RETURN expr ';';
 
-sentWhile
-	returns[ ArrayList<Integer> sig ]:
-	WHILE {
-	Etiqueta e1=new Etiqueta(pc);
-	genera(e1+": skip\n");
-} '(' expr ')' {
-	Etiqueta e2=new Etiqueta(pc);
-	genera(e2+": skip\n");
-} bloque {
-	// backpatch(expr.cierto,e2);
-	// backpatch(bloque.sig, e1);
-	// $sig=expr.falso;
-	genera("goto "+e1+"\n");
-};
+//TODO Gian
 
-sentReturn: RETURN expr ';';
+sentExpr
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	exprSent ';';
 
-sentInvocaMet: Identificador '(' ( argumentos)? ')';
+exprSent
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	asignacion
+	| sentInvocaMet;
+
+sentInvocaMet
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	Identificador '(' (argumentos)? ')';
 
 argumentos: expr (',' expr)*;
 
-asignacion returns [ ArrayList<Integer> sig]:
+asignacion
+	returns[ ArrayList<Integer> sig]:
 	Identificador '=' expr {
 	Etiqueta ec,ef,efin;
 	Simbolo.TipoSubyacente idTsub = null;
@@ -172,41 +165,112 @@ asignacion returns [ ArrayList<Integer> sig]:
 			efin=new Etiqueta(pc);
 			genera(ec+": skip");
 			// genera(Identificador);
-		}		
+		}
 	}catch(TablaSimbolos.exceptionTablaSimbolos ex){}
  };
 
-expr: exprCondOr | asignacion;
+expr
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	exprCondOr
+	| asignacion;
 
-exprCondOr: exprCondAnd exprCondOr_;
+exprCondOr
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	exprCondAnd exprCondOr_;
 
-exprCondOr_: OR exprCondAnd exprCondOr_ |; //lambda
+exprCondOr_
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	OR {
+		Etiqueta e=new Etiqueta(pc);
+		genera(e+": skip\n");
+	}exprCondAnd exprCondOr_
+	|; //lambda
 
-exprCondAnd: exprComp exprCondAnd_;
+exprCondAnd
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	exprComp exprCondAnd_;
 
-exprCondAnd_: AND exprComp exprCondAnd_ |; //lambda
+exprCondAnd_
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	AND {
+		Etiqueta e=new Etiqueta(pc);
+		genera(e+": skip\n");
+	}exprComp exprCondAnd_
+	|; //lambda
 
-exprComp: exprSuma exprComp_;
+exprComp
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	exprSuma exprComp_;
 
-exprComp_: Comparador exprSuma exprComp_ |; //lambda
+exprComp_
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	OPREL exprSuma exprComp_
+	|; //lambda
 
-exprSuma: exprMult exprSuma_;
+exprSuma
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	exprMult exprSuma_;
 
-exprSuma_: OpBinSum exprMult exprSuma_ |; //lambda
+exprSuma_
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	OpBinSum exprMult exprSuma_
+	|; //lambda
 
-exprMult: exprUnaria exprMult_;
+exprMult
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	exprUnaria exprMult_;
 
-exprMult_:
+exprMult_
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
 	MULT exprUnaria exprMult_
 	| DIV exprUnaria exprMult_
 	|; //lambda
 
-exprUnaria: OpBinSum exprNeg | exprNeg;
+exprUnaria
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	OpBinSum exprNeg
+	| exprNeg;
 
-exprNeg: NOT exprUnaria | exprPostfija;
+exprNeg
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	NOT exprUnaria { 
+		$cierto=$exprUnaria.falso;
+		$falso=$exprUnaria.cierto;
+	}
+	| exprPostfija;
 
-exprPostfija: primario | Identificador | sentInvocaMet;
+exprPostfija
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	primario {
+		$cierto=$primario.cierto;
+		$falso=$primario.falso;
+	}
+	| Identificador
+	| sentInvocaMet;
 
-primario: '(' expr ')' | literal;
+primario
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	'(' expr ')' {
+		$cierto=$expr.cierto;
+		$falso=$expr.falso;
+	}
+	| literal {
+		$cierto=$literal.cierto;
+		$falso=$literal.falso;
+	};
 
-literal: LiteralInteger | LiteralBoolean | LiteralString;
+literal
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	LiteralInteger
+	| LiteralBoolean {
+		genera("goto $$$\n");
+		$cierto=new ArrayList<Integer>();
+		$falso=new ArrayList<Integer>();
+		if($LiteralBoolean.getText().equals("true"))
+		{
+			$cierto.add(pc); // true
+		}else{
+			$falso.add(pc); // false
+		}
+	}
+	| LiteralString;
