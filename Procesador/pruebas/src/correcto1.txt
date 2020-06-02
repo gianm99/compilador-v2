@@ -31,3 +31,4 @@ proc main(){
 
 var int z =2;
 z=z+1;
+printINT(z);
