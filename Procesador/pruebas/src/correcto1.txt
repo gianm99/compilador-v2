@@ -28,3 +28,6 @@ proc main(){
 	procedure1(function1(s1, a));
 	printINT(c);
 }
+
+var int z =2;
+z=z+1;

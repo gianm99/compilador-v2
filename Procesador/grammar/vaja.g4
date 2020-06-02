@@ -84,7 +84,7 @@ programaPrincipal:
             writer.write("digraph G {");//}
         }catch (Exception e){}
 		String programaPrincipal="programaPrincipal"+(dot++);
-	} declaracion[programaPrincipal]* EOF {
+	} (declaracion[programaPrincipal]|sents)* EOF {
 		try{
 			ts.saleBloque();
 		}catch(Exception ex){
@@ -510,13 +510,15 @@ declaracionVarLocal[Simbolo.Tipo t]:
 	declaracionVar[$tipo.tsub]
 	;
 
+sents: sents sent | sent;
+
 sent:
-	{
-		String sent="sent"+(dot++);
-		try{writer.write(sent+"->bloque"+(dot)+";\n");}catch(Exception e){}
-	}
-	bloque[null]
-	|
+	// {
+	// 	String sent="sent"+(dot++);
+	// 	try{writer.write(sent+"->bloque"+(dot)+";\n");}catch(Exception e){}
+	// }
+	// bloque[null]
+	// |
 	{
 		String sent="sent"+(dot++);
     	try{writer.write(sent+"->sentExpr"+(dot)+";\n");}catch(Exception e){}
@@ -629,14 +631,6 @@ sent:
 				returnenc = true;
 			}
 	}
-	;
-
-sentVacia:
-	{
-		String sentVacia="sentVacia"+(dot++);
-		try{writer.write(sentVacia+"->PUNTOYCOMA"+(dot++)+";\n");}catch(Exception e){}
-	}
-	';'
 	;
 
 sentExpr:
