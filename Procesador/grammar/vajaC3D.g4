@@ -93,6 +93,7 @@ sentDeclVarLocal: declaracionVarLocal;
 
 declaracionVarLocal: tipo declaracionVar;
 
+//TODO Gian
 sents: sents sent | sent;
 
 sent
@@ -133,8 +134,6 @@ sent
 		genera("goto "+e1+"\n");
 	}
 	| RETURN expr ';';
-
-//TODO Gian
 
 sentExpr
 	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
