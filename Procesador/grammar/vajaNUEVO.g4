@@ -107,21 +107,21 @@ decl:
 		$tipo.tsub+")";
 	}
 }
-	| FUNCTION encabezadoFunc BEGIN decls sents END
-	| PROCEDURE encabezadoProc BEGIN decls sents END;
+	| FUNCTION tipo encabezado[$tipo.tsub] BEGIN decls sents END
+	| PROCEDURE encabezado[null] BEGIN decls sents END;
 
 // Funciones y procedimientos
-encabezadoFunc
-	returns[Simbolo funcion]:
-	tipo ID {
-		$funcion = new Simbolo($ID.getText(),null,Simbolo.Tipo.FUNC,$tipo.tsub);
-	} '(' parametros[$funcion]? ')';
-
-encabezadoProc
-	returns[Simbolo procedimiento]:
+encabezado [Simbolo.TSub tsub]
+	returns[Simbolo met]:
 	ID {
-	$procedimiento = new Simbolo($ID.getText(),null,Simbolo.Tipo.PROC,Simbolo.TSub.NULL); 
-} '(' parametros[$procedimiento]? ')';
+		if($tsub!=null) {
+			// Función
+			$met = new Simbolo($ID.getText(),null,Simbolo.Tipo.FUNC,$tsub);
+		} else {
+			// Procedimiento
+			$met = new Simbolo($ID.getText(),null,Simbolo.Tipo.PROC,Simbolo.TSub.NULL);
+		}
+	} '(' parametros[$met]? ')';
 
 parametros[Simbolo anterior]:
 	parametro ',' {
