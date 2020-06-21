@@ -54,7 +54,7 @@ public void recover(RecognitionException ex)
 }
 }
 
-programaPrincipal:
+programa:
 	{
 		try{
 			ts=new TablaSimbolos(directorio);
@@ -81,8 +81,8 @@ programaPrincipal:
 			writer = new BufferedWriter(new FileWriter(arbolFile));
             writer.write("digraph G {");//}
         }catch (Exception e){}
-		String programaPrincipal="programaPrincipal"+(dot++);
-	} (declaracion[programaPrincipal]|sents)* EOF {
+		String programa="programa"+(dot++);
+	} declaracion[programa]* sents* EOF {
 		try{
 			ts.saleBloque();
 		}catch(Exception ex){
@@ -254,7 +254,7 @@ encabezadoFunc
 	tipo
 	{
 		try{
-			$identificadorMetFunc.metodo.setTs($tipo.tsub);
+			$identificadorMetFunc.metodo.setTsub($tipo.tsub);
 			$metodo = $identificadorMetFunc.metodo;
 			ts.inserta($identificadorMetFunc.metodo.getId(), $identificadorMetFunc.metodo);
 		}catch (TablaSimbolos.exceptionTablaSimbolos e){
@@ -424,7 +424,7 @@ bloque[Simbolo met]:
 		if($met != null){
 			if($met.getT() == Simbolo.Tipo.FUNC){
 				returnreq = true;
-				tiporeturn = $met.getTs();
+				tiporeturn = $met.getTsub();
 			}
 			Simbolo ps = $met.getNext();
 			while(ps != null){
@@ -782,7 +782,7 @@ sentInvocaMet
 				if(s.getT()==Simbolo.Tipo.PROC){
 					$tsub=Simbolo.TipoSubyacente.NULL;
 				} else if(s.getT()==Simbolo.Tipo.FUNC){
-					$tsub=s.getTs();
+					$tsub=s.getTsub();
 				}
 			} else if($Identificador.getText().equals("print")) {
 				$tsub = Simbolo.TipoSubyacente.NULL;
@@ -832,7 +832,7 @@ argumentos[String nombre, int linea]:
 		if($nombre.equals("print")){
 			String print = "print" + $expr.tsub;
 			try{
-				Simbolo.TipoSubyacente tprint = ts.consulta(print).getNext().getTs();
+				Simbolo.TipoSubyacente tprint = ts.consulta(print).getNext().getTsub();
 			} catch (TablaSimbolos.exceptionTablaSimbolos e){
 				errores+=("ERROR SEMANTICO - Línea: "+$linea+", al invocar "+ $nombre
 				+" no se esperaba un " + $expr.tsub + "\n");
@@ -848,9 +848,9 @@ argumentos[String nombre, int linea]:
 				errores+=("ERROR SEMANTICO - Línea: "+$linea+", "+ $nombre
 				+"tiene demasiados argumentos" + "\n");
 			}else{
-				if(metodo.getTs()!=$expr.tsub){
+				if(metodo.getTsub()!=$expr.tsub){
 					errores+=("ERROR SEMANTICO - Línea: "+$linea+", tipos incompatibles\n"+
-					"encontrado: "+$expr.tsub+" esperado "+metodo.getTs()+"\n");
+					"encontrado: "+$expr.tsub+" esperado "+metodo.getTsub()+"\n");
 				}
 				metodo=metodo.getNext();
 			}
@@ -870,9 +870,9 @@ argumentos[String nombre, int linea]:
 			}
 		}
 		if(metodo != null){
-			if(metodo.getTs() != $expr.tsub){
+			if(metodo.getTsub() != $expr.tsub){
 				errores+=("ERROR SEMANTICO - Línea: "+$linea+", al invocar"+ $nombre
-				+"se esperaba un " + metodo.getTs() + " y se ha encontrado un " + $expr.tsub + "\n");
+				+"se esperaba un " + metodo.getTsub() + " y se ha encontrado un " + $expr.tsub + "\n");
 			}
 			metodo = metodo.getNext();
 		}
@@ -906,7 +906,7 @@ asignacion
 		Simbolo.TipoSubyacente idTsub = null;
 		Simbolo.Tipo idT = null;
 		try{
-			idTsub = ts.consulta($Identificador.getText()).getTs();
+			idTsub = ts.consulta($Identificador.getText()).getTsub();
 			idT = ts.consulta($Identificador.getText()).getT();
 		}catch(TablaSimbolos.exceptionTablaSimbolos ex){
 			errores+=("ERROR SEMANTICO - Línea: "+$Identificador.getLine()+", "+ex.getMessage()+"\n");
@@ -1261,7 +1261,7 @@ exprPostfija
 		try{
 			Simbolo s=ts.consulta($Identificador.getText());
                         if(s!=null){
-                            $tsub=s.getTs();
+                            $tsub=s.getTsub();
                         }
 		}catch(TablaSimbolos.exceptionTablaSimbolos ex){
 			errores+=("ERROR SEMANTICO - "+ex.getMessage()+"\n");

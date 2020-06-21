@@ -1,4 +1,5 @@
 package procesador;
+
 // Utilidades específicas de antlr
 import antlr.*;
 import org.antlr.v4.runtime.*;
@@ -42,7 +43,7 @@ public class Procesador {
         }
         try {
             tokens.seek(0);
-            parser.programaPrincipal();
+            parser.programa();
             System.out.println("PROCESO COMPLETADO CON ÉXITO");
         } catch (RuntimeException e) {
             System.out.println(e.getMessage());
