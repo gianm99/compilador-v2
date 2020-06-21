@@ -9,11 +9,9 @@ import java.util.*;
 
 @parser::members {
 public TablaSimbolos ts;
-boolean returnreq = false;
-boolean returnenc = false;
-Simbolo.TSub tiporeturn = null;
 String errores="";
 String directorio;
+Deque<Simbolo> pproc=new ArrayDeque<Simbolo>();
 
 public vajaNUEVOParser(TokenStream input,String directorio){
 	this(input);
@@ -90,7 +88,7 @@ decl:
 		'=' expr {
 	if($expr.tsub!=$tipo.tsub) {
 		errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": tipos incompatibles (esperado "+
-		$tipo.tsub+")";
+		$tipo.tsub+")\n";
 	}
 }
 	)? ';'
@@ -104,14 +102,56 @@ decl:
 } '=' expr ';' {
 	if($expr.tsub!=$tipo.tsub) {
 		errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": tipos incompatibles (esperado "+
-		$tipo.tsub+")";
+		$tipo.tsub+")\n";
 	}
 }
-	| FUNCTION tipo encabezado[$tipo.tsub] BEGIN decls sents END
-	| PROCEDURE encabezado[null] BEGIN decls sents END;
+	| FUNCTION tipo encabezado[$tipo.tsub] BEGIN {
+		ts=ts.entraBloque();
+		pproc.push($encabezado.met);
+		Simbolo param=$encabezado.met.getNext();
+		while(param!=null) {
+			Simbolo aux=new Simbolo(param);
+			aux.setNext(null);
+			try {
+				ts.inserta(aux.getId(),aux);
+			} catch(TablaSimbolos.TablaSimbolosException e) {
+				errores+= e.getMessage();
+			}
+			param=param.getNext();
+		}
+	} decls sents END {
+		ts=ts.saleBloque();
+		pproc.pop();
+		if(!$encabezado.met.returnEncontrado) {
+			errores+="ERROR SEMÁNTICO - Línea "+$FUNCTION.getLine()+
+			": 'return' no encontrado para la función "+$encabezado.met.getId()+"\n";
+		}
+	}
+	| PROCEDURE encabezado[null] BEGIN {
+		ts=ts.entraBloque();
+		pproc.push($encabezado.met);
+		Simbolo param=$encabezado.met.getNext();
+		while(param!=null) {
+			Simbolo aux=new Simbolo(param);
+			aux.setNext(null);
+			try {
+				ts.inserta(aux.getId(),aux);
+			} catch(TablaSimbolos.TablaSimbolosException e) {
+				errores+= e.getMessage();
+			}
+			param=param.getNext();
+		}
+	} decls sents END {
+		ts=ts.saleBloque();
+		pproc.pop();
+		if($encabezado.met.returnEncontrado) {
+			errores+="ERROR SEMÁNTICO - Línea "+$PROCEDURE.getLine()+
+			": 'return' encontrado para el procedimiento "+$encabezado.met.getId()+"\n";
+		}
+	};
 
 // Funciones y procedimientos
-encabezado [Simbolo.TSub tsub]
+encabezado[Simbolo.TSub tsub]
 	returns[Simbolo met]:
 	ID {
 		if($tsub!=null) {
@@ -144,8 +184,8 @@ sent:
 	| IF expr BEGIN sents END ELSE BEGIN sents END
 	| WHILE expr BEGIN sents END
 	| RETURN expr ';'
-	| referencia ASSIGN expr
-	| referencia;
+	| referencia ASSIGN expr ';'
+	| referencia ';';
 
 referencia: ID | cont_idx ')';
 

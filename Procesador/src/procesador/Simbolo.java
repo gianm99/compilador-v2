@@ -12,6 +12,7 @@ public class Simbolo{
 	private Simbolo next;
 	private Tipo t;
 	private TSub tsub;
+	public boolean returnEncontrado;
 
 	public Simbolo(String id, Simbolo next, Tipo t, TSub tsub){
 		this.id=id;
