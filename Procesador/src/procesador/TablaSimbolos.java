@@ -92,14 +92,14 @@ public class TablaSimbolos {
         try {
             // TS poner elemento
             buffer.write("<td>" + s.getId() + "</td>" + "<td>" + s.getT() + "</td>" + "<td>"
-                    + s.getTs() + "</td>");
+                    + s.getTsub() + "</td>");
             if (s.getNext() != null) {
                 Simbolo sn = s.getNext();
                 buffer.write("<td>" + "<table style='width:100%'>" + "<tr>" + "<th>Id</th>"
                         + "<th>Tipo</th>" + "<th>Tipo Subyacente</th>" + "</tr>" + "<tr>");
                 while (sn != null) {
                     buffer.write("<td>" + sn.getId() + "</td>" + "<td>" + sn.getT() + "</td>"
-                            + "<td>" + sn.getTs() + "</td></tr>");
+                            + "<td>" + sn.getTsub() + "</td></tr>");
                     sn = sn.getNext();
                 }
                 buffer.write("</table>" + "</td>");

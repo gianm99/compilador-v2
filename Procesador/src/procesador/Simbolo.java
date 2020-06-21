@@ -11,20 +11,20 @@ public class Simbolo{
 	private String id;
 	private Simbolo next;
 	private Tipo t;
-	private TipoSubyacente ts;
+	private TipoSubyacente tsub;
 
-	public Simbolo(String id, Simbolo next, Tipo t, TipoSubyacente ts){
+	public Simbolo(String id, Simbolo next, Tipo t, TipoSubyacente tsub){
 		this.id=id;
 		this.next=next;
 		this.t=t;
-		this.ts=ts;
+		this.tsub=tsub;
 	}
 
 	public Simbolo(Simbolo s){
 		this.id=s.id;
 		this.next=s.next;
 		this.t=s.t;
-		this.ts=s.ts;
+		this.tsub=s.tsub;
 	}
 
 	public enum Tipo{
@@ -51,11 +51,11 @@ public class Simbolo{
 		return t;
 	}
 
-	public TipoSubyacente getTs(){
-		return ts;
+	public TipoSubyacente getTsub(){
+		return tsub;
 	}
 
-	public void setTs(TipoSubyacente ts){
-		this.ts=ts;
+	public void setTsub(TipoSubyacente tsub){
+		this.tsub=tsub;
 	}
 }
