@@ -4,9 +4,9 @@ var string s2 = s1;
 var int c;
 
 func function1(string str, int i) boolean{
-	a = 2;
+	var int a = 2;
+	var boolean b;
 	a = 5;
-	boolean b;
 	if(str == "Hola mundo"){
 		b = true;
 	}
