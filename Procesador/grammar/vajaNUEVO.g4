@@ -11,7 +11,7 @@ import java.util.*;
 public TablaSimbolos ts;
 boolean returnreq = false;
 boolean returnenc = false;
-Simbolo.TipoSubyacente tiporeturn = null;
+Simbolo.TSub tiporeturn = null;
 String errores="";
 String directorio;
 
@@ -58,14 +58,14 @@ programa:
 	{
 	ts = new TablaSimbolos(directorio);
 	// Insertar operaciones de input/output
-	ts.inserta("read",new Simbolo("read",null,Simbolo.Tipo.FUNC,Simbolo.TipoSubyacente.String));
-	for(Simbolo.TipoSubyacente tsub : Simbolo.TipoSubyacente.values())
+	ts.inserta("read",new Simbolo("read",null,Simbolo.Tipo.FUNC,Simbolo.TSub.String));
+	for(Simbolo.TSub tsub : Simbolo.TSub.values())
 	{
-		if(tsub!=Simbolo.TipoSubyacente.NULL)
+		if(tsub!=Simbolo.TSub.NULL)
 		{
 			Simbolo arg = new Simbolo("arg"+tsub,null,Simbolo.Tipo.ARG,tsub); 
 			ts.inserta("print"+tsub,new Simbolo("print"+tsub,arg,Simbolo.Tipo.PROC,
-			Simbolo.TipoSubyacente.NULL));
+			Simbolo.TSub.NULL));
 		}
 	}
 } decls sents EOF {
@@ -125,7 +125,7 @@ expr:
 	| expr SUB expr
 	| SUB expr;
 
-tipo: INTEGER | BOOLEAN | STRING;
+tipo returns[Simbolo.TSub tsub]: INTEGER | BOOLEAN | STRING;
 
 literal: LiteralInteger | LiteralBoolean | LiteralString;
 

@@ -11,9 +11,9 @@ public class Simbolo{
 	private String id;
 	private Simbolo next;
 	private Tipo t;
-	private TipoSubyacente tsub;
+	private TSub tsub;
 
-	public Simbolo(String id, Simbolo next, Tipo t, TipoSubyacente tsub){
+	public Simbolo(String id, Simbolo next, Tipo t, TSub tsub){
 		this.id=id;
 		this.next=next;
 		this.t=t;
@@ -31,7 +31,7 @@ public class Simbolo{
 		CONST,VAR,PROC,FUNC,ARG,NULO;
 	}
 
-	public enum TipoSubyacente{
+	public enum TSub{
 		BOOLEAN,INT,STRING,NULL;
 	}
 
@@ -51,11 +51,11 @@ public class Simbolo{
 		return t;
 	}
 
-	public TipoSubyacente getTsub(){
+	public TSub getTsub(){
 		return tsub;
 	}
 
-	public void setTsub(TipoSubyacente tsub){
+	public void setTsub(TSub tsub){
 		this.tsub=tsub;
 	}
 }
