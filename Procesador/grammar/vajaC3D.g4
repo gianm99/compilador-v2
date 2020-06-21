@@ -154,18 +154,18 @@ asignacion
 	returns[ ArrayList<Integer> sig]:
 	Identificador '=' expr {
 	Etiqueta ec,ef,efin;
-	Simbolo.TipoSubyacente idTsub = null;
+	Simbolo.TSub idTsub = null;
 	$sig=new ArrayList<Integer>();
 	try{
-		idTsub=simbolos.consulta($Identificador.getText()).getTs();
-		if(idTsub==Simbolo.TipoSubyacente.BOOLEAN){
+		idTsub=simbolos.consulta($Identificador.getText()).getTsub();
+		if(idTsub==Simbolo.TSub.BOOLEAN){
 			ec=new Etiqueta(pc);
 			ef=new Etiqueta(pc);
 			efin=new Etiqueta(pc);
 			genera(ec+": skip");
 			// genera(Identificador);
 		}
-	}catch(TablaSimbolos.exceptionTablaSimbolos ex){}
+	}catch(TablaSimbolos.TablaSimbolosException ex){}
  };
 
 expr

@@ -16,11 +16,11 @@ public class TablaSimbolos {
     private TablaSimbolos pre;
     private static Writer buffer;
 
-    public class exceptionTablaSimbolos extends Exception {
+    public class TablaSimbolosException extends Exception {
 
         private static final long serialVersionUID = 7706912154843705180L;
 
-        public exceptionTablaSimbolos(String msg) {
+        public TablaSimbolosException(String msg) {
             super(msg);
         }
     }
@@ -84,9 +84,9 @@ public class TablaSimbolos {
         return pre;
     }
 
-    public void inserta(String id, Simbolo s) throws exceptionTablaSimbolos {
+    public void inserta(String id, Simbolo s) throws TablaSimbolosException {
         if (this.existe(id)) {
-            throw new exceptionTablaSimbolos("Identificador repetido: " + id);
+            throw new TablaSimbolosException("Identificador repetido: " + id);
         }
         tabla.put(id, s);
         try {
@@ -117,13 +117,13 @@ public class TablaSimbolos {
         return this.tabla.get(id) != null;
     }
 
-    public Simbolo consulta(String id) throws exceptionTablaSimbolos {
+    public Simbolo consulta(String id) throws TablaSimbolosException {
         for (TablaSimbolos ts = this; ts != null; ts = ts.pre) {
             if (ts.tabla.get(id) != null) {
                 return ts.tabla.get(id);
             }
         }
-        throw new exceptionTablaSimbolos(
+        throw new TablaSimbolosException(
                 "No se ha encontrado el símbolo " + id + " en la tabla de símbolos");
     }
 }

@@ -58,21 +58,21 @@ programa:
 	{
 	ts = new TablaSimbolos(directorio);
 	// Insertar operaciones de input/output
-	ts.inserta("read",new Simbolo("read",null,Simbolo.Tipo.FUNC,Simbolo.TSub.String));
-	for(Simbolo.TSub tsub : Simbolo.TSub.values())
-	{
-		if(tsub!=Simbolo.TSub.NULL)
-		{
-			Simbolo arg = new Simbolo("arg"+tsub,null,Simbolo.Tipo.ARG,tsub); 
-			ts.inserta("print"+tsub,new Simbolo("print"+tsub,arg,Simbolo.Tipo.PROC,
-			Simbolo.TSub.NULL));
+	try {
+		ts.inserta("read",new Simbolo("read",null,Simbolo.Tipo.FUNC,Simbolo.TSub.STRING));
+		for(Simbolo.TSub tsub : Simbolo.TSub.values()) {
+			if(tsub!=Simbolo.TSub.NULL) {
+				Simbolo arg = new Simbolo("arg"+tsub,null,Simbolo.Tipo.ARG,tsub); 
+				ts.inserta("print"+tsub,new Simbolo("print"+tsub,arg,Simbolo.Tipo.PROC,
+				Simbolo.TSub.NULL));
+			}
 		}
-	}
+	} catch (TablaSimbolos.TablaSimbolosException e) {}
+	
 } decls sents EOF {
 	ts.saleBloque();
-	if(!errores.isEmpty())
-	{
-		trow new RuntimeException(errores);
+	if(!errores.isEmpty()) {
+		throw new RuntimeException(errores);
 	}
 };
 
