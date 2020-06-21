@@ -79,15 +79,42 @@ programa:
 decls: decls decl | decl;
 
 decl:
-	VARIABLE tipo declVar
-	| CONSTANT tipo declConst
+	VARIABLE tipo declVar[$tipo.tsub]
+	| CONSTANT tipo declConst[$tipo.tsub]
 	| FUNCTION encabezadoFunc BEGIN decls sents END
 	| PROCEDURE encabezadoProc BEGIN decls sents END;
 
 // Variables y constantes
-declVar: ID ('=' expr)? ';';
+declVar[Simbolo.TSub tsub]:
+	ID {
+	try{
+		ts.inserta($ID.getText(),new Simbolo($ID.getText(),null,Simbolo.Tipo.VAR,$tsub));
+	} catch(TablaSimbolos.TablaSimbolosException e) {
+		errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": variable "+$ID.getText()+
+		"redeclarada\n";
+	}
+} (
+		'=' expr {
+	if($expr.tsub!=$tsub) {
+		errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": tipos incompatibles (esperado "+
+		$tsub+")";
+	}
+}
+	)? ';';
 
-declConst: ID '=' expr ';';
+declConst[Simbolo.TSub tsub]: ID {
+	try {
+		ts.inserta($ID.getText(),new Simbolo($ID.getText(),null,Simbolo.Tipo.CONST,$tsub));
+	} catch(TablaSimbolos.TablaSimbolosException e) {
+		errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": constante "+$ID.getText()+
+		"redeclarada\n";
+	}
+} '=' expr ';' {
+	if($expr.tsub!=$tsub) {
+		errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": tipos incompatibles (esperado "+
+		$tsub+")";
+	}
+};
 
 // Funciones y procedimientos
 encabezadoFunc: tipo ID '(' parametros? ')';
@@ -112,7 +139,8 @@ referencia: ID | cont_idx ')';
 
 cont_idx: cont_idx ',' expr | ID '(' expr;
 
-expr:
+expr
+	returns[Simbolo.TSub tsub]:
 	NOT expr
 	| '(' expr ')'
 	| literal
@@ -125,7 +153,8 @@ expr:
 	| expr SUB expr
 	| SUB expr;
 
-tipo returns[Simbolo.TSub tsub]: INTEGER | BOOLEAN | STRING;
+tipo
+	returns[Simbolo.TSub tsub]: INTEGER | BOOLEAN | STRING;
 
 literal: LiteralInteger | LiteralBoolean | LiteralString;
 
