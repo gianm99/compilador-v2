@@ -1,7 +1,5 @@
 grammar vajaNUEVO;
 
-// SINTAXIS
-
 @header {
 package antlr;
 import procesador.*;
@@ -147,7 +145,7 @@ expr:
 	| expr SUB expr
 	| expr MULT expr
 	| expr DIV expr
-	| expr  expr
+	| expr expr
 	| LPAREN expr RPAREN
 	| literal;
 
@@ -183,8 +181,6 @@ exprPostfija: primario | Identificador | sentInvocaMet;
 primario: '(' expr ')' | literal;
 
 literal: LiteralInteger | LiteralBoolean | LiteralString;
-
-// LÉXICO
 
 // Palabras reservadas
 VAR: 'var';

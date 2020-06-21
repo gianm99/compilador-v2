@@ -1,7 +1,5 @@
 grammar vajaANTIGUO;
 
-// SINTAXIS
-
 @header {
 package antlr;
 import procesador.*;
@@ -1329,8 +1327,6 @@ literal
     	try{writer.write(literal+"->"+$LiteralString.getText() +(dot++)+";\n");}catch(Exception e){}
 	}
 	;
-
-// LÉXICO
 
 // Palabras reservadas
 VAR: 'var';
