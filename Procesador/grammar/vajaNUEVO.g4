@@ -79,51 +79,63 @@ programa:
 decls: decls decl | decl;
 
 decl:
-	VARIABLE tipo declVar[$tipo.tsub]
-	| CONSTANT tipo declConst[$tipo.tsub]
-	| FUNCTION encabezadoFunc BEGIN decls sents END
-	| PROCEDURE encabezadoProc BEGIN decls sents END;
-
-// Variables y constantes
-declVar[Simbolo.TSub tsub]:
-	ID {
+	VARIABLE tipo ID {
 	try{
-		ts.inserta($ID.getText(),new Simbolo($ID.getText(),null,Simbolo.Tipo.VAR,$tsub));
+		ts.inserta($ID.getText(),new Simbolo($ID.getText(),null,Simbolo.Tipo.VAR,$tipo.tsub));
 	} catch(TablaSimbolos.TablaSimbolosException e) {
 		errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": variable "+$ID.getText()+
 		"redeclarada\n";
 	}
 } (
 		'=' expr {
-	if($expr.tsub!=$tsub) {
+	if($expr.tsub!=$tipo.tsub) {
 		errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": tipos incompatibles (esperado "+
-		$tsub+")";
+		$tipo.tsub+")";
 	}
 }
-	)? ';';
-
-declConst[Simbolo.TSub tsub]: ID {
+	)? ';'
+	| CONSTANT tipo ID {
 	try {
-		ts.inserta($ID.getText(),new Simbolo($ID.getText(),null,Simbolo.Tipo.CONST,$tsub));
+		ts.inserta($ID.getText(),new Simbolo($ID.getText(),null,Simbolo.Tipo.CONST,$tipo.tsub));
 	} catch(TablaSimbolos.TablaSimbolosException e) {
 		errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": constante "+$ID.getText()+
 		"redeclarada\n";
 	}
 } '=' expr ';' {
-	if($expr.tsub!=$tsub) {
+	if($expr.tsub!=$tipo.tsub) {
 		errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": tipos incompatibles (esperado "+
-		$tsub+")";
+		$tipo.tsub+")";
 	}
-};
+}
+	| FUNCTION encabezadoFunc BEGIN decls sents END
+	| PROCEDURE encabezadoProc BEGIN decls sents END;
 
 // Funciones y procedimientos
-encabezadoFunc: tipo ID '(' parametros? ')';
+encabezadoFunc
+	returns[Simbolo funcion]:
+	tipo ID {
+		$funcion = new Simbolo($ID.getText(),null,Simbolo.Tipo.FUNC,$tipo.tsub);
+	} '(' parametros[$funcion]? ')';
 
-encabezadoProc: ID '(' parametros? ')';
+encabezadoProc
+	returns[Simbolo procedimiento]:
+	ID {
+	$procedimiento = new Simbolo($ID.getText(),null,Simbolo.Tipo.PROC,Simbolo.TSub.NULL); 
+} '(' parametros[$procedimiento]? ')';
 
-parametros: parametro ',' parametros | parametro;
+parametros[Simbolo anterior]:
+	parametro ',' {
+		$anterior.setNext($parametro.s);
+	} parametros[$anterior.getNext()]
+	| parametro {
+		$anterior.setNext($parametro.s);
+	};
 
-parametro: tipo ID;
+parametro
+	returns[Simbolo s]:
+	tipo ID {
+	$s = new Simbolo($ID.getText(),null,Simbolo.Tipo.ARG,$tipo.tsub);
+};
 
 sents: sents sent | sent;
 
