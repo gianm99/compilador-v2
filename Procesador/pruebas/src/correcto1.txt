@@ -3,10 +3,13 @@ const string s1 = "Hola mundo";
 var string s2 = s1;
 var int c;
 
-func function1(string str, int i) boolean{
+func boolean function1(string str, int i){
 	var int a = 2;
 	var boolean b;
 	a = 5;
+	proc prueba(){
+		printINT(5);
+	}
 	if(str == "Hola mundo"){
 		b = true;
 	}
