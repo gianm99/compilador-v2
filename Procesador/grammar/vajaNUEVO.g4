@@ -1,4 +1,4 @@
-grammar vajaNEW;
+grammar vajaNUEVO;
 
 // SINTAXIS
 
@@ -17,7 +17,7 @@ grammar vajaNEW;
 	String errores="";
 	String directorio;
 
-	public vajaNEWParser(TokenStream input,String directorio){
+	public vajaNUEVOParser(TokenStream input,String directorio){
 		this(input);
 		this.directorio=directorio;
 	}

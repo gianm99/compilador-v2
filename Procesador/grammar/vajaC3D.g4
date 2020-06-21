@@ -2,7 +2,7 @@ parser grammar vajaC3D;
 
 options
 {
-	tokenVocab = vajaLexer;
+	tokenVocab = vajaANTIGUOLexer;
 }
 
 @header {
