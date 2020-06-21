@@ -54,19 +54,19 @@ public void recover(RecognitionException ex)
 }
 }
 
-programaPrincipal: declaracion* sent* EOF;
+programa: declaracion* sent* EOF;
 
 declaracion:
-	'var' tipo declaracionVar
-	| 'const' tipo declaracionConst
+	'var' tipo declVar
+	| 'const' tipo declConst
 	| 'func' declFunc
 	| 'proc' declProc;
 
 tipo: INT | BOOLEAN | STRING;
 // Variables y constantes
-declaracionVar: Identificador ('=' initVar)? ';';
+declVar: Identificador ('=' initVar)? ';';
 
-declaracionConst: Identificador '=' initConst ';';
+declConst: Identificador '=' initConst ';';
 
 initVar: expr;
 
@@ -103,7 +103,7 @@ exprDeBloque: sentDeclVarLocal | sent;
 
 sentDeclVarLocal: declaracionVarLocal;
 
-declaracionVarLocal: tipo declaracionVar;
+declaracionVarLocal: tipo declVar;
 
 sents: sents sent | sent;
 
