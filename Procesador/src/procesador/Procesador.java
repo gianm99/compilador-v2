@@ -28,10 +28,10 @@ public class Procesador {
         // Stream del archivo pasado como argumento
         CharStream stream = CharStreams.fromFileName(args[0]);
         // Se crea el lexer y el CommonTokenStream
-        vajaLexer lexer = new vajaLexer(stream);
+        vajaANTIGUOLexer lexer = new vajaANTIGUOLexer(stream);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         // Parser para el análisis sintáctico y semántico
-        vajaParser parser = new vajaParser(tokens, buildPath);
+        vajaANTIGUOParser parser = new vajaANTIGUOParser(tokens, buildPath);
         tokens.fill();
         File tokensFile = new File(buildPath + "/tokens.txt");
         try (Writer buffer = new BufferedWriter(new FileWriter(tokensFile))) {
