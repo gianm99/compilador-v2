@@ -54,143 +54,70 @@ public void recover(RecognitionException ex)
 }
 }
 
-programa: declaracion* sent* EOF;
+programa: decls sents EOF;
 
-declaracion:
-	'var' tipo declVar
-	| 'const' tipo declConst
-	| 'func' declFunc
-	| 'proc' declProc;
+decls: decls decl | decl;
 
-tipo: INT | BOOLEAN | STRING;
+decl:
+	VARIABLE tipo declVar
+	| CONSTANT tipo declConst
+	| FUNCTION encabezadoFunc BEGIN decls sents END
+	| PROCEDURE encabezadoProc BEGIN decls sents END;
+
 // Variables y constantes
-declVar: Identificador ('=' initVar)? ';';
+declVar: ID ('=' expr)? ';';
 
-declConst: Identificador '=' initConst ';';
-
-initVar: expr;
-
-initConst: expr;
+declConst: ID '=' expr ';';
 
 // Funciones y procedimientos
-declFunc: encabezadoFunc cuerpoFunc;
+encabezadoFunc: tipo ID '(' parametros? ')';
 
-encabezadoFunc: identificadorMetFunc tipo;
-
-cuerpoFunc: bloque | ';';
-
-declProc: encabezadoProc cuerpoProc;
-
-encabezadoProc: identificadorMetProc;
-
-cuerpoProc: bloque | ';';
-
-identificadorMetFunc: Identificador '(' parametros? ')';
-
-identificadorMetProc: Identificador '(' parametros? ')';
+encabezadoProc: ID '(' parametros? ')';
 
 parametros: parametro ',' parametros | parametro;
 
-parametro: tipo identificadorVar;
-
-identificadorVar: Identificador;
-
-bloque: '{' exprsBloque? '}';
-
-exprsBloque: exprDeBloque+;
-
-exprDeBloque: sentDeclVarLocal | sent;
-
-sentDeclVarLocal: declaracionVarLocal;
-
-declaracionVarLocal: tipo declVar;
+parametro: tipo ID;
 
 sents: sents sent | sent;
 
-// sent: bloque | sentExpr | sentIf | sentIfElse | sentWhile | sentReturn | ';';
 sent:
 	IF expr BEGIN sents END
 	| IF expr BEGIN sents END ELSE BEGIN sents END
 	| WHILE expr BEGIN sents END
+	| RETURN expr ';'
 	| referencia ASSIGN expr
-	| RETURN expr ';';
+	| referencia;
 
-referencia: Identificador;
+referencia: ID | cont_idx ')';
 
-sentExpr: exprSent ';';
+cont_idx: cont_idx ',' expr | ID '(' expr;
 
-exprSent: asignacion | sentInvocaMet;
-
-// sentIf: IF '(' expr ')' bloque;
-
-// sentIfElse: IF '(' expr ')' bloque ELSE bloque;
-
-// sentWhile: WHILE '(' expr ')' bloque;
-
-// sentReturn: RETURN expr ';';
-
-sentInvocaMet: Identificador '(' ( argumentos)? ')';
-
-argumentos: expr (',' expr)*;
-
-asignacion: Identificador '=' expr;
-
-// expr: exprCondOr | asignacion;
 expr:
-	expr OPREL expr
-	| NOT expr
+	NOT expr
+	| '(' expr ')'
+	| literal
+	| expr OPREL expr
 	| expr AND expr
 	| expr OR expr
-	| expr ADD expr
-	| expr SUB expr
 	| expr MULT expr
 	| expr DIV expr
-	| expr expr
-	| LPAREN expr RPAREN
-	| literal;
+	| expr ADD expr
+	| expr SUB expr
+	| SUB expr;
 
-exprCondOr: exprCondAnd exprCondOr_;
-
-exprCondOr_: OR exprCondAnd exprCondOr_ |; //lambda
-
-exprCondAnd: exprComp exprCondAnd_;
-
-exprCondAnd_: AND exprComp exprCondAnd_ |; //lambda
-
-exprComp: exprSuma exprComp_;
-
-exprComp_: OPREL exprSuma exprComp_ |; //lambda
-
-exprSuma: exprMult exprSuma_;
-
-exprSuma_: OpBinSum exprMult exprSuma_ |; //lambda
-
-exprMult: exprUnaria exprMult_;
-
-exprMult_:
-	MULT exprUnaria exprMult_
-	| DIV exprUnaria exprMult_
-	|; //lambda
-
-exprUnaria: OpBinSum exprNeg | exprNeg;
-
-exprNeg: NOT exprUnaria | exprPostfija;
-
-exprPostfija: primario | Identificador | sentInvocaMet;
-
-primario: '(' expr ')' | literal;
+tipo: INTEGER | BOOLEAN | STRING;
 
 literal: LiteralInteger | LiteralBoolean | LiteralString;
 
 // Palabras reservadas
-VAR: 'var';
-CONST: 'const';
+VARIABLE: 'var';
+CONSTANT: 'const';
 FUNCTION: 'func';
 PROCEDURE: 'proc';
 RETURN: 'return';
 
 // Tipos
-INT: 'int';
+INTEGER: 'int';
 BOOLEAN: 'boolean';
 STRING: 'string';
 
@@ -244,7 +171,7 @@ OR: '||';
 NOT: '!';
 
 // Identificador
-Identificador: LETRA LETRADIGITO*;
+ID: LETRA LETRADIGITO*;
 
 fragment LETRA: [a-zA-Z$_];
 
