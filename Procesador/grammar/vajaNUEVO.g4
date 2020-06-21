@@ -54,7 +54,7 @@ public void recover(RecognitionException ex)
 }
 }
 
-programaPrincipal: declaracion* EOF;
+programaPrincipal: declaracion* sent* EOF;
 
 declaracion:
 	'var' tipo declaracionVar
