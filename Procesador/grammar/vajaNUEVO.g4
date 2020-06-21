@@ -3,57 +3,57 @@ grammar vajaNUEVO;
 // SINTAXIS
 
 @header {
-	package antlr;
-	import procesador.*;
-	import java.io.*;
-    import java.util.*;
+package antlr;
+import procesador.*;
+import java.io.*;
+import java.util.*;
 }
 
 @parser::members {
-	public TablaSimbolos ts;
-	boolean returnreq = false;
-	boolean returnenc = false;
-	Simbolo.TipoSubyacente tiporeturn = null;
-	String errores="";
-	String directorio;
+public TablaSimbolos ts;
+boolean returnreq = false;
+boolean returnenc = false;
+Simbolo.TipoSubyacente tiporeturn = null;
+String errores="";
+String directorio;
 
-	public vajaNUEVOParser(TokenStream input,String directorio){
-		this(input);
-		this.directorio=directorio;
-	}
+public vajaNUEVOParser(TokenStream input,String directorio){
+	this(input);
+	this.directorio=directorio;
+}
 
-	@Override
-	public void notifyErrorListeners(Token offendingToken, String msg, RecognitionException ex)
-	{
-		String notificacion = "ERROR SINTACTICO - Línea " + offendingToken.getLine()
-		+ " Columna " + offendingToken.getCharPositionInLine() + ": \n\t ";
-		String expected = msg;
-		if(expected.contains("expecting")){
-			expected = expected.substring(expected.indexOf("expecting") + 10);
-			notificacion += "encontrado: '" + offendingToken.getText() + "' esperado: "+ expected;
-		}else if(expected.contains("missing")){
-			expected = expected.substring(expected.indexOf("missing") + 8);
-			expected = expected.substring(0, expected.indexOf("at") - 1);
-			notificacion += "encontrado: '" + offendingToken.getText() + "', falta "+ expected;
-		}else if(expected.contains("alternative")){
-			expected = expected.substring(expected.indexOf("input") + 6);
-			notificacion += "no se reconoce " + expected;
-		}
-		notificacion = notificacion.replaceAll("Comparador","==, !=, <, >, <=, >=");
-		notificacion = notificacion.replaceAll("OpBinSum","+, -");
-		throw new RuntimeException(notificacion);
+@Override
+public void notifyErrorListeners(Token offendingToken, String msg, RecognitionException ex)
+{
+	String notificacion = "ERROR SINTACTICO - Línea " + offendingToken.getLine()
+	+ " Columna " + offendingToken.getCharPositionInLine() + ": \n\t ";
+	String expected = msg;
+	if(expected.contains("expecting")){
+		expected = expected.substring(expected.indexOf("expecting") + 10);
+		notificacion += "encontrado: '" + offendingToken.getText() + "' esperado: "+ expected;
+	}else if(expected.contains("missing")){
+		expected = expected.substring(expected.indexOf("missing") + 8);
+		expected = expected.substring(0, expected.indexOf("at") - 1);
+		notificacion += "encontrado: '" + offendingToken.getText() + "', falta "+ expected;
+	}else if(expected.contains("alternative")){
+		expected = expected.substring(expected.indexOf("input") + 6);
+		notificacion += "no se reconoce " + expected;
 	}
-	// DOT
-	Writer writer;
-	int dot = 0;
+	notificacion = notificacion.replaceAll("Comparador","==, !=, <, >, <=, >=");
+	notificacion = notificacion.replaceAll("OpBinSum","+, -");
+	throw new RuntimeException(notificacion);
+}
+// DOT
+Writer writer;
+int dot = 0;
 }
 
 @lexer::members {
-	@Override
-	public void recover(RecognitionException ex)
-	{
-		throw new RuntimeException("ERROR LEXICO -  "+ex.getMessage());
-	}
+@Override
+public void recover(RecognitionException ex)
+{
+	throw new RuntimeException("ERROR LEXICO -  "+ex.getMessage());
+}
 }
 
 programaPrincipal: declaracion* EOF;

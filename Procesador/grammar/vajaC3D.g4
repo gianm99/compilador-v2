@@ -2,10 +2,10 @@ parser grammar vajaC3D;
 
 options
 {
-	tokenVocab = vajaANTIGUOLexer;
+tokenVocab = vajaANTIGUOLexer;
 }
 
-@header {
+@parser::header {
 package antlr;
 import procesador.*;
 import java.io.*;
