@@ -54,7 +54,27 @@ public void recover(RecognitionException ex)
 }
 }
 
-programa: decls sents EOF;
+programa:
+	{
+	ts = new TablaSimbolos(directorio);
+	// Insertar operaciones de input/output
+	ts.inserta("read",new Simbolo("read",null,Simbolo.Tipo.FUNC,Simbolo.TipoSubyacente.String));
+	for(Simbolo.TipoSubyacente tsub : Simbolo.TipoSubyacente.values())
+	{
+		if(tsub!=Simbolo.TipoSubyacente.NULL)
+		{
+			Simbolo arg = new Simbolo("arg"+tsub,null,Simbolo.Tipo.ARG,tsub); 
+			ts.inserta("print"+tsub,new Simbolo("print"+tsub,arg,Simbolo.Tipo.PROC,
+			Simbolo.TipoSubyacente.NULL));
+		}
+	}
+} decls sents EOF {
+	ts.saleBloque();
+	if(!errores.isEmpty())
+	{
+		trow new RuntimeException(errores);
+	}
+};
 
 decls: decls decl | decl;
 
