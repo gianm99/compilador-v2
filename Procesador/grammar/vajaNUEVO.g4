@@ -150,7 +150,6 @@ decl:
 		}
 	};
 
-// Funciones y procedimientos
 encabezado[Simbolo.TSub tsub]
 	returns[Simbolo met]:
 	ID {
@@ -263,9 +262,28 @@ expr
 	| referencia;
 
 tipo
-	returns[Simbolo.TSub tsub]: INTEGER | BOOLEAN | STRING;
+	returns[Simbolo.TSub tsub]:
+	INTEGER {
+		$tsub=Simbolo.TSub.INT;
+	}
+	| BOOLEAN {
+		$tsub=Simbolo.TSub.BOOLEAN;
+	}
+	| STRING {
+		$tsub=Simbolo.TSub.STRING;
+	};
 
-literal: LiteralInteger | LiteralBoolean | LiteralString;
+literal
+	returns[Simbolo.TSub tsub]:
+	LiteralInteger {
+		$tsub=Simbolo.TSub.INT;
+	}
+	| LiteralBoolean {
+		$tsub=Simbolo.TSub.BOOLEAN;
+	}
+	| LiteralString {
+		$tsub=Simbolo.TSub.STRING;
+	};
 
 // Palabras reservadas
 VARIABLE: 'var';
