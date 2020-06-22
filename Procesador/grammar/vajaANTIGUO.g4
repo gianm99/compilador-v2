@@ -841,11 +841,6 @@ argumentos[String nombre, int linea]:
 		}else {
 			if(metodo==null){
 				demasiadosArg=true;
-				errores+=("ERROR SEMANTICO - Línea "+$linea+"\n");
-			}
-
-			if(metodo==null){
-				demasiadosArg=true;
 				errores+=("ERROR SEMANTICO - Línea: "+$linea+", "+ $nombre
 				+"tiene demasiados argumentos" + "\n");
 			}else{
