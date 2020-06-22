@@ -11,7 +11,7 @@ import java.util.*;
 public TablaSimbolos ts;
 String errores="";
 String directorio;
-Deque<Simbolo> pproc=new ArrayDeque<Simbolo>();
+Deque<Simbolo> pproc=new ArrayDeque<Simbolo>(); // Pila de procedimientos
 
 public vajaNUEVOParser(TokenStream input,String directorio){
 	this(input);
@@ -60,13 +60,13 @@ programa:
 		ts.inserta("read",new Simbolo("read",null,Simbolo.Tipo.FUNC,Simbolo.TSub.STRING));
 		for(Simbolo.TSub tsub : Simbolo.TSub.values()) {
 			if(tsub!=Simbolo.TSub.NULL) {
-				Simbolo arg = new Simbolo("arg"+tsub,null,Simbolo.Tipo.ARG,tsub); 
+				Simbolo arg = new Simbolo("arg"+tsub,null,Simbolo.Tipo.ARG,tsub);
 				ts.inserta("print"+tsub,new Simbolo("print"+tsub,arg,Simbolo.Tipo.PROC,
 				Simbolo.TSub.NULL));
 			}
 		}
 	} catch (TablaSimbolos.TablaSimbolosException e) {}
-	
+
 } decls sents EOF {
 	ts.saleBloque();
 	if(!errores.isEmpty()) {
@@ -187,9 +187,65 @@ sent:
 	| referencia ASSIGN expr ';'
 	| referencia ';';
 
-referencia: ID | cont_idx ')';
+referencia
+	returns[Simbolo.TSub tsub]:
+	ID
+	| ID '(' ')' {
+		Simbolo met=new Simbolo();
+		try {
+			met=ts.consulta($ID.getText());
+			$tsub=met.getTsub();
+			if(met.getNext()!=null) {
+				errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": falta(n) argumento(s) para "+
+				$ID.getText()+"\n";
+			}
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": "+e.getMessage()+"\n";
+		}
+	}
+	| contIdx ')' {
+		$tsub=$contIdx.tsub;
+	};
 
-cont_idx: cont_idx ',' expr | ID '(' expr;
+contIdx
+	returns[Simbolo.TSub tsub]:
+	ID '(' expr {
+		Simbolo met=new Simbolo();
+		Deque<Simbolo.TSub> pparams=new ArrayDeque<Simbolo.TSub>();
+		try {
+			met=ts.consulta($ID.getText());
+			$tsub=met.getTsub();
+			pparams.add($expr.tsub);
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": "+e.getMessage()+"\n";
+		}
+	} contIdx_[pparams] {
+		Simbolo.TSub aux;
+		Simbolo param=met;
+		while(pparams.size()!=0) {
+			param=param.getNext();
+			aux=pparams.remove();
+			if(param==null) {
+				errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": demasiados argumentos para "+
+				$ID.getText()+"\n";
+				break;
+			} else if(aux!=param.getTsub()) {
+				errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+
+				": tipos incompatibles (esperado "+param.getTsub()+")\n";
+				break;
+			}
+		}
+		if(param!=null) {
+			errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": falta(n) argumento(s) para "+
+			$ID.getText()+"\n";
+		}
+	};
+
+contIdx_[Deque<Simbolo.TSub> pparams]:
+	',' expr {
+	$pparams.add($expr.tsub);
+} contIdx_[$pparams]
+	|; // lambda
 
 expr
 	returns[Simbolo.TSub tsub]:
@@ -203,7 +259,8 @@ expr
 	| expr DIV expr
 	| expr ADD expr
 	| expr SUB expr
-	| SUB expr;
+	| SUB expr
+	| referencia;
 
 tipo
 	returns[Simbolo.TSub tsub]: INTEGER | BOOLEAN | STRING;
