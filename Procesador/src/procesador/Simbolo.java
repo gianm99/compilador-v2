@@ -1,62 +1,65 @@
 package procesador;
 
 /**
- * Simbolo. Clase que sirve para gestionar la información relacionada con los
- * símbolos que aparecen en el código fuente.
+ * Simbolo. Clase que sirve para gestionar la información relacionada con los símbolos que aparecen
+ * en el código fuente.
  * 
  * @author Gian Lucas Martín Chamorro
  * @author Jordi Antoni Sastre Moll
  */
-public class Simbolo{
+public class Simbolo {
 	private String id;
 	private Simbolo next;
 	private Tipo t;
 	private TSub tsub;
 	public boolean returnEncontrado;
 
-	public Simbolo(String id, Simbolo next, Tipo t, TSub tsub){
-		this.id=id;
-		this.next=next;
-		this.t=t;
-		this.tsub=tsub;
+	public Simbolo(String id, Simbolo next, Tipo t, TSub tsub) {
+		this.id = id;
+		this.next = next;
+		this.t = t;
+		this.tsub = tsub;
 	}
 
-	public Simbolo(Simbolo s){
-		this.id=s.id;
-		this.next=s.next;
-		this.t=s.t;
-		this.tsub=s.tsub;
+	public Simbolo(Simbolo s) {
+		this.id = s.id;
+		this.next = s.next;
+		this.t = s.t;
+		this.tsub = s.tsub;
 	}
 
-	public enum Tipo{
-		CONST,VAR,PROC,FUNC,ARG,NULO;
+	public Simbolo() {
+	};
+
+	public enum Tipo {
+		CONST, VAR, PROC, FUNC, ARG, NULO;
 	}
 
-	public enum TSub{
-		BOOLEAN,INT,STRING,NULL;
+	public enum TSub {
+		BOOLEAN, INT, STRING, NULL;
 	}
 
-	public String getId(){
+	public String getId() {
 		return id;
 	}
 
-	public Simbolo getNext(){
+	public Simbolo getNext() {
 		return next;
 	}
 
-	public void setNext(Simbolo next){
-		this.next=next;
+	public void setNext(Simbolo next) {
+		this.next = next;
 	}
 
-	public Tipo getT(){
+	public Tipo getT() {
 		return t;
 	}
 
-	public TSub getTsub(){
+	public TSub getTsub() {
 		return tsub;
 	}
 
-	public void setTsub(TSub tsub){
-		this.tsub=tsub;
+	public void setTsub(TSub tsub) {
+		this.tsub = tsub;
 	}
 }
