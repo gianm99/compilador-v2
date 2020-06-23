@@ -1,4 +1,3 @@
-
 grammar vajaC3DNUEVO;
 // options { tokenVocab = vajaNUEVOLexer; }
 
@@ -30,6 +29,17 @@ public void genera(String codigo){
 		pc++;
 		writer.write(codigo);
 	}catch(IOException e){}
+}
+
+public void backpatch(Deque<Integer> lista, Etiqueta e){
+
+}
+
+public Deque<Integer> concat(Deque<Integer> dq1, Deque<Integer> dq2){
+	while(dq2.size()>0){
+		dq1.add(dq2.removeFirst());
+	}
+	return dq1;
 }
 }
 
@@ -67,37 +77,83 @@ referencia
 	returns[Variable r]: ID | ID '(' ')' | contIdx ')';
 
 contIdx
-	returns[Simbolo.TSub tsub]:
-	ID '(' expr contIdx_[null];
+	returns[Simbolo.TSub tsub]: ID '(' expr contIdx_[null];
 
 contIdx_[Deque<Simbolo.TSub> pparams]:
 	',' expr contIdx_[$pparams]
 	|; // lambda
 
 expr
-	returns[Variable r]:
+	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
 	// Lógicas
 	NOT expr {
-		
+		$cierto = $expr.falso;
+		$falso = $expr.cierto;
 	}
-	| expr{
-
+	| expr {
+		Variable r = $r;
     } OPREL expr {
-
+		genera("if " + r + " " + OPREL.getText() + " " + $expr.r + " goto ");
+		$cierto = pc;
+		genera("goto ");
+		$falso = pc;
     }
-	| expr AND expr
-	| expr OR expr
+	| expr {
+		Deque<Integer> cierto = $expr.cierto;
+		Deque<Integer> falso = $expr.falso;
+	} AND {
+		Etiqueta e = new Etiqueta(pc);
+		genera("e : skip");
+	} expr {
+		backpatch(cierto, e);
+		$falso = concat(falso, $expr.falso);
+		$cierto = $expr.cierto;
+	}
+	| expr {
+		Deque<Integer> cierto = $expr.cierto;
+		Deque<Integer> falso = $expr.falso;
+	} OR {
+		Etiqueta e = new Etiqueta(pc);
+		genera("e : skip");
+	} expr {
+		backpatch(cierto, e);
+		$falso = concat(falso, $expr.falso);
+		$cierto = $expr.cierto;
+	}
 	// Aritméticas
 	| SUB expr {
 		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
 		genera("t = - " + $expr.r);
 		$r = t;
+	} expr {
+		Variable r = $expr.r;
+	} MULT expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
+		genera("t = " + r + " * " + $expr.r);
+		$r = t;
+	} expr {
+		Variable r = $expr.r;
+	} DIV expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
+		genera("t = " + r + " / " + $expr.r);
+		$r = t;
 	}
-	| expr MULT expr
-	| expr DIV expr
-	| expr ADD expr
-	| expr SUB expr
-	| '(' expr ')'
+	| expr {
+		Variable r = $expr.r;
+	} ADD expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
+		genera("t = " + r + " + " + $expr.r);
+		$r = t;
+	} expr {
+		Variable r = $expr.r;
+	} SUB expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
+		genera("t = " + r + " - " + $expr.r);
+		$r = t;
+	}
+	| '(' expr ')' {
+		$r = $expr.r;
+	}
 	| referencia {
 		$r = $referencia.r;
 	}
@@ -105,6 +161,17 @@ expr
 		Variable t = tv.nuevaVar(pproc.peek(), $literal.tsub);
 		genera("t = " + $literal.tsub);
 		$r = t;
+		if($literal.tsub == BOOLEAN){
+			if($literal.getText().equals('true')) {
+				genera("goto ");
+				$cierto = pc;
+				$falso = null;
+			} else {
+				genera("goto ");
+				$falso = pc;
+				$cierto = null;
+			}
+		}
 	};
 
 tipo
