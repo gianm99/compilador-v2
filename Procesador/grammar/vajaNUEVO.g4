@@ -9,6 +9,7 @@ import java.util.*;
 
 @parser::members {
 public TablaSimbolos ts;
+int profCondRep; // Profundidad dentro de condicional (if) o repetitivo (while)
 String errores="";
 String directorio;
 Deque<Simbolo> pproc=new ArrayDeque<Simbolo>(); // Pila de procedimientos
@@ -66,7 +67,6 @@ programa:
 			}
 		}
 	} catch (TablaSimbolos.TablaSimbolosException e) {}
-
 } decls sents EOF {
 	ts.saleBloque();
 	if(!errores.isEmpty()) {
@@ -179,7 +179,13 @@ parametro
 sents: sents sent | sent;
 
 sent:
-	IF expr BEGIN sents END
+	IF expr {
+		if($expr.tsub!=Simbolo.TSub.BOOLEAN) {
+			
+		}
+	} BEGIN {
+
+	} sents END
 	| IF expr BEGIN sents END ELSE BEGIN sents END
 	| WHILE expr BEGIN sents END
 	| RETURN expr ';'
