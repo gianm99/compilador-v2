@@ -22,8 +22,8 @@ public vajaNUEVOParser(TokenStream input,String directorio){
 @Override
 public void notifyErrorListeners(Token offendingToken, String msg, RecognitionException ex)
 {
-	String notificacion = "ERROR SINTACTICO - Línea " + offendingToken.getLine()
-	+ " Columna " + offendingToken.getCharPositionInLine() + ": \n\t ";
+	String notificacion = "ERROR SINTÁCTICO - Línea " + offendingToken.getLine()
+	+ ", Columna " + offendingToken.getCharPositionInLine() + ": \n\t ";
 	String expected = msg;
 	if(expected.contains("expecting")){
 		expected = expected.substring(expected.indexOf("expecting") + 10);
