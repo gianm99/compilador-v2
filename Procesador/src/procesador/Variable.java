@@ -6,7 +6,7 @@ package procesador;
  * @author Gian Lucas Martín Chamorro
  */
 public class Variable {
-
+    private int r;
     private int nv; // Número de variable
     private int np; // Subprograma que la ha declarado. 0 -> ninguno
     private Tipo tipo; // Tipo: variable, constante o argumento
@@ -37,5 +37,13 @@ public class Variable {
 
     public static int getNumVar() {
         return cv;
+    }
+
+    public int getR() {
+        return r;
+    }
+
+    public void setR(int r) {
+        this.r = r;
     }
 }
