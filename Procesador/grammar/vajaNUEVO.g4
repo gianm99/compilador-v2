@@ -106,6 +106,11 @@ decl:
 	}
 }
 	| FUNCTION tipo encabezado[$tipo.tsub] BEGIN {
+		try {
+			ts.inserta($encabezado.met.getId(),$encabezado.met);
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			errores+="ERROR SEMÁNTICO - Línea "+$FUNCTION.getLine()+": "+e.getMessage();
+		}
 		ts=ts.entraBloque();
 		pproc.push($encabezado.met);
 		Simbolo param=$encabezado.met.getNext();
@@ -115,19 +120,28 @@ decl:
 			try {
 				ts.inserta(aux.getId(),aux);
 			} catch(TablaSimbolos.TablaSimbolosException e) {
-				errores+= e.getMessage();
+				errores+="ERROR SEMÁNTICO - Línea "+$FUNCTION.getLine()+": "+e.getMessage();
 			}
 			param=param.getNext();
 		}
 	} decls sents END {
 		ts=ts.saleBloque();
 		pproc.pop();
-		if(!$encabezado.met.returnEncontrado) {
+		if(!$encabezado.met.isReturnEncontrado()) {
 			errores+="ERROR SEMÁNTICO - Línea "+$FUNCTION.getLine()+
 			": 'return' no encontrado para la función "+$encabezado.met.getId()+"\n";
 		}
+		if(profCondRep!=0) {
+			errores+="ERROR SEMÁNTICO - Línea "+$FUNCTION.getLine()+
+			": no se puede definir una función en una estructura condicional o repetitiva\n";
+	}
 	}
 	| PROCEDURE encabezado[null] BEGIN {
+		try {
+			ts.inserta($encabezado.met.getId(),$encabezado.met);
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			errores+="ERROR SEMÁNTICO - Línea "+$PROCEDURE.getLine()+": "+e.getMessage();
+		}
 		ts=ts.entraBloque();
 		pproc.push($encabezado.met);
 		Simbolo param=$encabezado.met.getNext();
@@ -137,16 +151,20 @@ decl:
 			try {
 				ts.inserta(aux.getId(),aux);
 			} catch(TablaSimbolos.TablaSimbolosException e) {
-				errores+= e.getMessage();
+				errores+="ERROR SEMÁNTICO - Línea "+$PROCEDURE.getLine()+": "+e.getMessage();
 			}
 			param=param.getNext();
 		}
 	} decls sents END {
 		ts=ts.saleBloque();
 		pproc.pop();
-		if($encabezado.met.returnEncontrado) {
+		if($encabezado.met.isReturnEncontrado()) {
 			errores+="ERROR SEMÁNTICO - Línea "+$PROCEDURE.getLine()+
 			": 'return' encontrado para el procedimiento "+$encabezado.met.getId()+"\n";
+		}
+		if(profCondRep!=0) {
+			errores+="ERROR SEMÁNTICO - Línea "+$PROCEDURE.getLine()+
+			": no se puede definir un procedimiento en una estructura condicional o repetitiva\n";
 		}
 	};
 
