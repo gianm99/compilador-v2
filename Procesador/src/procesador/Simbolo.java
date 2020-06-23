@@ -12,7 +12,7 @@ public class Simbolo {
 	private Simbolo next;
 	private Tipo t;
 	private TSub tsub;
-	public boolean returnEncontrado;
+	private boolean returnEncontrado;
 
 	public Simbolo(String id, Simbolo next, Tipo t, TSub tsub) {
 		this.id = id;
@@ -43,6 +43,10 @@ public class Simbolo {
 		return id;
 	}
 
+	public void setId(String id) {
+		this.id = id;
+	}
+
 	public Simbolo getNext() {
 		return next;
 	}
@@ -55,11 +59,23 @@ public class Simbolo {
 		return t;
 	}
 
+	public void setT(Tipo t) {
+		this.t = t;
+	}
+
 	public TSub getTsub() {
 		return tsub;
 	}
 
 	public void setTsub(TSub tsub) {
 		this.tsub = tsub;
+	}
+
+	public boolean isReturnEncontrado() {
+		return returnEncontrado;
+	}
+
+	public void setReturnEncontrado(boolean returnEncontrado) {
+		this.returnEncontrado = returnEncontrado;
 	}
 }
