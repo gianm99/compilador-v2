@@ -21,6 +21,6 @@ proc main(){
 	} else {
 		b = true;
 	}
-	string palabra = funcion(d, hola);;
+	string palabra = funcion(d, hola);
 	string lectura=read();
 }
