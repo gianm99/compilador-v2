@@ -74,7 +74,7 @@ programa:
 	}
 };
 
-decls: decls decl | decl;
+decls: decls decl | decl |;
 
 decl:
 	VARIABLE tipo ID {
