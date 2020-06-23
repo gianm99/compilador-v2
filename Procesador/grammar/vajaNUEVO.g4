@@ -268,6 +268,7 @@ referencia
 			}
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": "+e.getMessage()+"\n";
+			$tsub=Simbolo.TSub.NULL;
 		}
 	}
 	| contIdx ')' {
@@ -285,6 +286,7 @@ contIdx
 			pparams.add($expr.tsub);
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": "+e.getMessage()+"\n";
+			$tsub=Simbolo.TSub.NULL;
 		}
 	} contIdx_[pparams] {
 		Simbolo.TSub aux;
