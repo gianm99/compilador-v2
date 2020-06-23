@@ -1,4 +1,4 @@
-parser grammar vajaC3D;
+parser grammar vajaC3DANTIGUO;
 
 options
 {
@@ -21,7 +21,7 @@ String directorio;
 Writer writer;
 int pc = 0; // program counter
 
-public vajaC3D(TokenStream input, String directorio, TablaSimbolos simbolos){
+public vajaC3DANTIGUO(TokenStream input, String directorio, TablaSimbolos simbolos){
 	this(input);
 	this.directorio=directorio;
 	this.simbolos=simbolos;
