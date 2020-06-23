@@ -204,8 +204,10 @@ sent:
 		}
 	} BEGIN {
 		profCondRep++;
+		ts=ts.entraBloque();
 	} decls sents {
 		profCondRep--;
+		ts=ts.saleBloque();
 	} END
 	| IF expr {
 		if($expr.tsub!=Simbolo.TSub.BOOLEAN) {
@@ -214,8 +216,14 @@ sent:
 		}
 	} BEGIN {
 		profCondRep++;
-	} decls sents END ELSE BEGIN decls sents {
+		ts=ts.entraBloque();
+	} decls sents {
+		ts=ts.saleBloque();
+	} END ELSE BEGIN {
+		ts=ts.entraBloque();
+	} decls sents {
 		profCondRep--;
+		ts=ts.saleBloque();
 	} END
 	| WHILE expr {
 		if($expr.tsub!=Simbolo.TSub.BOOLEAN) {
@@ -224,8 +232,10 @@ sent:
 		}
 	} BEGIN {
 		profCondRep++;
+		ts=ts.entraBloque();
 	} decls sents {
 		profCondRep--;
+		ts=ts.saleBloque();
 	} END
 	| RETURN expr ';' {
 		if(pproc.size()==0) {
