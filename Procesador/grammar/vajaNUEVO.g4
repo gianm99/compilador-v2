@@ -247,7 +247,16 @@ sent:
 
 referencia
 	returns[Simbolo.TSub tsub]:
-	ID
+	ID {
+		Simbolo ref=new Simbolo();
+		try {
+			ref=ts.consulta($ID.getText());
+			$tsub=ref.getTsub();
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			errores+="ERROR SEMÁNTICO - Línea"+$ID.getLine()+": "+e.getMessage()+"\n";
+			$tsub=Simbolo.TSub.NULL;
+		}
+	}
 	| ID '(' ')' {
 		Simbolo met=new Simbolo();
 		try {
