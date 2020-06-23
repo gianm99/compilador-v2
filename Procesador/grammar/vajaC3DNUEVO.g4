@@ -22,7 +22,7 @@ String directorio;
 Writer writer;
 int pc = 0; // program counter
 
-public vajaC3DNUEVO(TokenStream input, String directorio, TablaSimbolos ts){
+public vajaC3DNUEVOParser(TokenStream input, String directorio, TablaSimbolos ts){
 	this(input);
 	this.directorio=directorio;
 	this.ts=ts;
@@ -67,7 +67,7 @@ sent:
 	| referencia ';';
 
 referencia
-	returns[Simbolo.TSub tsub]: ID | ID '(' ')' | contIdx ')';
+	returns[Variable r]: ID | ID '(' ')' | contIdx ')';
 
 contIdx
 	returns[Simbolo.TSub tsub]:
@@ -92,7 +92,7 @@ expr
 	| expr OR expr
 	// Aritméticas
 	| SUB expr {
-		Variable t = tv.nuevaVar(pprog.peek(),Simbolo.TSub.INT);
+		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
 		genera("t = - " + $expr.r);
 		$r = t;
 	}
@@ -105,7 +105,7 @@ expr
 		$r = $referencia.r;
 	}
 	| literal {
-		Variable t = tv.nuevaVar(pprog.peek(), $literal.tsub);
+		Variable t = tv.nuevaVar(pproc.peek(), $literal.tsub);
 		genera("t = " + $literal.tsub);
 		$r = t;
 	};

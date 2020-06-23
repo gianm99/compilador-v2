@@ -1,9 +1,7 @@
 package procesador;
 
-// Utilidades específicas de antlr
 import antlr.*;
 import org.antlr.v4.runtime.*;
-// Utilidades generales
 import java.io.*;
 import org.apache.commons.io.*;
 
