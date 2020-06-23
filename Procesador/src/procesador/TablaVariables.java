@@ -22,4 +22,10 @@ public class TablaVariables {
     public TablaVariables(String directorio){
         
     }
+
+    public Variable nuevaVar(int np, Variable.Tipo tipo){
+        Variable var = new Variable(np, tipo);
+        tv.add(var);
+        return var;
+    }
 }

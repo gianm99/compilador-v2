@@ -1,8 +1,7 @@
 package procesador;
-// Utilidades específicas de antlr
+
 import antlr.*;
 import org.antlr.v4.runtime.*;
-// Utilidades generales
 import java.io.*;
 import org.apache.commons.io.*;
 
@@ -42,13 +41,15 @@ public class Procesador {
         }
         try {
             tokens.seek(0);
-            parser.programaPrincipal();
-            System.out.println("PROCESO COMPLETADO CON ÉXITO");
+            parser.programa();
+            System.out.println("Proceso completado con éxito");
         } catch (RuntimeException e) {
             System.out.println(e.getMessage());
             File erroresFile = new File(buildPath + "/errores.txt");
             Writer buffer = new BufferedWriter(new FileWriter(erroresFile));
-            buffer.write(e.getMessage());
+            if (e != null) {
+                buffer.write(e.getMessage());
+            }
             buffer.close();
         }
     }

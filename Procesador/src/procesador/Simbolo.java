@@ -1,61 +1,81 @@
 package procesador;
 
 /**
- * Simbolo. Clase que sirve para gestionar la información relacionada con los
- * símbolos que aparecen en el código fuente.
+ * Simbolo. Clase que sirve para gestionar la información relacionada con los símbolos que aparecen
+ * en el código fuente.
  * 
  * @author Gian Lucas Martín Chamorro
  * @author Jordi Antoni Sastre Moll
  */
-public class Simbolo{
+public class Simbolo {
 	private String id;
 	private Simbolo next;
 	private Tipo t;
-	private TipoSubyacente ts;
+	private TSub tsub;
+	private boolean returnEncontrado;
 
-	public Simbolo(String id, Simbolo next, Tipo t, TipoSubyacente ts){
-		this.id=id;
-		this.next=next;
-		this.t=t;
-		this.ts=ts;
+	public Simbolo(String id, Simbolo next, Tipo t, TSub tsub) {
+		this.id = id;
+		this.next = next;
+		this.t = t;
+		this.tsub = tsub;
 	}
 
-	public Simbolo(Simbolo s){
-		this.id=s.id;
-		this.next=s.next;
-		this.t=s.t;
-		this.ts=s.ts;
+	public Simbolo(Simbolo s) {
+		this.id = s.id;
+		this.next = s.next;
+		this.t = s.t;
+		this.tsub = s.tsub;
 	}
 
-	public enum Tipo{
-		CONST,VAR,PROC,FUNC,ARG,NULO;
+	public Simbolo() {
+	};
+
+	public enum Tipo {
+		CONST, VAR, PROC, FUNC, ARG, NULO;
 	}
 
-	public enum TipoSubyacente{
-		BOOLEAN,INT,STRING,NULL;
+	public enum TSub {
+		BOOLEAN, INT, STRING, NULL;
 	}
 
-	public String getId(){
+	public String getId() {
 		return id;
 	}
 
-	public Simbolo getNext(){
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public Simbolo getNext() {
 		return next;
 	}
 
-	public void setNext(Simbolo next){
-		this.next=next;
+	public void setNext(Simbolo next) {
+		this.next = next;
 	}
 
-	public Tipo getT(){
+	public Tipo getT() {
 		return t;
 	}
 
-	public TipoSubyacente getTs(){
-		return ts;
+	public void setT(Tipo t) {
+		this.t = t;
 	}
 
-	public void setTs(TipoSubyacente ts){
-		this.ts=ts;
+	public TSub getTsub() {
+		return tsub;
+	}
+
+	public void setTsub(TSub tsub) {
+		this.tsub = tsub;
+	}
+
+	public boolean isReturnEncontrado() {
+		return returnEncontrado;
+	}
+
+	public void setReturnEncontrado(boolean returnEncontrado) {
+		this.returnEncontrado = returnEncontrado;
 	}
 }

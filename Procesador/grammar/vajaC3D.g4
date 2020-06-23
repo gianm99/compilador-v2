@@ -1,134 +1,241 @@
 grammar vajaC3D;
-
-options { tokenVocab=vajaLexer; }
+// options { tokenVocab = vajaNUEVOLexer; }
 
 @header {
-	package antlr;
-	import procesador.*;
-	import java.io.*;
-    import java.util.*;
-	import procesador.*;
+package antlr;
+import procesador.*;
+import java.io.*;
+import java.util.*;
+import procesador.*;
 }
 
 @parser::members {
-	TablaVariables variables;
-	TablaProcedimientos procedimientos;
+Deque<Integer> pproc=new ArrayDeque<Integer>(); // Pila de procedimientos
+TablaSimbolos ts;
+TablaVariables tv;
+TablaProcedimientos tp;
+String directorio;
+Writer writer;
+int pc = 0; // program counter
+
+public vajaC3DParser(TokenStream input, String directorio, TablaSimbolos ts){
+	this(input);
+	this.directorio=directorio;
+	this.ts=ts;
 }
 
-// TODO Jordi
-programaPrincipal: declaracion* EOF;
+public void genera(String codigo){
+	try{
+		pc++;
+		writer.write(codigo);
+	}catch(IOException e){}
+}
 
-declaracion:
-	'var' tipo declaracionVar
-	| 'const' tipo declaracionConst
-	| 'func' declFunc
-	| 'proc' declProc
-	| ';';
+public void backpatch(Deque<Integer> lista, Etiqueta e){
 
-tipo: INT | BOOLEAN | STRING;
-// Variables y constantes
-declaracionVar: Identificador ('=' initVar)? ';';
+}
 
-declaracionConst: Identificador '=' initConst ';';
+public Deque<Integer> concat(Deque<Integer> dq1, Deque<Integer> dq2){
+	while(dq2.size()>0){
+		dq1.add(dq2.removeFirst());
+	}
+	return dq1;
+}
+}
 
-initVar: expr;
+programa: decls sents EOF;
 
-initConst: expr;
+decls: decls decl | decl;
 
-// Funciones y procedimientos
-declFunc: encabezadoFunc cuerpoFunc;
+decl:
+	VARIABLE tipo ID ('=' expr)? ';'
+	| CONSTANT tipo ID '=' expr ';'
+	| FUNCTION tipo encabezado[$tipo.tsub] BEGIN decls sents END
+	| PROCEDURE encabezado[null] BEGIN decls sents END;
 
-encabezadoFunc: identificadorMetFunc tipo;
+encabezado[Simbolo.TSub tsub]
+	returns[Simbolo met]: ID '(' parametros[$met]? ')';
 
-cuerpoFunc: bloque | ';';
+parametros[Simbolo anterior]:
+	parametro ',' parametros[$anterior.getNext()]
+	| parametro;
 
-declProc: encabezadoProc cuerpoProc;
+parametro
+	returns[Simbolo s]: tipo ID;
 
-encabezadoProc: identificadorMetProc;
-
-cuerpoProc: bloque | ';';
-
-identificadorMetFunc: Identificador '(' parametros? ')';
-
-identificadorMetProc: Identificador '(' parametros? ')';
-
-parametros: parametro ',' parametros | parametro;
-
-parametro: tipo identificadorVar;
-
-identificadorVar: Identificador;
-
-bloque: '{' exprsBloque? '}';
-
-exprsBloque: exprDeBloque+;
-
-exprDeBloque: sentDeclVarLocal | sent;
-
-sentDeclVarLocal: declaracionVarLocal;
-
-declaracionVarLocal: tipo declaracionVar;
+sents: sents sent | sent;
 
 sent:
-	bloque
-	| sentVacia
-	| sentExpr
-	| sentIf
-	| sentIfElse
-	| sentWhile
-	| sentReturn;
+	IF expr BEGIN sents END
+	| IF expr BEGIN sents END ELSE BEGIN sents END
+	| WHILE expr BEGIN sents END
+	| RETURN expr ';'
+	| referencia ASSIGN expr ';'
+	| referencia ';';
 
-//TODO Gian
-sentVacia: ';';
+referencia
+	returns[Variable r]: ID | ID '(' ')' | contIdx ')';
 
-sentExpr: exprSent ';';
+contIdx
+	returns[Simbolo.TSub tsub]: ID '(' expr contIdx_[null];
 
-exprSent: asignacion | sentInvocaMet;
+contIdx_[Deque<Simbolo.TSub> pparams]:
+	',' expr contIdx_[$pparams]
+	|; // lambda
 
-sentIf: IF '(' expr ')' bloque;
+expr
+	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
+	// Lógicas
+	NOT expr {
+		$cierto = $expr.falso;
+		$falso = $expr.cierto;
+	}
+	| expr {
+		Variable r = $r;
+    } OPREL expr {
+		genera("if " + r + " " + OPREL.getText() + " " + $expr.r + " goto ");
+		$cierto = pc;
+		genera("goto ");
+		$falso = pc;
+    }
+	| expr {
+		Deque<Integer> cierto = $expr.cierto;
+		Deque<Integer> falso = $expr.falso;
+	} AND {
+		Etiqueta e = new Etiqueta(pc);
+		genera("e : skip");
+	} expr {
+		backpatch(cierto, e);
+		$falso = concat(falso, $expr.falso);
+		$cierto = $expr.cierto;
+	}
+	| expr {
+		Deque<Integer> cierto = $expr.cierto;
+		Deque<Integer> falso = $expr.falso;
+	} OR {
+		Etiqueta e = new Etiqueta(pc);
+		genera("e : skip");
+	} expr {
+		backpatch(cierto, e);
+		$falso = concat(falso, $expr.falso);
+		$cierto = $expr.cierto;
+	}
+	// Aritméticas
+	| SUB expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
+		genera("t = - " + $expr.r);
+		$r = t;
+	} expr {
+		Variable r = $expr.r;
+	} MULT expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
+		genera("t = " + r + " * " + $expr.r);
+		$r = t;
+	} expr {
+		Variable r = $expr.r;
+	} DIV expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
+		genera("t = " + r + " / " + $expr.r);
+		$r = t;
+	}
+	| expr {
+		Variable r = $expr.r;
+	} ADD expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
+		genera("t = " + r + " + " + $expr.r);
+		$r = t;
+	} expr {
+		Variable r = $expr.r;
+	} SUB expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
+		genera("t = " + r + " - " + $expr.r);
+		$r = t;
+	}
+	| '(' expr ')' {
+		$r = $expr.r;
+	}
+	| referencia {
+		$r = $referencia.r;
+	}
+	| literal {
+		Variable t = tv.nuevaVar(pproc.peek(), $literal.tsub);
+		genera("t = " + $literal.tsub);
+		$r = t;
+		if($literal.tsub == BOOLEAN){
+			if($literal.getText().equals('true')) {
+				genera("goto ");
+				$cierto = pc;
+				$falso = null;
+			} else {
+				genera("goto ");
+				$falso = pc;
+				$cierto = null;
+			}
+		}
+	};
 
-sentIfElse: IF '(' expr ')' bloque ELSE bloque;
+tipo
+	returns[Simbolo.TSub tsub]: INTEGER | BOOLEAN | STRING;
 
-sentWhile: WHILE '(' expr ')' bloque;
+literal
+	returns[Simbolo.TSub tsub]:
+	LiteralInteger
+	| LiteralBoolean
+	| LiteralString;
 
-sentReturn: RETURN expr ';';
-
-sentInvocaMet: Identificador '(' ( argumentos)? ')';
-
-argumentos: expr (',' expr)*;
-
-asignacion: Identificador '=' expr;
-
-expr: exprCondOr | asignacion;
-
-exprCondOr: exprCondAnd exprCondOr_;
-
-exprCondOr_: OR exprCondAnd exprCondOr_ |; //lambda
-
-exprCondAnd: exprComp exprCondAnd_;
-
-exprCondAnd_: AND exprComp exprCondAnd_ |; //lambda
-
-exprComp: exprSuma exprComp_;
-
-exprComp_: Comparador exprSuma exprComp_ |; //lambda
-
-exprSuma: exprMult exprSuma_;
-
-exprSuma_: OpBinSum exprMult exprSuma_ |; //lambda
-
-exprMult: exprUnaria exprMult_;
-
-exprMult_:
-	MULT exprUnaria exprMult_
-	| DIV exprUnaria exprMult_
-	|; //lambda
-
-exprUnaria: OpBinSum exprNeg | exprNeg;
-
-exprNeg: NOT exprUnaria | exprPostfija;
-
-exprPostfija: primario | Identificador | sentInvocaMet;
-
-primario: '(' expr ')' | literal;
-
-literal: LiteralInteger | LiteralBoolean | LiteralString;
+// Palabras reservadas
+VARIABLE: 'var';
+CONSTANT: 'const';
+FUNCTION: 'func';
+PROCEDURE: 'proc';
+RETURN: 'return';
+// Tipos
+INTEGER: 'int';
+BOOLEAN: 'boolean';
+STRING: 'string';
+// Operaciones
+WHILE: 'while';
+IF: 'if';
+ELSE: 'else';
+// Enteros
+LiteralInteger: DecimalLiteral;
+fragment DecimalLiteral: DecimalPositivo | '0';
+fragment DecimalPositivo: [1-9][0-9]*;
+// Booleans
+LiteralBoolean: 'true' | 'false';
+// Cadenas
+LiteralString: '"' LetrasString? '"';
+fragment LetrasString: LetraString+;
+fragment LetraString: ~["\\\r\n];
+// Separadores
+LPAREN: '(';
+RPAREN: ')';
+BEGIN: '{';
+END: '}';
+COMMA: ',';
+SEMI: ';';
+// Operadores
+OPREL: EQUAL | NOTEQUAL | GT | LT | GE | LE;
+OpBinSum: ADD | SUB;
+ASSIGN: '=';
+EQUAL: '==';
+NOTEQUAL: '!=';
+GT: '<';
+LT: '>';
+GE: '>=';
+LE: '<=';
+ADD: '+';
+SUB: '-';
+MULT: '*';
+DIV: '/';
+AND: '&&';
+OR: '||';
+NOT: '!';
+// Identificador
+ID: LETRA LETRADIGITO*;
+fragment LETRA: [a-zA-Z$_];
+fragment LETRADIGITO: [a-zA-Z$_0-9];
+// Comentarios y espacios en blanco
+WS: [ \r\n\t]+ -> skip;
+BLOCK_COMMENT: '/*' .*? '*/' -> skip;
+LINE_COMMENT: '#' ~[\r\n]* -> skip;
