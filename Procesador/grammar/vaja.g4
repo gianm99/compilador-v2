@@ -477,7 +477,6 @@ COMMA: ',';
 SEMI: ';';
 // Operadores
 OPREL: EQUAL | NOTEQUAL | GT | LT | GE | LE;
-OpBinSum: ADD | SUB;
 ASSIGN: '=';
 EQUAL: '==';
 NOTEQUAL: '!=';
