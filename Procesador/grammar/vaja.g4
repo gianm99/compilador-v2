@@ -49,7 +49,7 @@ int dot = 0;
 @Override
 public void recover(RecognitionException ex)
 {
-	throw new RuntimeException("ERROR LEXICO -  "+ex.getMessage());
+	throw new RuntimeException("Error léxico -  "+ex.getMessage());
 }
 }
 
@@ -67,14 +67,12 @@ programa:
 			}
 		}
 	} catch (TablaSimbolos.TablaSimbolosException e) {}
-} decls sents EOF {
+} decl* sents EOF {
 	ts.saleBloque();
 	if(!errores.isEmpty()) {
 		throw new RuntimeException(errores);
 	}
 };
-
-decls: decls decl | decl |;
 
 decl:
 	VARIABLE tipo ID {
@@ -124,7 +122,7 @@ decl:
 			}
 			param=param.getNext();
 		}
-	} decls sents END {
+	} decl* sents END {
 		ts=ts.saleBloque();
 		pproc.pop();
 		if(!$encabezado.met.isReturnEncontrado()) {
@@ -155,7 +153,7 @@ decl:
 			}
 			param=param.getNext();
 		}
-	} decls sents END {
+	} decl* sents END {
 		ts=ts.saleBloque();
 		pproc.pop();
 		if($encabezado.met.isReturnEncontrado()) {
@@ -205,7 +203,7 @@ sent:
 	} BEGIN {
 		profCondRep++;
 		ts=ts.entraBloque();
-	} decls sents {
+	} decl* sents {
 		profCondRep--;
 		ts=ts.saleBloque();
 	} END
@@ -217,23 +215,23 @@ sent:
 	} BEGIN {
 		profCondRep++;
 		ts=ts.entraBloque();
-	} decls sents {
+	} decl* sents {
 		ts=ts.saleBloque();
 	} END ELSE BEGIN {
 		ts=ts.entraBloque();
-	} decls sents {
+	} decl* sents {
 		profCondRep--;
 		ts=ts.saleBloque();
 	} END
 	| WHILE expr {
 		if($expr.tsub!=Simbolo.TSub.BOOLEAN) {
-			errores+="ERROR SEMÁNTICO - Línea "+$WHILE.getLine()+
+			errores+="Error semántico - Línea "+$WHILE.getLine()+
 			": tipos incompatibles (esperado BOOLEAN)\n";
 		}
 	} BEGIN {
 		profCondRep++;
 		ts=ts.entraBloque();
-	} decls sents {
+	} decl* sents {
 		profCondRep--;
 		ts=ts.saleBloque();
 	} END
