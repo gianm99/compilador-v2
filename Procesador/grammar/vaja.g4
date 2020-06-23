@@ -22,7 +22,7 @@ public vajaParser(TokenStream input,String directorio){
 @Override
 public void notifyErrorListeners(Token offendingToken, String msg, RecognitionException ex)
 {
-	String notificacion = "ERROR SINTÁCTICO - Línea " + offendingToken.getLine()
+	String notificacion = "Error sintáctico - Línea " + offendingToken.getLine()
 	+ ", Columna " + offendingToken.getCharPositionInLine() + ": \n\t ";
 	String expected = msg;
 	if(expected.contains("expecting")){
@@ -81,13 +81,13 @@ decl:
 	try{
 		ts.inserta($ID.getText(),new Simbolo($ID.getText(),null,Simbolo.Tipo.VAR,$tipo.tsub));
 	} catch(TablaSimbolos.TablaSimbolosException e) {
-		errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": variable "+$ID.getText()+
+		errores+="Error semántico - Línea "+$ID.getLine()+": variable "+$ID.getText()+
 		"redeclarada\n";
 	}
 } (
 		'=' expr {
 	if($expr.tsub!=$tipo.tsub) {
-		errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": tipos incompatibles (esperado "+
+		errores+="Error semántico - Línea "+$ID.getLine()+": tipos incompatibles (esperado "+
 		$tipo.tsub+")\n";
 	}
 }
@@ -96,12 +96,12 @@ decl:
 	try {
 		ts.inserta($ID.getText(),new Simbolo($ID.getText(),null,Simbolo.Tipo.CONST,$tipo.tsub));
 	} catch(TablaSimbolos.TablaSimbolosException e) {
-		errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": constante "+$ID.getText()+
+		errores+="Error semántico - Línea "+$ID.getLine()+": constante "+$ID.getText()+
 		"redeclarada\n";
 	}
 } '=' expr ';' {
 	if($expr.tsub!=$tipo.tsub) {
-		errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": tipos incompatibles (esperado "+
+		errores+="Error semántico - Línea "+$ID.getLine()+": tipos incompatibles (esperado "+
 		$tipo.tsub+")\n";
 	}
 }
@@ -109,7 +109,7 @@ decl:
 		try {
 			ts.inserta($encabezado.met.getId(),$encabezado.met);
 		} catch(TablaSimbolos.TablaSimbolosException e) {
-			errores+="ERROR SEMÁNTICO - Línea "+$FUNCTION.getLine()+": "+e.getMessage();
+			errores+="Error semántico - Línea "+$FUNCTION.getLine()+": "+e.getMessage();
 		}
 		ts=ts.entraBloque();
 		pproc.push($encabezado.met);
@@ -120,7 +120,7 @@ decl:
 			try {
 				ts.inserta(aux.getId(),aux);
 			} catch(TablaSimbolos.TablaSimbolosException e) {
-				errores+="ERROR SEMÁNTICO - Línea "+$FUNCTION.getLine()+": "+e.getMessage();
+				errores+="Error semántico - Línea "+$FUNCTION.getLine()+": "+e.getMessage();
 			}
 			param=param.getNext();
 		}
@@ -128,11 +128,11 @@ decl:
 		ts=ts.saleBloque();
 		pproc.pop();
 		if(!$encabezado.met.isReturnEncontrado()) {
-			errores+="ERROR SEMÁNTICO - Línea "+$FUNCTION.getLine()+
+			errores+="Error semántico - Línea "+$FUNCTION.getLine()+
 			": 'return' no encontrado para la función "+$encabezado.met.getId()+"\n";
 		}
 		if(profCondRep!=0) {
-			errores+="ERROR SEMÁNTICO - Línea "+$FUNCTION.getLine()+
+			errores+="Error semántico - Línea "+$FUNCTION.getLine()+
 			": no se puede definir una función en una estructura condicional o repetitiva\n";
 		}
 	}
@@ -140,7 +140,7 @@ decl:
 		try {
 			ts.inserta($encabezado.met.getId(),$encabezado.met);
 		} catch(TablaSimbolos.TablaSimbolosException e) {
-			errores+="ERROR SEMÁNTICO - Línea "+$PROCEDURE.getLine()+": "+e.getMessage();
+			errores+="Error semántico - Línea "+$PROCEDURE.getLine()+": "+e.getMessage();
 		}
 		ts=ts.entraBloque();
 		pproc.push($encabezado.met);
@@ -151,7 +151,7 @@ decl:
 			try {
 				ts.inserta(aux.getId(),aux);
 			} catch(TablaSimbolos.TablaSimbolosException e) {
-				errores+="ERROR SEMÁNTICO - Línea "+$PROCEDURE.getLine()+": "+e.getMessage();
+				errores+="Error semántico - Línea "+$PROCEDURE.getLine()+": "+e.getMessage();
 			}
 			param=param.getNext();
 		}
@@ -159,11 +159,11 @@ decl:
 		ts=ts.saleBloque();
 		pproc.pop();
 		if($encabezado.met.isReturnEncontrado()) {
-			errores+="ERROR SEMÁNTICO - Línea "+$PROCEDURE.getLine()+
+			errores+="Error semántico - Línea "+$PROCEDURE.getLine()+
 			": 'return' encontrado para el procedimiento "+$encabezado.met.getId()+"\n";
 		}
 		if(profCondRep!=0) {
-			errores+="ERROR SEMÁNTICO - Línea "+$PROCEDURE.getLine()+
+			errores+="Error semántico - Línea "+$PROCEDURE.getLine()+
 			": no se puede definir un procedimiento en una estructura condicional o repetitiva\n";
 		}
 	};
@@ -199,7 +199,7 @@ sents: sents sent | sent;
 sent:
 	IF expr {
 		if($expr.tsub!=Simbolo.TSub.BOOLEAN) {
-			errores+="ERROR SEMÁNTICO - Línea "+$IF.getLine()+
+			errores+="Error semántico - Línea "+$IF.getLine()+
 			": tipos incompatibles (esperado BOOLEAN)\n";
 		}
 	} BEGIN {
@@ -211,7 +211,7 @@ sent:
 	} END
 	| IF expr {
 		if($expr.tsub!=Simbolo.TSub.BOOLEAN) {
-			errores+="ERROR SEMÁNTICO - Línea "+$IF.getLine()+
+			errores+="Error semántico - Línea "+$IF.getLine()+
 			": tipos incompatibles (esperado BOOLEAN)\n";
 		}
 	} BEGIN {
@@ -240,11 +240,11 @@ sent:
 	| RETURN expr ';' {
 		if(pproc.size()==0) {
 			// Return fuera de una función
-			errores+="ERROR SEMÁNTICO - Línea "+$RETURN.getLine()+": return fuera de función\n";
+			errores+="Error semántico - Línea "+$RETURN.getLine()+": return fuera de función\n";
 		} else {
 			if(pproc.peek().getTsub()!=$expr.tsub) {
 				// Return de tipo incorrecto
-				errores+="ERROR SEMÁNTICO - Línea "+$RETURN.getLine()+
+				errores+="Error semántico - Línea "+$RETURN.getLine()+
 				": return de tipo incorrecto (esperado "+pproc.peek().getTsub()+")\n";
 			} else if(profCondRep==0) {
 				// Return correcto
@@ -256,11 +256,11 @@ sent:
 		if($referencia.s!=null) {
 			if($referencia.s.getT()==Simbolo.Tipo.CONST) {
 				// Asignación a una constante
-				errores+="ERROR SEMÁNTICO - Línea "+$ASSIGN.getLine()+": "+$referencia.s.getId()+
+				errores+="Error semántico - Línea "+$ASSIGN.getLine()+": "+$referencia.s.getId()+
 				"es una constante\n";
 			} else if($referencia.s.getTsub()!=$expr.tsub) {
 				// Tipos incompatibles
-				errores+="ERROR SEMÁNTICO - Línea "+$ASSIGN.getLine()+
+				errores+="Error semántico - Línea "+$ASSIGN.getLine()+
 				": asignación de tipo incorrecto (esperado "+$referencia.s.getTsub()+")\n";
 			}
 		}
@@ -269,7 +269,7 @@ sent:
 		if($referencia.s!=null) {
 			if($referencia.s.getT()!=Simbolo.Tipo.FUNC && $referencia.s.getT()!=Simbolo.Tipo.PROC) {
 				// Tiene que ser función o procedimiento
-				errores+="ERROR SEMÁNTICO - Línea "+$SEMI.getLine()+
+				errores+="Error semántico - Línea "+$SEMI.getLine()+
 				": se esperaba una función o un procedimiento\n";
 			}
 		}
@@ -281,7 +281,7 @@ referencia
 		try {
 			$s=ts.consulta($ID.getText());
 		} catch(TablaSimbolos.TablaSimbolosException e) {
-			errores+="ERROR SEMÁNTICO - Línea"+$ID.getLine()+": "+e.getMessage();
+			errores+="Error semántico - Línea"+$ID.getLine()+": "+e.getMessage();
 			$s=null;
 		}
 	}
@@ -289,11 +289,11 @@ referencia
 		try {
 			$s=ts.consulta($ID.getText());
 			if($s.getNext()!=null) {
-				errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": falta(n) argumento(s) para "+
+				errores+="Error semántico - Línea "+$ID.getLine()+": falta(n) argumento(s) para "+
 				$ID.getText()+"\n";
 			}
 		} catch(TablaSimbolos.TablaSimbolosException e) {
-			errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": "+e.getMessage()+"\n";
+			errores+="Error semántico - Línea "+$ID.getLine()+": "+e.getMessage()+"\n";
 			$s=null;
 		}
 	}
@@ -309,7 +309,7 @@ contIdx
 			$met=ts.consulta($ID.getText());
 			pparams.add($expr.tsub);
 		} catch(TablaSimbolos.TablaSimbolosException e) {
-			errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": "+e.getMessage()+"\n";
+			errores+="Error semántico - Línea "+$ID.getLine()+": "+e.getMessage()+"\n";
 			$met=null;
 		}
 	} contIdx_[pparams] {
@@ -320,18 +320,18 @@ contIdx
 			while(pparams.size()!=0) {
 				aux=pparams.remove();
 				if(param==null) {
-					errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": demasiados argumentos para "+
-					$ID.getText()+"\n";
+					errores+="Error semántico - Línea "+$ID.getLine()+
+					": demasiados argumentos para "+$ID.getText()+"\n";
 					break;
 				} else if(aux!=param.getTsub()) {
-					errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+
+					errores+="Error semántico - Línea "+$ID.getLine()+
 					": tipos incompatibles (esperado "+param.getTsub()+")\n";
 					break;
 				}
 				param=param.getNext();
 			}
 			if(param!=null) {
-				errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": falta(n) argumento(s) para "+
+				errores+="Error semántico - Línea "+$ID.getLine()+": falta(n) argumento(s) para "+
 				$ID.getText()+"\n";
 			}
 		}
