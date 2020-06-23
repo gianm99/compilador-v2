@@ -316,8 +316,8 @@ contIdx
 		if($met!=null) {
 			Simbolo.TSub aux;
 			Simbolo param=$met;
+			param=param.getNext();
 			while(pparams.size()!=0) {
-				param=param.getNext();
 				aux=pparams.remove();
 				if(param==null) {
 					errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": demasiados argumentos para "+
@@ -328,6 +328,7 @@ contIdx
 					": tipos incompatibles (esperado "+param.getTsub()+")\n";
 					break;
 				}
+				param=param.getNext();
 			}
 			if(param!=null) {
 				errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": falta(n) argumento(s) para "+
