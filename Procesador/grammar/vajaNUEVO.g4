@@ -252,8 +252,28 @@ sent:
 			}
 		}
 	}
-	| referencia ASSIGN expr ';'
-	| referencia ';';
+	| referencia ASSIGN expr ';' {
+		if($referencia.s!=null) {
+			if($referencia.s.getT()==Simbolo.Tipo.CONST) {
+				// Asignación a una constante
+				errores+="ERROR SEMÁNTICO - Línea "+$ASSIGN.getLine()+": "+$referencia.s.getId()+
+				"es una constante\n";
+			} else if($referencia.s.getTsub()!=$expr.tsub) {
+				// Tipos incompatibles
+				errores+="ERROR SEMÁNTICO - Línea "+$ASSIGN.getLine()+
+				": asignación de tipo incorrecto (esperado "+$referencia.s.getTsub()+")\n";
+			}
+		}
+	}
+	| referencia SEMI {
+		if($referencia.s!=null) {
+			if($referencia.s.getT()!=Simbolo.Tipo.FUNC && $referencia.s.getT()!=Simbolo.Tipo.PROC) {
+				// Tiene que ser función o procedimiento
+				errores+="ERROR SEMÁNTICO - Línea "+$SEMI.getLine()+
+				": se esperaba una función o un procedimiento\n";
+			}
+		}
+	};
 
 referencia
 	returns[Simbolo s]:
@@ -293,7 +313,7 @@ contIdx
 			$met=null;
 		}
 	} contIdx_[pparams] {
-		if(met!=null) {
+		if($met!=null) {
 			Simbolo.TSub aux;
 			Simbolo param=$met;
 			while(pparams.size()!=0) {
