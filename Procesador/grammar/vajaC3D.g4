@@ -1,4 +1,4 @@
-grammar vajaC3DNUEVO;
+grammar vajaC3D;
 // options { tokenVocab = vajaNUEVOLexer; }
 
 @header {
@@ -18,7 +18,7 @@ String directorio;
 Writer writer;
 int pc = 0; // program counter
 
-public vajaC3DNUEVOParser(TokenStream input, String directorio, TablaSimbolos ts){
+public vajaC3DParser(TokenStream input, String directorio, TablaSimbolos ts){
 	this(input);
 	this.directorio=directorio;
 	this.ts=ts;

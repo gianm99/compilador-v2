@@ -1,4 +1,4 @@
-grammar vajaNUEVO;
+grammar vaja;
 
 @header {
 package antlr;
@@ -14,7 +14,7 @@ String errores="";
 String directorio;
 Deque<Simbolo> pproc=new ArrayDeque<Simbolo>(); // Pila de procedimientos
 
-public vajaNUEVOParser(TokenStream input,String directorio){
+public vajaParser(TokenStream input,String directorio){
 	this(input);
 	this.directorio=directorio;
 }
