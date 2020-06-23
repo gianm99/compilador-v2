@@ -27,10 +27,10 @@ public class Procesador {
         // Stream del archivo pasado como argumento
         CharStream stream = CharStreams.fromFileName(args[0]);
         // Se crea el lexer y el CommonTokenStream
-        vajaANTIGUOLexer lexer = new vajaANTIGUOLexer(stream);
+        vajaLexer lexer = new vajaLexer(stream);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         // Parser para el análisis sintáctico y semántico
-        vajaANTIGUOParser parser = new vajaANTIGUOParser(tokens, buildPath);
+        vajaParser parser = new vajaParser(tokens, buildPath);
         tokens.fill();
         File tokensFile = new File(buildPath + "/tokens.txt");
         try (Writer buffer = new BufferedWriter(new FileWriter(tokensFile))) {
@@ -42,12 +42,14 @@ public class Procesador {
         try {
             tokens.seek(0);
             parser.programa();
-            System.out.println("PROCESO COMPLETADO CON ÉXITO");
+            System.out.println("Proceso completado con éxito");
         } catch (RuntimeException e) {
             System.out.println(e.getMessage());
             File erroresFile = new File(buildPath + "/errores.txt");
             Writer buffer = new BufferedWriter(new FileWriter(erroresFile));
-            buffer.write(e.getMessage());
+            if (e != null) {
+                buffer.write(e.getMessage());
+            }
             buffer.close();
         }
     }
