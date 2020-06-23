@@ -1,9 +1,6 @@
-// parser grammar vajaC3DNUEVO;
+
 grammar vajaC3DNUEVO;
-// options
-// {
-// 	tokenVocab = vajaNUEVOLexer;
-// }
+// options { tokenVocab = vajaNUEVOLexer; }
 
 @header {
 package antlr;
@@ -41,7 +38,7 @@ programa: decls sents EOF;
 decls: decls decl | decl;
 
 decl:
-	VARIABLE tipo ID ( '=' expr )? ';'
+	VARIABLE tipo ID ('=' expr)? ';'
 	| CONSTANT tipo ID '=' expr ';'
 	| FUNCTION tipo encabezado[$tipo.tsub] BEGIN decls sents END
 	| PROCEDURE encabezado[null] BEGIN decls sents END;
@@ -125,32 +122,23 @@ CONSTANT: 'const';
 FUNCTION: 'func';
 PROCEDURE: 'proc';
 RETURN: 'return';
-
 // Tipos
 INTEGER: 'int';
 BOOLEAN: 'boolean';
 STRING: 'string';
-
 // Operaciones
 WHILE: 'while';
 IF: 'if';
 ELSE: 'else';
-
 // Enteros
 LiteralInteger: DecimalLiteral;
-
 fragment DecimalLiteral: DecimalPositivo | '0';
-
 fragment DecimalPositivo: [1-9][0-9]*;
-
 // Booleans
 LiteralBoolean: 'true' | 'false';
-
 // Cadenas
 LiteralString: '"' LetrasString? '"';
-
 fragment LetrasString: LetraString+;
-
 fragment LetraString: ~["\\\r\n];
 // Separadores
 LPAREN: '(';
@@ -159,12 +147,9 @@ BEGIN: '{';
 END: '}';
 COMMA: ',';
 SEMI: ';';
-
 // Operadores
 OPREL: EQUAL | NOTEQUAL | GT | LT | GE | LE;
-
 OpBinSum: ADD | SUB;
-
 ASSIGN: '=';
 EQUAL: '==';
 NOTEQUAL: '!=';
@@ -179,17 +164,11 @@ DIV: '/';
 AND: '&&';
 OR: '||';
 NOT: '!';
-
 // Identificador
 ID: LETRA LETRADIGITO*;
-
 fragment LETRA: [a-zA-Z$_];
-
 fragment LETRADIGITO: [a-zA-Z$_0-9];
-
 // Comentarios y espacios en blanco
 WS: [ \r\n\t]+ -> skip;
-
 BLOCK_COMMENT: '/*' .*? '*/' -> skip;
-
 LINE_COMMENT: '#' ~[\r\n]* -> skip;

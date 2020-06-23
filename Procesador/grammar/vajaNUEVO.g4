@@ -9,7 +9,7 @@ import java.util.*;
 
 @parser::members {
 public TablaSimbolos ts;
-int profCondRep; // Profundidad dentro de condicional (if) o repetitivo (while)
+int profCondRep; // Profundidad dentro de estructura condicional o repetitiva
 String errores="";
 String directorio;
 Deque<Simbolo> pproc=new ArrayDeque<Simbolo>(); // Pila de procedimientos
@@ -134,7 +134,7 @@ decl:
 		if(profCondRep!=0) {
 			errores+="ERROR SEMÁNTICO - Línea "+$FUNCTION.getLine()+
 			": no se puede definir una función en una estructura condicional o repetitiva\n";
-	}
+		}
 	}
 	| PROCEDURE encabezado[null] BEGIN {
 		try {
@@ -416,32 +416,23 @@ CONSTANT: 'const';
 FUNCTION: 'func';
 PROCEDURE: 'proc';
 RETURN: 'return';
-
 // Tipos
 INTEGER: 'int';
 BOOLEAN: 'boolean';
 STRING: 'string';
-
 // Operaciones
 WHILE: 'while';
 IF: 'if';
 ELSE: 'else';
-
 // Enteros
 LiteralInteger: DecimalLiteral;
-
 fragment DecimalLiteral: DecimalPositivo | '0';
-
 fragment DecimalPositivo: [1-9][0-9]*;
-
 // Booleans
 LiteralBoolean: 'true' | 'false';
-
 // Cadenas
 LiteralString: '"' LetrasString? '"';
-
 fragment LetrasString: LetraString+;
-
 fragment LetraString: ~["\\\r\n];
 // Separadores
 LPAREN: '(';
@@ -450,12 +441,9 @@ BEGIN: '{';
 END: '}';
 COMMA: ',';
 SEMI: ';';
-
 // Operadores
 OPREL: EQUAL | NOTEQUAL | GT | LT | GE | LE;
-
 OpBinSum: ADD | SUB;
-
 ASSIGN: '=';
 EQUAL: '==';
 NOTEQUAL: '!=';
@@ -470,17 +458,11 @@ DIV: '/';
 AND: '&&';
 OR: '||';
 NOT: '!';
-
 // Identificador
 ID: LETRA LETRADIGITO*;
-
 fragment LETRA: [a-zA-Z$_];
-
 fragment LETRADIGITO: [a-zA-Z$_0-9];
-
 // Comentarios y espacios en blanco
 WS: [ \r\n\t]+ -> skip;
-
 BLOCK_COMMENT: '/*' .*? '*/' -> skip;
-
 LINE_COMMENT: '#' ~[\r\n]* -> skip;

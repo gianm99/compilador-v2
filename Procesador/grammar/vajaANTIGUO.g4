@@ -612,17 +612,17 @@ sent:
 		{try{writer.write(sent+"->PUNTOYCOMA"+(dot++)+";\n");}catch(Exception e){}}
 	';'
 	 {
-			try {
-				if($expr.tsub != tiporeturn){
-					errores += ("ERROR SEMANTICO - Línea: " +$RETURN.getLine()+"\n"+
-					"Tipo en el return encontrado: "+$expr.tsub+"\n"+
-					"Tipo en el return esperado: "+tiporeturn+"\n");
-				} else {
-					returnenc = true;
-				}
-			} catch (NullPointerException e){
+		try {
+			if($expr.tsub != tiporeturn){
+				errores += ("ERROR SEMANTICO - Línea: " +$RETURN.getLine()+"\n"+
+				"Tipo en el return encontrado: "+$expr.tsub+"\n"+
+				"Tipo en el return esperado: "+tiporeturn+"\n");
+			} else {
 				returnenc = true;
 			}
+		} catch (NullPointerException e){
+			returnenc = true;
+		}
 	}
 	;
 
