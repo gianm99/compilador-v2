@@ -256,67 +256,63 @@ sent:
 	| referencia ';';
 
 referencia
-	returns[Simbolo.TSub tsub]:
+	returns[Simbolo s]:
 	ID {
-		Simbolo ref=new Simbolo();
 		try {
-			ref=ts.consulta($ID.getText());
-			$tsub=ref.getTsub();
+			$s=ts.consulta($ID.getText());
 		} catch(TablaSimbolos.TablaSimbolosException e) {
-			errores+="ERROR SEMÁNTICO - Línea"+$ID.getLine()+": "+e.getMessage()+"\n";
-			$tsub=Simbolo.TSub.NULL;
+			errores+="ERROR SEMÁNTICO - Línea"+$ID.getLine()+": "+e.getMessage();
+			$s=null;
 		}
 	}
 	| ID '(' ')' {
-		Simbolo met=new Simbolo();
 		try {
-			met=ts.consulta($ID.getText());
-			$tsub=met.getTsub();
-			if(met.getNext()!=null) {
+			$s=ts.consulta($ID.getText());
+			if($s.getNext()!=null) {
 				errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": falta(n) argumento(s) para "+
 				$ID.getText()+"\n";
 			}
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": "+e.getMessage()+"\n";
-			$tsub=Simbolo.TSub.NULL;
+			$s=null;
 		}
 	}
 	| contIdx ')' {
-		$tsub=$contIdx.tsub;
+		$s=$contIdx.met;
 	};
 
 contIdx
-	returns[Simbolo.TSub tsub]:
+	returns[Simbolo met]:
 	ID '(' expr {
-		Simbolo met=new Simbolo();
 		Deque<Simbolo.TSub> pparams=new ArrayDeque<Simbolo.TSub>();
 		try {
-			met=ts.consulta($ID.getText());
-			$tsub=met.getTsub();
+			$met=ts.consulta($ID.getText());
 			pparams.add($expr.tsub);
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": "+e.getMessage()+"\n";
-			$tsub=Simbolo.TSub.NULL;
+			$met=null;
 		}
 	} contIdx_[pparams] {
-		Simbolo.TSub aux;
-		Simbolo param=met;
-		while(pparams.size()!=0) {
-			param=param.getNext();
-			aux=pparams.remove();
-			if(param==null) {
-				errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": demasiados argumentos para "+
-				$ID.getText()+"\n";
-				break;
-			} else if(aux!=param.getTsub()) {
-				errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+
-				": tipos incompatibles (esperado "+param.getTsub()+")\n";
-				break;
+		if(met!=null) {
+			Simbolo.TSub aux;
+			Simbolo param=$met;
+			while(pparams.size()!=0) {
+				param=param.getNext();
+				aux=pparams.remove();
+				if(param==null) {
+					errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": demasiados argumentos para "+
+					$ID.getText()+"\n";
+					break;
+				} else if(aux!=param.getTsub()) {
+					errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+
+					": tipos incompatibles (esperado "+param.getTsub()+")\n";
+					break;
+				}
 			}
-		}
-		if(param!=null) {
-			errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": falta(n) argumento(s) para "+
-			$ID.getText()+"\n";
+			if(param!=null) {
+				errores+="ERROR SEMÁNTICO - Línea "+$ID.getLine()+": falta(n) argumento(s) para "+
+				$ID.getText()+"\n";
+			}
 		}
 	};
 
@@ -432,11 +428,13 @@ expr
 		$tsub=$expr.tsub;
 	}
 	| referencia {
-		if($expr.tsub==Simbolo.TSub.NULL) {
-			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
+		if($referencia.s==null) {
+			errores+="ERROR SEMÁNTICO - Línea "+$referencia.start.getLine()+
 			": tipos incompatibles (encontrado NULL)\n";
+			$tsub=Simbolo.TSub.NULL;
+		} else {
+			$tsub=$referencia.s.getTsub();
 		}
-		$tsub=$referencia.tsub;
 	}
 	| literal {
 		$tsub=$literal.tsub;
