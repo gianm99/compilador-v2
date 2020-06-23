@@ -31,7 +31,7 @@ public class TablaSimbolos {
         pre = null;
         try {
             // TS output
-            File tsFile = new File(directorio + "\\tablasimbolos.html");
+            File tsFile = new File(directorio + "/tablasimbolos.html");
             buffer = new BufferedWriter(new FileWriter(tsFile));
             buffer.write("<!DOCTYPE html>" + "<html>" + "<head>" + "<style>"
                     + "table, th, td {border: 1px solid black;background-color: aqua;}" + "</style>"
@@ -54,9 +54,9 @@ public class TablaSimbolos {
         try {
             // TS entre bloque output
             buffer.write("</tr>" + "</table>" + "</td>" + "</tr>" + "<tr>" + "<th>Nivel "
-                    + (niveltabla + 1) + "</th>" + "<td>" + "<table>" + "<tr>" + "<th>Id</th>"
-                    + "<th>Tipo</th>" + "<th>Tipo Subyacente</th>" + "<th>Next</th>" + "</tr>"
-                    + "<tr>");
+                    + (niveltabla + 1) + "</th>" + "<td>" + "<table style='width:100%'>" + "<tr>"
+                    + "<th>Id</th>" + "<th>Tipo</th>" + "<th>Tipo Subyacente</th>" + "<th>Next</th>"
+                    + "</tr>" + "<tr>");
         } catch (IOException e) {
             System.out.println("error escribiendo la tabla de símbolos: " + e.getMessage());
         }
