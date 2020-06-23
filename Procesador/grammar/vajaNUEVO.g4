@@ -199,14 +199,49 @@ sents: sents sent | sent;
 sent:
 	IF expr {
 		if($expr.tsub!=Simbolo.TSub.BOOLEAN) {
-			
+			errores+="ERROR SEMÁNTICO - Línea "+$IF.getLine()+
+			": tipos incompatibles (esperado BOOLEAN)\n";
 		}
 	} BEGIN {
-
-	} sents END
-	| IF expr BEGIN sents END ELSE BEGIN sents END
-	| WHILE expr BEGIN sents END
-	| RETURN expr ';'
+		profCondRep++;
+	} decls sents {
+		profCondRep--;
+	} END
+	| IF expr {
+		if($expr.tsub!=Simbolo.TSub.BOOLEAN) {
+			errores+="ERROR SEMÁNTICO - Línea "+$IF.getLine()+
+			": tipos incompatibles (esperado BOOLEAN)\n";
+		}
+	} BEGIN {
+		profCondRep++;
+	} decls sents END ELSE BEGIN decls sents {
+		profCondRep--;
+	} END
+	| WHILE expr {
+		if($expr.tsub!=Simbolo.TSub.BOOLEAN) {
+			errores+="ERROR SEMÁNTICO - Línea "+$WHILE.getLine()+
+			": tipos incompatibles (esperado BOOLEAN)\n";
+		}
+	} BEGIN {
+		profCondRep++;
+	} decls sents {
+		profCondRep--;
+	} END
+	| RETURN expr ';' {
+		if(pproc.size()==0) {
+			// Return fuera de una función
+			errores+="ERROR SEMÁNTICO - Línea "+$RETURN.getLine()+": return fuera de función\n";
+		} else {
+			if(pproc.peek().getTsub()!=$expr.tsub) {
+				// Return de tipo incorrecto
+				errores+="ERROR SEMÁNTICO - Línea "+$RETURN.getLine()+
+				": return de tipo incorrecto (esperado "+pproc.peek().getTsub()+")\n";
+			} else if(profCondRep==0) {
+				// Return correcto
+				pproc.peek().setReturnEncontrado(true);
+			}
+		}
+	}
 	| referencia ASSIGN expr ';'
 	| referencia ';';
 
