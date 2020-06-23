@@ -40,7 +40,7 @@ public class TablaSimbolos {
                     + "<th>Id</th>" + "<th>Tipo</th>" + "<th>Tipo Subyacente</th>" + "<th>Next</th>"
                     + "</tr>" + "<tr>");
         } catch (IOException e) {
-            System.out.println("Error escribiendo la tabla de símbolos: " + e.getMessage());
+            System.out.println("error escribiendo la tabla de símbolos: " + e.getMessage());
         }
     }
 
@@ -58,7 +58,7 @@ public class TablaSimbolos {
                     + "<th>Tipo</th>" + "<th>Tipo Subyacente</th>" + "<th>Next</th>" + "</tr>"
                     + "<tr>");
         } catch (IOException e) {
-            System.out.println("Error escribiendo la tabla de símbolos: " + e.getMessage());
+            System.out.println("error escribiendo la tabla de símbolos: " + e.getMessage());
         }
         return new TablaSimbolos(this, niveltabla + 1);
     }
@@ -79,7 +79,7 @@ public class TablaSimbolos {
                         + "<th>Next</th>" + "</tr>" + "<tr>");
             }
         } catch (IOException e) {
-            System.out.println("Error escribiendo la tabla de símbolos: " + e.getMessage());
+            System.out.println("error escribiendo la tabla de símbolos: " + e.getMessage());
         }
         return pre;
     }
@@ -108,7 +108,7 @@ public class TablaSimbolos {
             }
             buffer.write("</tr>" + "<tr>");
         } catch (IOException e) {
-            System.out.println("Error escribiendo la tabla de símbolos: " + e.getMessage());
+            System.out.println("error escribiendo la tabla de símbolos: " + e.getMessage());
         }
 
     }
@@ -124,6 +124,6 @@ public class TablaSimbolos {
             }
         }
         throw new TablaSimbolosException(
-                "No se ha encontrado el símbolo " + id + " en la tabla de símbolos");
+                "no se ha encontrado el símbolo " + id + " en la tabla de símbolos");
     }
 }
