@@ -52,5 +52,7 @@ Como detalles a destacar del lenguaje tenemos los siguientes:
 - La estructura de los programas, subprogramas y sentencias complejas (condicionales e iterativas) tiene que ser esta:
   1. *Declaraciones*. Puede no haber ninguna declaración.
   2. *Sentencias*. Tiene que haber como mínimo una.
-- La gestión de errores detecta
+- El compilador detecta los errores léxicos, sintácticos y semánticos. 
+  - Si detecta un error sintáctico deja de ejecutarse.
+  - Si detecta un error semántico sigue evaluando el restro del programa para encontrar el resto.
 - Al imprimir los mensajes se muestran con colores distintos dependiendo de si el proceso de compilación ha sido exitoso. Se muestra en verde si se ha compilado correctamente y en rojo si ha habido algún error. 
