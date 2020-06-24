@@ -101,13 +101,13 @@ sents_[Deque<Integer> sents_seg] returns[Deque<Integer> sents_seg_]:
 	| referencia ';';
 
 referencia
-	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
+	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso, Simbolo.TSub tsub]:
 	ID {
 		Simbolo s;
 		try {
 			s = ts.consulta($ID.getText());
 			if (s.getT() == Simbolo.Tipo.CONST){
-				Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.CONST);
+				Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.CONST);
 				switch(s.getTsub()) {
 					case BOOLEAN:
 						genera("t"+Variable.getCv()+" = " + s.isvCB());
@@ -119,19 +119,46 @@ referencia
 						genera("t"+Variable.getCv()+" = " + s.getvCS());
 						break;
 				}
+				$r = t;
+			} else {
+				$tsub=s.getTsub();
 			}
 		} catch(TablaSimbolos.TablaSimbolosException e) {
-			System.out.println("ERROR TABLA SÍMBOLOS"+e.getMessage());
+			System.out.println("Error con la tabla de símbolos "+e.getMessage());
 		}
 	}
-	| ID '(' ')'
-	| contIdx ')';
+	| ID '(' ')' {
+		Simbolo s;
+		try {
+			s = ts.consulta($ID.getText());
+			genera("call " + s.getNp());
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			System.out.println("Error con la tabla de símbolos "+e.getMessage());
+		}
+	}
+	| contIdx ')' {
+		while($contIdx.pparams.size()>0) genera("param_s" + $contIdx.pparams.pop());
+		genera("call "+$contIdx.met.getNp());
+	};
 
 contIdx
-	returns[Simbolo met]: ID '(' expr contIdx_[pparams];
+	returns[Deque<Variable> pparams, Procedimiento met]:
+	ID '(' expr {
+		Simbolo met;
+		$pparams = new ArrayDeque<Variable>();
+		try {
+			met = ts.consulta($ID.getText());
+			$pparams.push($expr.r);
+			$met = met.getNp();
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			System.out.println("Error con la tabla de símbolos "+e.getMessage());
+		}
+	} contIdx_[$pparams];
 
-contIdx_[Deque<Simbolo.TSub> pparams]:
-	',' expr contIdx_[$pparams]
+contIdx_[Deque<Variable> pparams]:
+	',' expr {
+		$pparams.push($expr.r);
+	} contIdx_[$pparams]
 	|; // lambda
 
 expr
