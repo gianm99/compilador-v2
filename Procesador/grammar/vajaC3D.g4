@@ -62,12 +62,36 @@ parametros[Simbolo anterior]:
 parametro
 	returns[Simbolo s]: tipo ID;
 
-sents: sents sent | sent;
+sents
+	returns[Deque<Integer> sents_seg]:
+	sent[$sents_seg] {
+		Etiqueta ec = new Etiqueta();
+		genera(ec + ": skip");
+		ec.setNl(pc);
+	} sents_[$sents_seg] {
+		backpatch($sent.sent_seg, ec);
+		if($sents_.sents_seg_!=null) {
+			$sents_seg = $sents_.sents_seg_;
+		} else{
+			$sents_seg= $sent.sent_seg;
+		}
+	};
 
-sent:
-	IF expr BEGIN decl* sents END
-	| IF expr BEGIN decl* sents END ELSE BEGIN decl* sents END
-	| WHILE expr BEGIN decl* sents END
+sents_[Deque<Integer> sents_seg] returns[Deque<Integer> sents_seg_]:
+	sent[$sents_seg] {
+		Etiqueta ec = new Etiqueta();
+		genera(ec + ": skip");
+		ec.setNl(pc);
+	} sents_[$sents_seg] {
+		backpatch($sent.sent_seg, ec);
+		if($sents_.sents_seg_!=null) {
+			$sents_seg_ = $sents_.sents_seg_;
+		} else{
+			$sents_seg_= $sent.sent_seg;
+		}
+	}
+	|;
+
 	| RETURN expr ';'
 	| referencia {
 		Variable r = $referencia.r;

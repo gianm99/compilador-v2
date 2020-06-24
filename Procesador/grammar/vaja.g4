@@ -192,7 +192,9 @@ parametro
 	$s = new Simbolo($ID.getText(),null,Simbolo.Tipo.ARG,$tipo.tsub);
 };
 
-sents: sents sent | sent;
+sents: sent sents_;
+
+sents_: sent sents_ |;
 
 sent:
 	IF expr {
