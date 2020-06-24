@@ -47,10 +47,31 @@ public Deque<Integer> concat(Deque<Integer> dq1, Deque<Integer> dq2){
 programa: decl* sents EOF;
 
 decl:
-	VARIABLE tipo ID ('=' expr)? ';'
+	VARIABLE tipo ID ('=' expr)? ';' // TODO Preguntar cómo va esto
 	| CONSTANT tipo ID '=' expr ';'
-	| FUNCTION tipo encabezado[$tipo.tsub] BEGIN decl* sents END
-	| PROCEDURE encabezado[null] BEGIN decl* sents END;
+	| FUNCTION tipo encabezado BEGIN {
+		profundidad++;
+		pproc.push($encabezado.met);
+		Etiqueta e=new Etiqueta(); // TODO Hacer una tabla de etiquetas y cambiar esto
+		$encabezado.met.setInicio(e);
+		genera(e+": skip");
+		genera("pmb "+$encabezado.met.getNp()); // TODO Comprobar si esto se hace aquí
+	} decl* sents {
+		genera("rtn "+$encabezado.met.getNp());
+		profundidad--;
+	} END
+	| PROCEDURE encabezado BEGIN {
+		profundidad++;
+		pproc.push($encabezado.met);
+		Etiqueta e=new Etiqueta();
+		$encabezado.met.setInicio(e);
+		genera(e+": skip");
+		e.setNl(pc);
+		genera("pmb "+$encabezado.met.getNp());
+	} decl* sents {
+		genera("rtn "+$encabezado.met.getNp());
+		profundidad--;
+	} END;
 
 encabezado
 	returns[Procedimiento met]:
