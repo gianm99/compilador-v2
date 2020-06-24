@@ -71,4 +71,9 @@ public class Procedimiento {
     public void setTipo(Simbolo.Tipo tipo) {
         this.tipo = tipo;
     }
+
+    @Override
+    public String toString() {
+        return String.valueOf(np);
+    }
 }

@@ -58,4 +58,9 @@ public class Variable {
     public static void setCv(int cv) {
         Variable.cv = cv;
     }
+
+    @Override
+    public String toString() {
+        return String.valueOf(nv);
+    }
 }
