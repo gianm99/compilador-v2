@@ -1,11 +1,16 @@
-func main() int{
-	boolean b = true &&(false||true+5);
-	int c = true;
-	string d = "false";
-	string e = false;
+func int main(){
+	var boolean b = true &&(false||true+5);
+	var int c = true;
+	const string d = "false";
+	var string e = false;
 	if(d){
-		int a = 10;
+		c=false;
 	}
 
 	c = procedure();
+}
+
+main();
+if(5){
+	printSTRING("ADIÓS");
 }

@@ -23,8 +23,8 @@ public class TablaVariables {
         
     }
 
-    public Variable nuevaVar(int np, Variable.Tipo tipo){
-        Variable var = new Variable(np, tipo);
+    public Variable nuevaVar(Procedimiento sub, Simbolo.Tipo tipo){
+        Variable var = new Variable(sub, tipo);
         tv.add(var);
         return var;
     }

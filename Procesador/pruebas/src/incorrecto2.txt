@@ -5,3 +5,4 @@ proc main() {
 	a24=b;
 	numero=b;
 }
+main();

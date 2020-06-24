@@ -4,3 +4,4 @@
 - ~~Al llamar a las funciones dice que le faltan argumentos~~
 - ~~No funcionan correctamente el análisis de expresiones~~
 - ~~No funciona la evaluación de operaciones relacionales.~~
+- ~~No funcionan las operaciones lógicas.~~
