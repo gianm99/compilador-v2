@@ -316,7 +316,7 @@ expr_[Variable r, Deque<Integer> cierto, Deque<Integer> falso]
 		e.setNl(pc);
 	} expr {
 		backpatch($cierto, e);
-		$falso = concat($falso, $expr.falso);
+		$falso = concat($expr_.falso, $expr.falso);
 		$cierto = $expr.cierto;
 	} expr_[$r, $cierto, $falso]
 	| OR {
@@ -324,9 +324,9 @@ expr_[Variable r, Deque<Integer> cierto, Deque<Integer> falso]
 		genera("e : skip");
 		e.setNl(pc);
 	} expr {
-		backpatch($falso, e);
+		backpatch($expr_.cierto, e);
+		$cierto = concat($expr_.cierto, $expr.cierto);
 		$falso = $expr.falso;
-		$cierto = concat(cierto, $expr.cierto);
 	} expr_[$r, $cierto, $falso]
 	| MULT expr {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
