@@ -13,6 +13,9 @@ public class Simbolo {
 	private Tipo t;
 	private TSub tsub;
 	private boolean returnEncontrado;
+	private boolean vCB;
+	private int vCI;
+	private String vCS;
 
 	public Simbolo(String id, Simbolo next, Tipo t, TSub tsub) {
 		this.id = id;
@@ -77,5 +80,29 @@ public class Simbolo {
 
 	public void setReturnEncontrado(boolean returnEncontrado) {
 		this.returnEncontrado = returnEncontrado;
+	}
+
+	public boolean isvCB() {
+		return vCB;
+	}
+
+	public void setvCB(boolean vCB) {
+		this.vCB = vCB;
+	}
+
+	public int getvCI() {
+		return vCI;
+	}
+
+	public void setvCI(int vCI) {
+		this.vCI = vCI;
+	}
+
+	public String getvCS() {
+		return vCS;
+	}
+
+	public void setvCS(String vCS) {
+		this.vCS = vCS;
 	}
 }

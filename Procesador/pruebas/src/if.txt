@@ -1,8 +1,0 @@
-var int a=1;
-var int b=2;
-
-proc main(){
-    if(a<b){
-        a=3;
-    }
-}
