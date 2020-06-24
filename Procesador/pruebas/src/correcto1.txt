@@ -22,6 +22,7 @@ proc main(){
 var int z =2+10;
 
 if(true){
+	a=78000000000000000000000000;
 }
 z=z+8+z+89-58;
 printINT(z);
