@@ -1,9 +1,5 @@
-parser grammar vajaC3D;
-
-options
-{
-	tokenVocab = vajaLexer;
-}
+grammar vajaC3D;
+// options { tokenVocab = vajaNUEVOLexer; }
 
 @header {
 package antlr;
@@ -14,17 +10,19 @@ import procesador.*;
 }
 
 @parser::members {
-TablaSimbolos simbolos;
-TablaVariables variables;
-TablaProcedimientos procedimientos;
+Deque<Integer> pproc=new ArrayDeque<Integer>(); // Pila de procedimientos
+TablaSimbolos ts;
+TablaVariables tv;
+TablaProcedimientos tp;
 String directorio;
 Writer writer;
+// TODO 
 int pc = 0; // program counter
 
-public vajaC3D(TokenStream input, String directorio, TablaSimbolos simbolos){
+public vajaC3DParser(TokenStream input, String directorio, TablaSimbolos ts){
 	this(input);
 	this.directorio=directorio;
-	this.simbolos=simbolos;
+	this.ts=ts;
 }
 
 public void genera(String codigo){
@@ -33,244 +31,241 @@ public void genera(String codigo){
 		writer.write(codigo);
 	}catch(IOException e){}
 }
+
+public void backpatch(Deque<Integer> lista, Etiqueta e){
+
 }
 
-// TODO Jordi
-programaPrincipal:
-	{
-		try{
-			File c3dFile=new File(this.directorio+"/c3d.txt");
-			writer=new BufferedWriter(new FileWriter(c3dFile));
-		}catch(Exception e){}
-	} (declaracion | sents)* EOF;
+public Deque<Integer> concat(Deque<Integer> dq1, Deque<Integer> dq2){
+	while(dq2.size()>0){
+		dq1.add(dq2.removeFirst());
+	}
+	return dq1;
+}
+}
 
-declaracion:
-	'var' tipo declaracionVar
-	| 'const' tipo declaracionConst
-	| 'func' declFunc
-	| 'proc' declProc;
+programa: decl* sents EOF;
 
-tipo: INT | BOOLEAN | STRING;
-// Variables y constantes
-declaracionVar: Identificador ('=' initVar)? ';';
+decl:
+	VARIABLE tipo ID ('=' expr)? ';'
+	| CONSTANT tipo ID '=' expr ';'
+	| FUNCTION tipo encabezado[$tipo.tsub] BEGIN decl* sents END
+	| PROCEDURE encabezado[null] BEGIN decl* sents END;
 
-declaracionConst: Identificador '=' initConst ';';
+encabezado[Simbolo.TSub tsub]
+	returns[Simbolo met]: ID '(' parametros[$met]? ')';
 
-initVar: expr;
+parametros[Simbolo anterior]:
+	parametro ',' parametros[$anterior.getNext()]
+	| parametro;
 
-initConst: expr;
+parametro
+	returns[Simbolo s]: tipo ID;
 
-// Funciones y procedimientos
-declFunc: encabezadoFunc cuerpoFunc;
-
-encabezadoFunc: identificadorMetFunc tipo;
-
-cuerpoFunc: bloque | ';';
-
-declProc: encabezadoProc cuerpoProc;
-
-encabezadoProc: identificadorMetProc;
-
-cuerpoProc: bloque | ';';
-
-identificadorMetFunc: Identificador '(' parametros? ')';
-
-identificadorMetProc: Identificador '(' parametros? ')';
-
-parametros: parametro ',' parametros | parametro;
-
-parametro: tipo identificadorVar;
-
-identificadorVar: Identificador;
-
-bloque: '{' exprsBloque? '}';
-
-exprsBloque: exprDeBloque+;
-
-exprDeBloque: sentDeclVarLocal | sent;
-
-sentDeclVarLocal: declaracionVarLocal;
-
-declaracionVarLocal: tipo declaracionVar;
-
-//TODO Gian
 sents: sents sent | sent;
 
-sent
-	returns[ ArrayList<Integer> sig]:
-	sentExpr
-	| IF '(' expr ')' {
-		Etiqueta e=new Etiqueta(pc);
-		genera(e+": skip\n");
-	} bloque {
-		//backpatch(expr.cierto, e);
-		$sig=new ArrayList<Integer>();
-		// $sig.addAll(expr.falso);
-		// $sig.addAll(bloque.sig);
+sent:
+	IF expr BEGIN decl* sents END
+	| IF expr BEGIN decl* sents END ELSE BEGIN decl* sents END
+	| WHILE expr BEGIN decl* sents END
+	| RETURN expr ';'
+	| referencia {
+		Variable r = $referencia.r;
+	} ASSIGN expr ';' {
+		genera("referencia.r = " + $expr.r);
 	}
-	| IF '(' expr ')' {
-		Etiqueta e1=new Etiqueta(pc);
-		genera(e1+": skip\n");
-	} bloque ELSE {
-		$sig=new ArrayList<Integer>();
-		// $sig.addAll(bloque.sig); // concatenar bloque 1
-		Etiqueta e2=new Etiqueta(pc);
-		genera(e2+": skip\n");
-	} bloque {
-		// backpatch(expr.cierto,e1);
-		// backpatch(expr.falso,e2);
-		// $sig.addAll(bloque.sig); // concatenar bloque 2
-	}
-	| WHILE {
-		Etiqueta e1=new Etiqueta(pc);
-		genera(e1+": skip\n");
-	} '(' expr ')' {
-		Etiqueta e2=new Etiqueta(pc);
-		genera(e2+": skip\n");
-	} bloque {
-		// backpatch(expr.cierto,e2);
-		// backpatch(bloque.sig, e1);
-		// $sig=expr.falso;
-		genera("goto "+e1+"\n");
-	}
-	| RETURN expr ';';
+	| referencia ';';
 
-sentExpr
-	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
-	exprSent ';';
-
-exprSent
-	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
-	asignacion
-	| sentInvocaMet;
-
-sentInvocaMet
-	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
-	Identificador '(' (argumentos)? ')';
-
-argumentos: expr (',' expr)*;
-
-asignacion
-	returns[ ArrayList<Integer> sig]:
-	Identificador '=' expr {
-	Etiqueta ec,ef,efin;
-	Simbolo.TipoSubyacente idTsub = null;
-	$sig=new ArrayList<Integer>();
-	try{
-		idTsub=simbolos.consulta($Identificador.getText()).getTs();
-		if(idTsub==Simbolo.TipoSubyacente.BOOLEAN){
-			ec=new Etiqueta(pc);
-			ef=new Etiqueta(pc);
-			efin=new Etiqueta(pc);
-			genera(ec+": skip");
-			// genera(Identificador);
+referencia
+	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
+	ID {
+		Simbolo s;
+		try {
+			s = ts.consulta($ID.getText());
+			if (s.getT() == Simbolo.Tipo.CONST){
+				Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.CONST);
+				switch(s.getTsub()) {
+					case BOOLEAN:
+						genera("t"+Variable.getCv()+" = " + s.isvCB());
+						break;
+					case INT:
+						genera("t"+Variable.getCv()+" = " + s.getvCI());
+						break;
+					case STRING:
+						genera("t"+Variable.getCv()+" = " + s.getvCS());
+						break;
+				}
+			}
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			System.out.println("ERROR TABLA SÍMBOLOS"+e.getMessage());
 		}
-	}catch(TablaSimbolos.exceptionTablaSimbolos ex){}
- };
+	}
+	| ID '(' ')'
+	| contIdx ')';
+
+contIdx
+	returns[Simbolo met]: ID '(' expr contIdx_[pparams];
+
+contIdx_[Deque<Simbolo.TSub> pparams]:
+	',' expr contIdx_[$pparams]
+	|; // lambda
 
 expr
-	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
-	exprCondOr
-	| asignacion;
-
-exprCondOr
-	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
-	exprCondAnd exprCondOr_;
-
-exprCondOr_
-	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
-	OR {
-		Etiqueta e=new Etiqueta(pc);
-		genera(e+": skip\n");
-	}exprCondAnd exprCondOr_
-	|; //lambda
-
-exprCondAnd
-	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
-	exprComp exprCondAnd_;
-
-exprCondAnd_
-	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
-	AND {
-		Etiqueta e=new Etiqueta(pc);
-		genera(e+": skip\n");
-	}exprComp exprCondAnd_
-	|; //lambda
-
-exprComp
-	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
-	exprSuma exprComp_;
-
-exprComp_
-	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
-	OPREL exprSuma exprComp_
-	|; //lambda
-
-exprSuma
-	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
-	exprMult exprSuma_;
-
-exprSuma_
-	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
-	OpBinSum exprMult exprSuma_
-	|; //lambda
-
-exprMult
-	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
-	exprUnaria exprMult_;
-
-exprMult_
-	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
-	MULT exprUnaria exprMult_
-	| DIV exprUnaria exprMult_
-	|; //lambda
-
-exprUnaria
-	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
-	OpBinSum exprNeg
-	| exprNeg;
-
-exprNeg
-	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
-	NOT exprUnaria { 
-		$cierto=$exprUnaria.falso;
-		$falso=$exprUnaria.cierto;
-	}
-	| exprPostfija;
-
-exprPostfija
-	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
-	primario {
-		$cierto=$primario.cierto;
-		$falso=$primario.falso;
-	}
-	| Identificador
-	| sentInvocaMet;
-
-primario
-	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
-	'(' expr ')' {
-		$cierto=$expr.cierto;
-		$falso=$expr.falso;
-	}
+	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
+	NOT expr {
+		$cierto = $expr.falso;
+		$falso = $expr.cierto;
+	} expr_[null,$cierto, $falso]
+	| SUB expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
+		genera("t"+Variable.getCv()+" = - " + $expr.r);
+		$r = t;
+	} expr_[null,null]
+	| '(' expr ')' {
+		$r = $expr.r;
+		$cierto = $expr.cierto;
+		$falso = $expr.falso;
+	} expr_[$r, $r,$cierto,$falso]
+	| referencia {
+		$r = $referencia.r;
+		$cierto = $referencia.cierto;
+		$falso = $referencia.falso;
+	} expr_[$r, $cierto, $falso]
 	| literal {
-		$cierto=$literal.cierto;
-		$falso=$literal.falso;
-	};
+		Variable t = tv.nuevaVar(pproc.peek(), $literal.tsub);
+		genera("t"+Variable.getCv()+" = " + $literal.getText());
+		$r = t;
+		if($literal.getTsub() == BOOLEAN){
+			if($literal.getText().equals('true')) {
+				genera("goto ");
+				$cierto=new Deque<Integer>();
+				$cierto.add(pc);
+				$falso = null;
+			} else {
+				genera("goto ");
+				$falso=new Deque<Integer>();
+				$falso.add(pc);
+				$cierto = null;
+			}
+		}
+	} expr_[$r,$cierto,$falso];
+
+expr_[Variable r, Deque<Integer> cierto, Deque<Integer> falso]
+	returns[Variable t]:
+	OPREL expr {
+		genera("if " + $r + " " + OPREL.getText() + " " + $expr.r + " goto ");
+		$cierto=new Deque<Integer>();
+		$cierto.add(pc);
+		genera("goto ");
+		$falso=new Deque<Integer>();
+		$falso.add(pc);
+    } expr_[Simbolo.TSub.BOOLEAN]
+	| AND {
+		Etiqueta e = new Etiqueta(pc);
+		genera("e : skip");
+	} expr {
+		backpatch($cierto, e);
+		$falso = concat($falso, $expr.falso);
+		$cierto = $expr.cierto;
+	} expr_[Simbolo.TSub.BOOLEAN]
+	| OR {
+		Etiqueta e = new Etiqueta(pc);
+		genera("e : skip");
+	} expr {
+		backpatch($falso, e);
+		$falso = $expr.falso;
+		$cierto = concat(cierto, $expr.cierto);
+	} expr_[Simbolo.TSub.BOOLEAN]
+	| MULT expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
+		genera("t"+Variable.getCv()+" = " + $r + " * " + $expr.r);
+		$t = t;
+	} expr_[Simbolo.TSub.INT]
+	| DIV expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
+		genera("t"+Variable.getCv()+" = " + $r + " / " + $expr.r);
+		$t = t;
+	} expr_[Simbolo.TSub.INT]
+	| ADD expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
+		genera("t"+Variable.getCv()+" = " + $r + " + " + $expr.r);
+		$t = t;
+	} expr_[Simbolo.TSub.INT]
+	| SUB expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
+		genera("t"+Variable.getCv()+" = " + $r + " - " + $expr.r);
+		$t = t;
+	} expr_[Simbolo.TSub.INT]
+	|;
+
+tipo
+	returns[Simbolo.TSub tsub]: INTEGER | BOOLEAN | STRING;
 
 literal
-	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
-	LiteralInteger
-	| LiteralBoolean {
-		genera("goto $$$\n");
-		$cierto=new ArrayList<Integer>();
-		$falso=new ArrayList<Integer>();
-		if($LiteralBoolean.getText().equals("true"))
-		{
-			$cierto.add(pc); // true
-		}else{
-			$falso.add(pc); // false
-		}
+	returns[Simbolo.TSub tsub]:
+	LiteralInteger {
+		$tsub=Simbolo.TSub.INT;
 	}
-	| LiteralString;
+	| LiteralBoolean {
+		$tsub=Simbolo.TSub.BOOLEAN;
+	}
+	| LiteralString {
+		$tsub=Simbolo.TSub.STRING;
+	};
 
+// Palabras reservadas
+VARIABLE: 'var';
+CONSTANT: 'const';
+FUNCTION: 'func';
+PROCEDURE: 'proc';
+RETURN: 'return';
+// Tipos
+INTEGER: 'int';
+BOOLEAN: 'boolean';
+STRING: 'string';
+// Operaciones
+WHILE: 'while';
+IF: 'if';
+ELSE: 'else';
+// Enteros
+LiteralInteger: DecimalLiteral;
+fragment DecimalLiteral: DecimalPositivo | '0';
+fragment DecimalPositivo: [1-9][0-9]*;
+// Booleans
+LiteralBoolean: 'true' | 'false';
+// Cadenas
+LiteralString: '"' LetrasString? '"';
+fragment LetrasString: LetraString+;
+fragment LetraString: ~["\\\r\n];
+// Separadores
+LPAREN: '(';
+RPAREN: ')';
+BEGIN: '{';
+END: '}';
+COMMA: ',';
+SEMI: ';';
+// Operadores
+OPREL: EQUAL | NOTEQUAL | GT | LT | GE | LE;
+OpBinSum: ADD | SUB;
+ASSIGN: '=';
+EQUAL: '==';
+NOTEQUAL: '!=';
+GT: '<';
+LT: '>';
+GE: '>=';
+LE: '<=';
+ADD: '+';
+SUB: '-';
+MULT: '*';
+DIV: '/';
+AND: '&&';
+OR: '||';
+NOT: '!';
+// Identificador
+ID: LETRA LETRADIGITO*;
+fragment LETRA: [a-zA-Z$_];
+fragment LETRADIGITO: [a-zA-Z$_0-9];
+// Comentarios y espacios en blanco
+WS: [ \r\n\t]+ -> skip;
+BLOCK_COMMENT: '/*' .*? '*/' -> skip;
+LINE_COMMENT: '#' ~[\r\n]* -> skip;
