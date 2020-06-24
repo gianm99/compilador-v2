@@ -84,7 +84,8 @@ sents
 		}
 	};
 
-sents_[Deque<Integer> sents_seg] returns[Deque<Integer> sents_seg_]:
+sents_[Deque<Integer> sents_seg]
+	returns[Deque<Integer> sents_seg_]:
 	sent[$sents_seg] {
 		Etiqueta ec = new Etiqueta();
 		genera(ec + ": skip");
@@ -99,11 +100,62 @@ sents_[Deque<Integer> sents_seg] returns[Deque<Integer> sents_seg_]:
 	}
 	|;
 
+sent[Deque<Integer> sents_seg]
+	returns[Deque<Integer> sent_seg]:
+	IF expr BEGIN {
+		Etiqueta ec = new Etiqueta();
+		genera(ec + ": skip");
+		ec.setNl(pc);
+	} decl* sents {
+		backpatch($expr.cierto, ec);
+		$sent_seg = concat($expr.falso, $sents_seg);
+	} END
+	| IF expr BEGIN {
+		Etiqueta ec = new Etiqueta();
+		genera(ec + ": skip");
+		ec.setNl(pc);
+	} decl* sents {
+		Deque<Integer> sents_seg1 = $sents.sents_seg;
+	} END ELSE BEGIN {
+		Etiqueta ef = new Etiqueta();
+		genera(ef + ": skip");
+		ef.setNl(pc);
+	} decl* sents END {
+		backpatch($expr.cierto, ec);
+		backpatch($expr.falso, ef);
+		$sent_seg = concat(sents_seg1, $sents.sents_seg);
+	}
+	| WHILE {
+		Etiqueta ei = new Etiqueta();
+		genera(ei + ": skip");
+		ei.setNl(pc);
+	} expr BEGIN {
+		Etiqueta ec = new Etiqueta();
+		genera(ec + ": skip");
+		ec.setNl(pc);
+	} decl* sents {
+		backpatch($expr.cierto,ec); // TODO Comprobar si esto es correcto
+		backpatch($sent_seg,ei);
+		$sents_seg=$expr.falso;
+		genera("goto "+ei);
+	} END
 	| RETURN expr ';'
-	| referencia {
-		Variable r = $referencia.r;
-	} ASSIGN expr ';' {
-		genera("referencia.r = " + $expr.r);
+	| referencia ASSIGN expr ';' { // TODO Comprobar si esto es suficiente
+		$sent_seg=null;
+		if($referencia.tsub==Simbolo.TSub.BOOLEAN) {
+			Etiqueta ec=new Etiqueta(); // TODO Revisar todos los new Etiqueta()
+			Etiqueta ef=new Etiqueta();
+			Etiqueta efin=new Etiqueta();
+			genera(ec+": skip");
+			ec.setNl(pc);
+			genera($referencia.r+"= -1");
+			genera("goto "+efin);
+			genera(ef+": skip");
+			ef.setNl(pc);
+			genera($referencia.r+"= 0");
+			genera(efin+": skip");
+			efin.setNl(pc);
+		}
 	}
 	| referencia ';';
 
