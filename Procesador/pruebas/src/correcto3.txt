@@ -1,16 +1,32 @@
 /*Esto es un comentario*/
 # Esto también es un comentario
 
-proc procedimiento1(int a, int b){
-	int c=a+b;
-	c=c-2;
+func boolean menor(int a, int b){
+	var boolean valor;
+	if(a<b){
+		valor=true;
+		printSTRING("El primer elemento es menor al segundo");
+	}else{
+		valor=false;
+		printSTRING("El segundo elemento es mayor o igual al primero");
+	}
+	return valor;
 }
 
-proc main(){
-	int d = 3;
-	int e = 5;
-	int f = 1;
-	procedimiento1(d, e);
+proc procedimiento2(){
+	var int d = 3;
+	var int e = 5;
+	var int f = 1;
+	var boolean b;
+	menor(d, e);
 	printINT(f);
-	boolean b = true && !(false || true);
+	f = 5+98;
+	b=!(true && false)||true||false;
+	printBOOLEAN(b);
 }
+
+if(menor(1,5)){
+	printINT(56);
+}
+procedimiento2();
+printSTRING("Adiós");

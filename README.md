@@ -10,13 +10,11 @@ Programa que procesa un archivo de texto escrito en el lenguaje inventado *Vaja*
 
 ## Enunciado de la práctica
 
-### Aspectos generales
-
 La práctica puede ser realizada en grupos de como mucho tres personas. La conformación de cada grupo se tendrá que hacer mediante el apartado correspondiente dentro de la página de la asignatura y en la herramienta Aula Digital.
 
 La práctica consiste en el desarrollo de la parte *back-end* de un procesador para un lenguaje de programación. Las tareas que tendrá que realizar el procesador son las de generación de código intermedio, optimización y generación de código ensamblador. Se tendrá que partir del *front-end* que se ha desarrollado como práctica de la asignatura `21742 - Compiladores I`.
 
-### Funcionalidad del Procesador
+### Funcionalidades del Procesador
 
 El procesador que se tiene que desarrollar debe contemplar las siguientes funcionalidades:
 
@@ -53,6 +51,6 @@ Una vez entregada la práctica se tendrá que realizar una entrevista para discu
 
 - Documentación correctamente escrita en la que se describan las técnicas utilizadas, el diseño y cualquier aspecto que se desee destacar. No constará de los listados de código fuente. Si por algún motivo especial se considera de especial interés alguna parte del código, sí que se podrá adjuntar.
 - Código fuente completo. Instrucciones para la correcta ejecución. La compilación del código fuente o la interpretación no deben generar errores ni excepciones no controladas. El código ensamblador se tendrá que poder compilar sin que se genere ningún error o mensaje de aviso. La ejecución del programa optimizado tendrá que dar el mismo resultado que el del programa no optimizado.
-- Como **mínimo 6 casos de prueba**, tanto correctos (al menos 3) como erróneos (al menos 3). Todos los casos se deben poder reproducir. El resultado de la ejecución será:
-  - Para los casos correctos: el fichero de código de tres direcciones, el de ensamblador no optimizado y el de ensamblador optimizado.
-  - Para los casos erróneos: el código y los mensajes de error obtenidos.
+- Como mínimo, **3 casos de prueba correctos** y **3 casos de prueba incorrectos**. Todos los casos se deben poder reproducir. El resultado de la ejecución será:
+  - Para los casos correctos el fichero de código de tres direcciones, el de ensamblador no optimizado y el de ensamblador optimizado. Además de la tabla de símbolos y el archivo con los tokens.
+  - Para los casos erróneos el código y los mensajes de error obtenidos.

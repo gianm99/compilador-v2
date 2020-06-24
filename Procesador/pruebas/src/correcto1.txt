@@ -2,8 +2,7 @@ var int a;
 const string s1 = "Hola mundo";
 var string s2 = s1;
 var int c;
-
-func boolean function1(string str, int i){
+func boolean function1(string str, int i, boolean foo){
 	var int a = 2;
 	var boolean b;
 	proc prueba(){
@@ -11,26 +10,20 @@ func boolean function1(string str, int i){
 		printINT(5);
 	}
 	a = 5;
-#	while(a>0){
-#		b = !b;
-#		a = a-1;
-#	}
-	return b;
+	while(a>0){
+		b = !b;
+		a = a-1;
+	}
+	return foo;
 }
-
-proc procedure1(boolean b){
-	c = 2;
-#	if(b){
-#		c = 10;
-#	}
-}
-
 proc main(){
-	procedure1(function1(s1, a));
 	printINT(c);
 }
+var int z =2+10;
 
-var int z =2;
-z=z+8;
+if(true){
+	a=78000000000000000000000000;
+}
+z=z+8+z+89-58;
 printINT(z);
 main();

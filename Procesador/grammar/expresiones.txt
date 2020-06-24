@@ -1,0 +1,90 @@
+expr
+	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
+	// Lógicas
+	NOT expr {
+		$cierto = $expr.falso;
+		$falso = $expr.cierto;
+	}
+	| expr {
+		Variable r = $r;
+    } OPREL expr {
+		genera("if " + r + " " + OPREL.getText() + " " + $expr.r + " goto ");
+		$cierto = pc;
+		genera("goto ");
+		$falso = pc;
+    }
+	| expr {
+		Deque<Integer> cierto = $expr.cierto;
+		Deque<Integer> falso = $expr.falso;
+	} AND {
+		Etiqueta e = new Etiqueta(pc);
+		genera("e : skip");
+	} expr {
+		backpatch(cierto, e);
+		$falso = concat(falso, $expr.falso);
+		$cierto = $expr.cierto;
+	}
+	| expr {
+		Deque<Integer> cierto = $expr.cierto;
+		Deque<Integer> falso = $expr.falso;
+	} OR {
+		Etiqueta e = new Etiqueta(pc);
+		genera("e : skip");
+	} expr {
+		backpatch(cierto, e);
+		$falso = concat(falso, $expr.falso);
+		$cierto = $expr.cierto;
+	}
+	// Aritméticas
+	| SUB expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
+		genera("t = - " + $expr.r);
+		$r = t;
+	} expr {
+		Variable r = $expr.r;
+	} MULT expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
+		genera("t = " + r + " * " + $expr.r);
+		$r = t;
+	} expr {
+		Variable r = $expr.r;
+	} DIV expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
+		genera("t = " + r + " / " + $expr.r);
+		$r = t;
+	}
+	| expr {
+		Variable r = $expr.r;
+	} ADD expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
+		genera("t = " + r + " + " + $expr.r);
+		$r = t;
+	} expr {
+		Variable r = $expr.r;
+	} SUB expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
+		genera("t = " + r + " - " + $expr.r);
+		$r = t;
+	}
+	| '(' expr ')' {
+		$r = $expr.r;
+	}
+	| referencia {
+		$r = $referencia.r;
+	}
+	| literal {
+		Variable t = tv.nuevaVar(pproc.peek(), $literal.tsub);
+		genera("t = " + $literal.tsub);
+		$r = t;
+		if($literal.tsub == BOOLEAN){
+			if($literal.getText().equals('true')) {
+				genera("goto ");
+				$cierto = pc;
+				$falso = null;
+			} else {
+				genera("goto ");
+				$falso = pc;
+				$cierto = null;
+			}
+		}
+	};

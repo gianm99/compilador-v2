@@ -3,24 +3,27 @@ const int s=2;
 var boolean b=false;
 var string res="hola";
 
-func funcion(int c, string palabra) string{
-	int a=c;
-	string str = "mundo";
+func string funcion(int c, string palabra){
+	var int a=c;
+	var string str = "mundo";
 	if(b){
 		return str;
 	} else {
 		return res;
 	}
+	return "nada";
 }
 
 proc main(){
-	int d;
-	string hola = "hola";
+	var int d;
+	var string hola = "hola";
+	var string palabra = funcion(d, hola);
+	var string lectura=read();
 	if(b){
 		d = s;
 	} else {
 		b = true;
 	}
-	string palabra = funcion(d, hola);
-	string lectura=read();
 }
+
+main();

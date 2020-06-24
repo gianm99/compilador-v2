@@ -8,35 +8,15 @@ package procesador;
 public class Variable {
     private int r;
     private int nv; // Número de variable
-    private int np; // Subprograma que la ha declarado. 0 -> ninguno
-    private Tipo tipo; // Tipo: variable, constante o argumento
+    private Procedimiento sub; // Subprograma que la ha declarado
+    private Simbolo.Tipo tipo; // Tipo: variable, constante o argumento
     private static int cv = 0; // Cantidad de variables creadas
 
-    public Variable(int np, Tipo tipo) {
+    public Variable(Procedimiento sub, Simbolo.Tipo tipo) {
         cv++; // Aumenta la cantidad de variables
         this.nv = cv;
-        this.np = np;
         this.tipo = tipo;
-    }
-
-    public enum Tipo {
-        VAR, CONST, ARG
-    }
-
-    public int getNv() {
-        return nv;
-    }
-
-    public int getNp() {
-        return np;
-    }
-
-    public Tipo getTipo() {
-        return tipo;
-    }
-
-    public static int getNumVar() {
-        return cv;
+        this.sub = sub;
     }
 
     public int getR() {
@@ -45,5 +25,42 @@ public class Variable {
 
     public void setR(int r) {
         this.r = r;
+    }
+
+    public int getNv() {
+        return nv;
+    }
+
+    public void setNv(int nv) {
+        this.nv = nv;
+    }
+
+    public Procedimiento getSub() {
+        return sub;
+    }
+
+    public void setSub(Procedimiento sub) {
+        this.sub = sub;
+    }
+
+    public Simbolo.Tipo getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(Simbolo.Tipo tipo) {
+        this.tipo = tipo;
+    }
+
+    public static int getCv() {
+        return cv;
+    }
+
+    public static void setCv(int cv) {
+        Variable.cv = cv;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(nv);
     }
 }
