@@ -16,8 +16,8 @@ public class Simbolo {
 	private boolean vCB;
 	private int vCI;
 	private String vCS;
-	private int nv;
-	private int np;
+	private Variable nv;
+	private Procedimiento np;
 
 	public Simbolo(String id, Simbolo next, Tipo t, TSub tsub) {
 		this.id = id;
@@ -36,19 +36,19 @@ public class Simbolo {
 	public Simbolo() {
 	};
 
-	public int getNp() {
+	public Procedimiento getNp() {
 		return np;
 	}
 
-	public void setNp(int np) {
+	public void setNp(Procedimiento np) {
 		this.np = np;
 	}
 
-	public int getNv() {
+	public Variable getNv() {
 		return nv;
 	}
 
-	public void setNv(int nv) {
+	public void setNv(Variable nv) {
 		this.nv = nv;
 	}
 
