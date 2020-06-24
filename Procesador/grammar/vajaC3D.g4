@@ -141,33 +141,33 @@ expr
 		$falso = $expr.cierto;
 	} expr_[null,$cierto, $falso]
 	| SUB expr {
-		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
+		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
 		genera("t"+Variable.getCv()+" = - " + $expr.r);
 		$r = t;
-	} expr_[null,null]
+	} expr_[$r,null,null]
 	| '(' expr ')' {
 		$r = $expr.r;
 		$cierto = $expr.cierto;
 		$falso = $expr.falso;
-	} expr_[$r, $r,$cierto,$falso]
+	} expr_[$r,$cierto,$falso]
 	| referencia {
 		$r = $referencia.r;
 		$cierto = $referencia.cierto;
 		$falso = $referencia.falso;
 	} expr_[$r, $cierto, $falso]
-	| literal {
-		Variable t = tv.nuevaVar(pproc.peek(), $literal.tsub);
-		genera("t"+Variable.getCv()+" = " + $literal.getText());
+	| literal {		// Añadir para las 3 variables de valores de Simbolo
+		Variable t = tv.nuevaVar(pproc.peek(), Simbolo.Tipo.VAR);
+		genera("t"+Variable.getCv()+" = " + $literal.start.getText());
 		$r = t;
-		if($literal.getTsub() == BOOLEAN){
-			if($literal.getText().equals('true')) {
+		if($literal.tsub == Simbolo.TSub.BOOLEAN){
+			if($literal.start.getText().equals("true")) {
 				genera("goto ");
-				$cierto=new Deque<Integer>();
+				$cierto=new ArrayDeque<Integer>();
 				$cierto.add(pc);
 				$falso = null;
 			} else {
 				genera("goto ");
-				$falso=new Deque<Integer>();
+				$falso=new ArrayDeque<Integer>();
 				$falso.add(pc);
 				$cierto = null;
 			}
@@ -177,49 +177,51 @@ expr
 expr_[Variable r, Deque<Integer> cierto, Deque<Integer> falso]
 	returns[Variable t]:
 	OPREL expr {
-		genera("if " + $r + " " + OPREL.getText() + " " + $expr.r + " goto ");
-		$cierto=new Deque<Integer>();
+		genera("if " + $r + " " + $OPREL.getText() + " " + $expr.r + " goto ");
+		$cierto=new ArrayDeque<Integer>();
 		$cierto.add(pc);
 		genera("goto ");
-		$falso=new Deque<Integer>();
+		$falso=new ArrayDeque<Integer>();
 		$falso.add(pc);
-    } expr_[Simbolo.TSub.BOOLEAN]
+    } expr_[$r,$cierto,$falso]
 	| AND {
-		Etiqueta e = new Etiqueta(pc);
+		Etiqueta e = new Etiqueta();
 		genera("e : skip");
+		e.setNl(pc);
 	} expr {
 		backpatch($cierto, e);
 		$falso = concat($falso, $expr.falso);
 		$cierto = $expr.cierto;
-	} expr_[Simbolo.TSub.BOOLEAN]
+	} expr_[$r, $cierto, $falso]
 	| OR {
-		Etiqueta e = new Etiqueta(pc);
+		Etiqueta e = new Etiqueta();
 		genera("e : skip");
+		e.setNl(pc);
 	} expr {
 		backpatch($falso, e);
 		$falso = $expr.falso;
 		$cierto = concat(cierto, $expr.cierto);
-	} expr_[Simbolo.TSub.BOOLEAN]
+	} expr_[$r, $cierto, $falso]
 	| MULT expr {
-		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
+		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
 		genera("t"+Variable.getCv()+" = " + $r + " * " + $expr.r);
 		$t = t;
-	} expr_[Simbolo.TSub.INT]
+	} expr_[$r, null, null]
 	| DIV expr {
-		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
+		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
 		genera("t"+Variable.getCv()+" = " + $r + " / " + $expr.r);
 		$t = t;
-	} expr_[Simbolo.TSub.INT]
+	} expr_[$r, null, null]
 	| ADD expr {
-		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
+		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
 		genera("t"+Variable.getCv()+" = " + $r + " + " + $expr.r);
 		$t = t;
-	} expr_[Simbolo.TSub.INT]
+	} expr_[$r,null,null]
 	| SUB expr {
-		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
+		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
 		genera("t"+Variable.getCv()+" = " + $r + " - " + $expr.r);
 		$t = t;
-	} expr_[Simbolo.TSub.INT]
+	} expr_[$r, null, null]
 	|;
 
 tipo
