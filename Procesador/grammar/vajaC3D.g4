@@ -10,14 +10,15 @@ import procesador.*;
 }
 
 @parser::members {
-Deque<Integer> pproc=new ArrayDeque<Integer>(); // Pila de procedimientos
+Deque<Procedimiento> pproc=new ArrayDeque<Procedimiento>(); // Pila de procedimientos
 TablaSimbolos ts;
 TablaVariables tv;
 TablaProcedimientos tp;
 String directorio;
 Writer writer;
-// TODO 
+// TODO Asegurarse de que no tenga que ser -1 en vez de 0
 int pc = 0; // program counter
+int profundidad=0;
 
 public vajaC3DParser(TokenStream input, String directorio, TablaSimbolos ts){
 	this(input);
@@ -44,7 +45,14 @@ public Deque<Integer> concat(Deque<Integer> dq1, Deque<Integer> dq2){
 }
 }
 
-programa: decl* sents EOF;
+programa:
+	decl* sents {
+	Etiqueta e=new Etiqueta();
+	genera(e+": skip");
+	e.setNl(pc);
+	backpatch($sents.sents_seg,e);
+	// TODO Según los apuntes aquí faltan cosas
+} EOF;
 
 decl:
 	VARIABLE tipo ID ('=' expr)? ';' // TODO Preguntar cómo va esto
