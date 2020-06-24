@@ -52,15 +52,22 @@ decl:
 	| FUNCTION tipo encabezado[$tipo.tsub] BEGIN decl* sents END
 	| PROCEDURE encabezado[null] BEGIN decl* sents END;
 
-encabezado[Simbolo.TSub tsub]
-	returns[Simbolo met]: ID '(' parametros[$met]? ')';
+encabezado
+	returns[Procedimiento met]:
+	ID '(' parametros? ')' {
+		Simbolo s=new Simbolo();
+		try {
+			s=ts.consulta($ID.getText());
+			$met=tp.nuevoProc(profundidad,s.getT());
+			s.setNp($met);
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			System.out.println("Error con la tabla de símbolos "+e.getMessage());
+		}
+	};
 
-parametros[Simbolo anterior]:
-	parametro ',' parametros[$anterior.getNext()]
-	| parametro;
+parametros: parametro ',' parametros | parametro;
 
-parametro
-	returns[Simbolo s]: tipo ID;
+parametro: tipo ID;
 
 sents
 	returns[Deque<Integer> sents_seg]:
