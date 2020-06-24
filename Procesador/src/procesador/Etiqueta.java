@@ -10,9 +10,8 @@ public class Etiqueta {
     private int ne; // Número de etiqueta
     private static int ce = 0; // Cantidad de etiquetas
 
-    public Etiqueta(int nl) {
+    public Etiqueta() {
         ce++; // Aumenta la cantidad de etiquetas generadas
-        this.nl = nl;
         ne = ce; // Asigna el número de etiqueta
     }
 
