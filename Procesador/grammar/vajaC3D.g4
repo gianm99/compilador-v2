@@ -224,8 +224,7 @@ expr_[Variable r, Deque<Integer> cierto, Deque<Integer> falso]
 	} expr_[$r, null, null]
 	|;
 
-tipo
-	returns[Simbolo.TSub tsub]: INTEGER | BOOLEAN | STRING;
+tipo: INTEGER | BOOLEAN | STRING;
 
 literal
 	returns[Simbolo.TSub tsub]:
