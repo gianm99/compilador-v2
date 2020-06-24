@@ -16,6 +16,8 @@ public class Simbolo {
 	private boolean vCB;
 	private int vCI;
 	private String vCS;
+	private int nv;
+	private int np;
 
 	public Simbolo(String id, Simbolo next, Tipo t, TSub tsub) {
 		this.id = id;
@@ -33,6 +35,22 @@ public class Simbolo {
 
 	public Simbolo() {
 	};
+
+	public int getNp() {
+		return np;
+	}
+
+	public void setNp(int np) {
+		this.np = np;
+	}
+
+	public int getNv() {
+		return nv;
+	}
+
+	public void setNv(int nv) {
+		this.nv = nv;
+	}
 
 	public enum Tipo {
 		CONST, VAR, PROC, FUNC, ARG, NULO;

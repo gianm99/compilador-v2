@@ -8,16 +8,22 @@ import java.util.ArrayList;
  * @author Gian Lucas Martín Chamorro
  */
 public class TablaProcedimientos {
-    private ArrayList<Procedimiento> TP;
+    private ArrayList<Procedimiento> tp;
 
     public ArrayList<Procedimiento> getTP() {
-        return TP;
+        return tp;
     }
 
     public void setTP(ArrayList<Procedimiento> tP) {
-        this.TP = tP;
+        this.tp = tP;
     }
 
     public TablaProcedimientos() {
+    }
+    
+    public Procedimiento nuevoProc(int nivelDecl, Simbolo.Tipo tipo){
+        Procedimiento met=new Procedimiento(nivelDecl,tipo);
+        tp.add(met);
+        return met;
     }
 }

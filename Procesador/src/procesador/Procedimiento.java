@@ -12,6 +12,13 @@ public class Procedimiento {
     private Etiqueta inicio; // Etiqueta de inicio
     private int numDecl; // Número de declaraciones o variables
     private static int cp = 0; // Cantidad de procedimientos creados
+    private Simbolo.Tipo tipo;
+
+    public Procedimiento(int nivelDecl, Simbolo.Tipo tipo) {
+        cp++; // Aumenta la cantidad de procedimientos
+        this.np = cp;
+        this.tipo = tipo;
+    }
 
     public int getNp() {
         return np;
@@ -49,11 +56,19 @@ public class Procedimiento {
         this.numDecl = numDecl;
     }
 
-    public Procedimiento(int np, int nivelDecl, Etiqueta inicio, int numDecl) {
-        this.np = np;
-        this.nivelDecl = nivelDecl;
-        this.inicio = inicio;
-        this.numDecl = numDecl;
-        cp++;
+    public static int getCp() {
+        return cp;
+    }
+
+    public static void setCp(int cp) {
+        Procedimiento.cp = cp;
+    }
+
+    public Simbolo.Tipo getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(Simbolo.Tipo tipo) {
+        this.tipo = tipo;
     }
 }
