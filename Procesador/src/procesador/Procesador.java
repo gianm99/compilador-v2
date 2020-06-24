@@ -42,9 +42,12 @@ public class Procesador {
         try {
             tokens.seek(0);
             parser.programa();
-            System.out.println("Proceso completado con éxito");
+            // System.out.println("Proceso completado con éxito");
+            System.out.println(ConsoleColors.GREEN_BOLD_BRIGHT + "Proceso completado con éxito"
+                    + ConsoleColors.RESET);
         } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
+            System.out.println("Se encontraron errores en el código:");
+            System.out.println(ConsoleColors.RED_BOLD + e.getMessage() + ConsoleColors.RESET);
             File erroresFile = new File(buildPath + "/errores.txt");
             Writer buffer = new BufferedWriter(new FileWriter(erroresFile));
             if (e != null) {
