@@ -397,7 +397,7 @@ expr_[Simbolo.TSub tsub]
 		}
 		$tsubExpr=Simbolo.TSub.BOOLEAN;
 	} expr_[Simbolo.TSub.BOOLEAN]
-	| AND {
+	| AND expr {
 		if($tsub!=Simbolo.TSub.BOOLEAN) {
 			errores+="Error semántico - Línea "+$AND.getLine()+
 			": tipos incompatibles (esperado BOOLEAN, encontrado "+$tsub+")\n";
@@ -406,8 +406,8 @@ expr_[Simbolo.TSub tsub]
 			": tipos incompatibles (esperado BOOLEAN, encontrado "+$expr.tsub+")\n";
 		}
 		$tsub=Simbolo.TSub.BOOLEAN;
-	} expr expr_[Simbolo.TSub.BOOLEAN]
-	| OR {
+	} expr_[Simbolo.TSub.BOOLEAN]
+	| OR expr {
 		if($tsub!=Simbolo.TSub.BOOLEAN) {
 			errores+="Error semántico - Línea "+$OR.getLine()+
 			": tipos incompatibles (esperado BOOLEAN, encontrado "+$tsub+")\n";
