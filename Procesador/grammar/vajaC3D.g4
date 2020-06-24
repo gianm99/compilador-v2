@@ -1,5 +1,9 @@
-grammar vajaC3D;
-// options { tokenVocab = vajaNUEVOLexer; }
+parser grammar vajaC3D;
+
+options
+{
+	tokenVocab = vajaLexer;
+}
 
 @header {
 package antlr;
@@ -10,18 +14,17 @@ import procesador.*;
 }
 
 @parser::members {
-Deque<Integer> pproc=new ArrayDeque<Integer>(); // Pila de procedimientos
-TablaSimbolos ts;
-TablaVariables tv;
-TablaProcedimientos tp;
+TablaSimbolos simbolos;
+TablaVariables variables;
+TablaProcedimientos procedimientos;
 String directorio;
 Writer writer;
 int pc = 0; // program counter
 
-public vajaC3DParser(TokenStream input, String directorio, TablaSimbolos ts){
+public vajaC3D(TokenStream input, String directorio, TablaSimbolos simbolos){
 	this(input);
 	this.directorio=directorio;
-	this.ts=ts;
+	this.simbolos=simbolos;
 }
 
 public void genera(String codigo){
@@ -30,212 +33,244 @@ public void genera(String codigo){
 		writer.write(codigo);
 	}catch(IOException e){}
 }
-
-public void backpatch(Deque<Integer> lista, Etiqueta e){
-
 }
 
-public Deque<Integer> concat(Deque<Integer> dq1, Deque<Integer> dq2){
-	while(dq2.size()>0){
-		dq1.add(dq2.removeFirst());
-	}
-	return dq1;
-}
-}
+// TODO Jordi
+programaPrincipal:
+	{
+		try{
+			File c3dFile=new File(this.directorio+"/c3d.txt");
+			writer=new BufferedWriter(new FileWriter(c3dFile));
+		}catch(Exception e){}
+	} (declaracion | sents)* EOF;
 
-programa: decls sents EOF;
+declaracion:
+	'var' tipo declaracionVar
+	| 'const' tipo declaracionConst
+	| 'func' declFunc
+	| 'proc' declProc;
 
-decls: decls decl | decl;
+tipo: INT | BOOLEAN | STRING;
+// Variables y constantes
+declaracionVar: Identificador ('=' initVar)? ';';
 
-decl:
-	VARIABLE tipo ID ('=' expr)? ';'
-	| CONSTANT tipo ID '=' expr ';'
-	| FUNCTION tipo encabezado[$tipo.tsub] BEGIN decls sents END
-	| PROCEDURE encabezado[null] BEGIN decls sents END;
+declaracionConst: Identificador '=' initConst ';';
 
-encabezado[Simbolo.TSub tsub]
-	returns[Simbolo met]: ID '(' parametros[$met]? ')';
+initVar: expr;
 
-parametros[Simbolo anterior]:
-	parametro ',' parametros[$anterior.getNext()]
-	| parametro;
+initConst: expr;
 
-parametro
-	returns[Simbolo s]: tipo ID;
+// Funciones y procedimientos
+declFunc: encabezadoFunc cuerpoFunc;
 
+encabezadoFunc: identificadorMetFunc tipo;
+
+cuerpoFunc: bloque | ';';
+
+declProc: encabezadoProc cuerpoProc;
+
+encabezadoProc: identificadorMetProc;
+
+cuerpoProc: bloque | ';';
+
+identificadorMetFunc: Identificador '(' parametros? ')';
+
+identificadorMetProc: Identificador '(' parametros? ')';
+
+parametros: parametro ',' parametros | parametro;
+
+parametro: tipo identificadorVar;
+
+identificadorVar: Identificador;
+
+bloque: '{' exprsBloque? '}';
+
+exprsBloque: exprDeBloque+;
+
+exprDeBloque: sentDeclVarLocal | sent;
+
+sentDeclVarLocal: declaracionVarLocal;
+
+declaracionVarLocal: tipo declaracionVar;
+
+//TODO Gian
 sents: sents sent | sent;
 
-sent:
-	IF expr BEGIN sents END
-	| IF expr BEGIN sents END ELSE BEGIN sents END
-	| WHILE expr BEGIN sents END
-	| RETURN expr ';'
-	| referencia ASSIGN expr ';'
-	| referencia ';';
+sent
+	returns[ ArrayList<Integer> sig]:
+	sentExpr
+	| IF '(' expr ')' {
+		Etiqueta e=new Etiqueta(pc);
+		genera(e+": skip\n");
+	} bloque {
+		//backpatch(expr.cierto, e);
+		$sig=new ArrayList<Integer>();
+		// $sig.addAll(expr.falso);
+		// $sig.addAll(bloque.sig);
+	}
+	| IF '(' expr ')' {
+		Etiqueta e1=new Etiqueta(pc);
+		genera(e1+": skip\n");
+	} bloque ELSE {
+		$sig=new ArrayList<Integer>();
+		// $sig.addAll(bloque.sig); // concatenar bloque 1
+		Etiqueta e2=new Etiqueta(pc);
+		genera(e2+": skip\n");
+	} bloque {
+		// backpatch(expr.cierto,e1);
+		// backpatch(expr.falso,e2);
+		// $sig.addAll(bloque.sig); // concatenar bloque 2
+	}
+	| WHILE {
+		Etiqueta e1=new Etiqueta(pc);
+		genera(e1+": skip\n");
+	} '(' expr ')' {
+		Etiqueta e2=new Etiqueta(pc);
+		genera(e2+": skip\n");
+	} bloque {
+		// backpatch(expr.cierto,e2);
+		// backpatch(bloque.sig, e1);
+		// $sig=expr.falso;
+		genera("goto "+e1+"\n");
+	}
+	| RETURN expr ';';
 
-referencia
-	returns[Variable r]: ID | ID '(' ')' | contIdx ')';
+sentExpr
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	exprSent ';';
 
-contIdx
-	returns[Simbolo.TSub tsub]: ID '(' expr contIdx_[null];
+exprSent
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	asignacion
+	| sentInvocaMet;
 
-contIdx_[Deque<Simbolo.TSub> pparams]:
-	',' expr contIdx_[$pparams]
-	|; // lambda
+sentInvocaMet
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	Identificador '(' (argumentos)? ')';
+
+argumentos: expr (',' expr)*;
+
+asignacion
+	returns[ ArrayList<Integer> sig]:
+	Identificador '=' expr {
+	Etiqueta ec,ef,efin;
+	Simbolo.TipoSubyacente idTsub = null;
+	$sig=new ArrayList<Integer>();
+	try{
+		idTsub=simbolos.consulta($Identificador.getText()).getTs();
+		if(idTsub==Simbolo.TipoSubyacente.BOOLEAN){
+			ec=new Etiqueta(pc);
+			ef=new Etiqueta(pc);
+			efin=new Etiqueta(pc);
+			genera(ec+": skip");
+			// genera(Identificador);
+		}
+	}catch(TablaSimbolos.exceptionTablaSimbolos ex){}
+ };
 
 expr
-	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
-	// Lógicas
-	NOT expr {
-		$cierto = $expr.falso;
-		$falso = $expr.cierto;
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	exprCondOr
+	| asignacion;
+
+exprCondOr
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	exprCondAnd exprCondOr_;
+
+exprCondOr_
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	OR {
+		Etiqueta e=new Etiqueta(pc);
+		genera(e+": skip\n");
+	}exprCondAnd exprCondOr_
+	|; //lambda
+
+exprCondAnd
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	exprComp exprCondAnd_;
+
+exprCondAnd_
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	AND {
+		Etiqueta e=new Etiqueta(pc);
+		genera(e+": skip\n");
+	}exprComp exprCondAnd_
+	|; //lambda
+
+exprComp
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	exprSuma exprComp_;
+
+exprComp_
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	OPREL exprSuma exprComp_
+	|; //lambda
+
+exprSuma
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	exprMult exprSuma_;
+
+exprSuma_
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	OpBinSum exprMult exprSuma_
+	|; //lambda
+
+exprMult
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	exprUnaria exprMult_;
+
+exprMult_
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	MULT exprUnaria exprMult_
+	| DIV exprUnaria exprMult_
+	|; //lambda
+
+exprUnaria
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	OpBinSum exprNeg
+	| exprNeg;
+
+exprNeg
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	NOT exprUnaria { 
+		$cierto=$exprUnaria.falso;
+		$falso=$exprUnaria.cierto;
 	}
-	| expr {
-		Variable r = $r;
-    } OPREL expr {
-		genera("if " + r + " " + OPREL.getText() + " " + $expr.r + " goto ");
-		$cierto = pc;
-		genera("goto ");
-		$falso = pc;
-    }
-	| expr {
-		Deque<Integer> cierto = $expr.cierto;
-		Deque<Integer> falso = $expr.falso;
-	} AND {
-		Etiqueta e = new Etiqueta(pc);
-		genera("e : skip");
-	} expr {
-		backpatch(cierto, e);
-		$falso = concat(falso, $expr.falso);
-		$cierto = $expr.cierto;
+	| exprPostfija;
+
+exprPostfija
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	primario {
+		$cierto=$primario.cierto;
+		$falso=$primario.falso;
 	}
-	| expr {
-		Deque<Integer> cierto = $expr.cierto;
-		Deque<Integer> falso = $expr.falso;
-	} OR {
-		Etiqueta e = new Etiqueta(pc);
-		genera("e : skip");
-	} expr {
-		backpatch(cierto, e);
-		$falso = concat(falso, $expr.falso);
-		$cierto = $expr.cierto;
-	}
-	// Aritméticas
-	| SUB expr {
-		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
-		genera("t = - " + $expr.r);
-		$r = t;
-	} expr {
-		Variable r = $expr.r;
-	} MULT expr {
-		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
-		genera("t = " + r + " * " + $expr.r);
-		$r = t;
-	} expr {
-		Variable r = $expr.r;
-	} DIV expr {
-		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
-		genera("t = " + r + " / " + $expr.r);
-		$r = t;
-	}
-	| expr {
-		Variable r = $expr.r;
-	} ADD expr {
-		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
-		genera("t = " + r + " + " + $expr.r);
-		$r = t;
-	} expr {
-		Variable r = $expr.r;
-	} SUB expr {
-		Variable t = tv.nuevaVar(pproc.peek(),Variable.Tipo.VAR);
-		genera("t = " + r + " - " + $expr.r);
-		$r = t;
-	}
-	| '(' expr ')' {
-		$r = $expr.r;
-	}
-	| referencia {
-		$r = $referencia.r;
+	| Identificador
+	| sentInvocaMet;
+
+primario
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
+	'(' expr ')' {
+		$cierto=$expr.cierto;
+		$falso=$expr.falso;
 	}
 	| literal {
-		Variable t = tv.nuevaVar(pproc.peek(), $literal.tsub);
-		genera("t = " + $literal.tsub);
-		$r = t;
-		if($literal.tsub == BOOLEAN){
-			if($literal.getText().equals('true')) {
-				genera("goto ");
-				$cierto = pc;
-				$falso = null;
-			} else {
-				genera("goto ");
-				$falso = pc;
-				$cierto = null;
-			}
-		}
+		$cierto=$literal.cierto;
+		$falso=$literal.falso;
 	};
 
-tipo
-	returns[Simbolo.TSub tsub]: INTEGER | BOOLEAN | STRING;
-
 literal
-	returns[Simbolo.TSub tsub]:
+	returns[ ArrayList<Integer> cierto, ArrayList<Integer> falso]:
 	LiteralInteger
-	| LiteralBoolean
+	| LiteralBoolean {
+		genera("goto $$$\n");
+		$cierto=new ArrayList<Integer>();
+		$falso=new ArrayList<Integer>();
+		if($LiteralBoolean.getText().equals("true"))
+		{
+			$cierto.add(pc); // true
+		}else{
+			$falso.add(pc); // false
+		}
+	}
 	| LiteralString;
 
-// Palabras reservadas
-VARIABLE: 'var';
-CONSTANT: 'const';
-FUNCTION: 'func';
-PROCEDURE: 'proc';
-RETURN: 'return';
-// Tipos
-INTEGER: 'int';
-BOOLEAN: 'boolean';
-STRING: 'string';
-// Operaciones
-WHILE: 'while';
-IF: 'if';
-ELSE: 'else';
-// Enteros
-LiteralInteger: DecimalLiteral;
-fragment DecimalLiteral: DecimalPositivo | '0';
-fragment DecimalPositivo: [1-9][0-9]*;
-// Booleans
-LiteralBoolean: 'true' | 'false';
-// Cadenas
-LiteralString: '"' LetrasString? '"';
-fragment LetrasString: LetraString+;
-fragment LetraString: ~["\\\r\n];
-// Separadores
-LPAREN: '(';
-RPAREN: ')';
-BEGIN: '{';
-END: '}';
-COMMA: ',';
-SEMI: ';';
-// Operadores
-OPREL: EQUAL | NOTEQUAL | GT | LT | GE | LE;
-OpBinSum: ADD | SUB;
-ASSIGN: '=';
-EQUAL: '==';
-NOTEQUAL: '!=';
-GT: '<';
-LT: '>';
-GE: '>=';
-LE: '<=';
-ADD: '+';
-SUB: '-';
-MULT: '*';
-DIV: '/';
-AND: '&&';
-OR: '||';
-NOT: '!';
-// Identificador
-ID: LETRA LETRADIGITO*;
-fragment LETRA: [a-zA-Z$_];
-fragment LETRADIGITO: [a-zA-Z$_0-9];
-// Comentarios y espacios en blanco
-WS: [ \r\n\t]+ -> skip;
-BLOCK_COMMENT: '/*' .*? '*/' -> skip;
-LINE_COMMENT: '#' ~[\r\n]* -> skip;
