@@ -276,7 +276,7 @@ expr
 		$cierto = $expr.cierto;
 		$falso = $expr.falso;
 	} expr_[$r,$cierto,$falso]
-	| referencia {
+	| referencia { // TODO Comprobar si esto es suficiente
 		$r = $referencia.r;
 		$cierto = $referencia.cierto;
 		$falso = $referencia.falso;
@@ -324,9 +324,9 @@ expr_[Variable r, Deque<Integer> cierto, Deque<Integer> falso]
 		genera("e : skip");
 		e.setNl(pc);
 	} expr {
-		backpatch($falso, e);
+		backpatch($cierto, e); // TODO Preguntar si esto es correcto
+		$cierto = concat($cierto, $expr.cierto);
 		$falso = $expr.falso;
-		$cierto = concat(cierto, $expr.cierto);
 	} expr_[$r, $cierto, $falso]
 	| MULT expr {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
