@@ -15,7 +15,7 @@ TablaSimbolos ts;
 TablaVariables tv;
 TablaProcedimientos tp;
 String directorio;
-Writer writer;
+ArrayList<String> codigoIntermedio = new ArrayList<String>();
 // TODO Asegurarse de que no tenga que ser -1 en vez de 0
 int pc = 0; // program counter
 int profundidad=0;
@@ -29,8 +29,19 @@ public vajaC3DParser(TokenStream input, String directorio, TablaSimbolos ts){
 public void genera(String codigo){
 	try{
 		pc++;
-		writer.write(codigo);
+		codigoIntermedio.add(codigo);
 	}catch(IOException e){}
+}
+
+public void imprimirGenera(){
+	try{
+		BufferedWriter writer = new BufferedWriter(new FileWriter(intermedio));
+		codigoIntermedio.forEach((s) -> writer.write(s));
+		writer.close();
+	}
+	catch(FileNotFoundException e){
+		System.out.println("Error al escribir el código intermedio en fichero");
+	}
 }
 
 public void backpatch(Deque<Integer> lista, Etiqueta e){
@@ -265,7 +276,7 @@ expr
 		$cierto = $expr.cierto;
 		$falso = $expr.falso;
 	} expr_[$r,$cierto,$falso]
-	| referencia {
+	| referencia { // TODO Comprobar si esto es suficiente
 		$r = $referencia.r;
 		$cierto = $referencia.cierto;
 		$falso = $referencia.falso;
@@ -314,9 +325,9 @@ expr_[Variable r, Deque<Integer> cierto, Deque<Integer> falso]
 		genera("e : skip");
 		e.setNl(pc);
 	} expr {
-		backpatch($falso, e);
+		backpatch($cierto, e); // TODO Preguntar si esto es correcto
+		$cierto = concat($cierto, $expr.cierto);
 		$falso = $expr.falso;
-		$cierto = concat(cierto, $expr.cierto);
 	} expr_[$r, $cierto, $falso]
 	| MULT expr {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
