@@ -310,24 +310,24 @@ expr_[Variable r, Deque<Integer> cierto, Deque<Integer> falso]
 		$falso=new ArrayDeque<Integer>();
 		$falso.add(pc);
     } expr_[$r,$cierto,$falso]
-	| AND {
+	| AND expr {
 		Etiqueta e = new Etiqueta();
 		genera("e : skip");
 		e.setNl(pc);
-	} expr {
-		backpatch($cierto, e);
-		$falso = concat($expr_.falso, $expr.falso);
-		$cierto = $expr.cierto;
-	} expr_[$r, $cierto, $falso]
-	| OR {
+	} expr_[$r, $cierto, $falso] {
+		backpatch($expr.cierto, e);
+		$falso = concat($expr.falso, $expr_.falso);
+		$cierto = $expr_.cierto;
+	}
+	| OR  expr {
 		Etiqueta e = new Etiqueta();
 		genera("e : skip");
-		e.setNl(pc);
-	} expr {
-		backpatch($expr_.cierto, e);
-		$cierto = concat($expr_.cierto, $expr.cierto);
-		$falso = $expr.falso;
-	} expr_[$r, $cierto, $falso]
+		e.setNl(pc);	
+	} expr_[$r, $cierto, $falso] {
+		backpatch($expr.cierto, e);
+		$cierto = concat($expr.cierto, $expr_.cierto);
+		$falso = $expr_.falso;
+	}
 	| MULT expr {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
 		genera("t"+Variable.getCv()+" = " + $r + " * " + $expr.r);
