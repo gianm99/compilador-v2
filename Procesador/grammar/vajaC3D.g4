@@ -15,7 +15,7 @@ TablaSimbolos ts;
 TablaVariables tv;
 TablaProcedimientos tp;
 String directorio;
-ArrayList<String> codigoIntermedio = new ArrayList<String>();
+ArrayList<StringBuilder> codigoIntermedio = new ArrayList<>(); // TODO Crear clase propia
 // TODO Asegurarse de que no tenga que ser -1 en vez de 0
 int pc = 0; // program counter
 int profundidad=0;
@@ -27,25 +27,29 @@ public vajaC3DParser(TokenStream input, String directorio, TablaSimbolos ts){
 }
 
 public void genera(String codigo){
-	try{
-		pc++;
-		codigoIntermedio.add(codigo);
-	}catch(IOException e){}
+	pc++;
+	StringBuilder aux=new StringBuilder();
+	aux.append(codigo);
+	codigoIntermedio.add(aux);
 }
 
 public void imprimirGenera(){
-	try{
-		BufferedWriter writer = new BufferedWriter(new FileWriter(intermedio));
-		codigoIntermedio.forEach((s) -> writer.write(s));
-		writer.close();
-	}
-	catch(FileNotFoundException e){
-		System.out.println("Error al escribir el código intermedio en fichero");
-	}
+	Writer buffer;
+	File interFile = new File(directorio + "/intermedio.txt");
+	try {
+		buffer = new BufferedWriter(new FileWriter(interFile));
+		for(int i=0;i<codigoIntermedio.size();i++) {
+			buffer.write(codigoIntermedio.get(i).toString());
+		}
+		buffer.close();
+	} catch(IOException e) {}
 }
 
 public void backpatch(Deque<Integer> lista, Etiqueta e){
-
+	while(lista.size()>0) {
+		int instruccion=lista.remove();
+		codigoIntermedio.get(instruccion).append(e.toString());
+	}
 }
 
 public Deque<Integer> concat(Deque<Integer> dq1, Deque<Integer> dq2){
@@ -174,7 +178,7 @@ sent[Deque<Integer> sents_seg]
 		genera(ec + ": skip");
 		ec.setNl(pc);
 	} decl* sents {
-		backpatch($expr.cierto,ec); // TODO Comprobar si esto es correcto
+		backpatch($expr.cierto,ec);
 		backpatch($sent_seg,ei);
 		$sents_seg=$expr.falso;
 		genera("goto "+ei);
@@ -183,7 +187,7 @@ sent[Deque<Integer> sents_seg]
 	| referencia ASSIGN expr ';' { // TODO Comprobar si esto es suficiente
 		$sent_seg=null;
 		if($referencia.tsub==Simbolo.TSub.BOOLEAN) {
-			Etiqueta ec=new Etiqueta(); // TODO Revisar todos los new Etiqueta()
+			Etiqueta ec=new Etiqueta();
 			Etiqueta ef=new Etiqueta();
 			Etiqueta efin=new Etiqueta();
 			genera(ec+": skip");
@@ -195,6 +199,8 @@ sent[Deque<Integer> sents_seg]
 			genera($referencia.r+"= 0");
 			genera(efin+": skip");
 			efin.setNl(pc);
+			backpatch($expr.cierto,ec);
+			backpatch($expr.falso,ef);
 		}
 	}
 	| referencia ';';
@@ -281,7 +287,8 @@ expr
 		$cierto = $referencia.cierto;
 		$falso = $referencia.falso;
 	} expr_[$r, $cierto, $falso]
-	| literal {		// Añadir para las 3 variables de valores de Simbolo
+	| literal {
+		// TODO Comprobar si hay que hacer esto para las 3 variables de valores de Simbolo
 		Variable t = tv.nuevaVar(pproc.peek(), Simbolo.Tipo.VAR);
 		genera("t"+Variable.getCv()+" = " + $literal.start.getText());
 		$r = t;
