@@ -195,6 +195,8 @@ sent[Deque<Integer> sents_seg]
 			genera($referencia.r+"= 0");
 			genera(efin+": skip");
 			efin.setNl(pc);
+			backpatch($expr.cierto,ec);
+			backpatch($expr.falso,ef);
 		}
 	}
 	| referencia ';';
