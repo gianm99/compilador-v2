@@ -15,7 +15,7 @@ TablaSimbolos ts;
 TablaVariables tv;
 TablaProcedimientos tp;
 String directorio;
-ArrayList<StringBuilder> codigoIntermedio = new ArrayList<>(); // TODO Crear clase propia
+ArrayList<StringBuilder> c3d = new ArrayList<>(); // TODO Crear clase propia
 // TODO Asegurarse de que no tenga que ser -1 en vez de 0
 int pc = 0; // program counter
 int profundidad=0;
@@ -30,7 +30,7 @@ public void genera(String codigo){
 	pc++;
 	StringBuilder aux=new StringBuilder();
 	aux.append(codigo);
-	codigoIntermedio.add(aux);
+	c3d.add(aux);
 }
 
 public void imprimirGenera(){
@@ -38,8 +38,8 @@ public void imprimirGenera(){
 	File interFile = new File(directorio + "/intermedio.txt");
 	try {
 		buffer = new BufferedWriter(new FileWriter(interFile));
-		for(int i=0;i<codigoIntermedio.size();i++) {
-			buffer.write(codigoIntermedio.get(i).toString());
+		for(int i=0;i<c3d.size();i++) {
+			buffer.write(c3d.get(i).toString());
 		}
 		buffer.close();
 	} catch(IOException e) {}
@@ -48,7 +48,7 @@ public void imprimirGenera(){
 public void backpatch(Deque<Integer> lista, Etiqueta e){
 	while(lista.size()>0) {
 		int instruccion=lista.remove();
-		codigoIntermedio.get(instruccion).append(e.toString());
+		c3d.get(instruccion).append(e.toString());
 	}
 }
 
