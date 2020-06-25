@@ -178,7 +178,7 @@ sent[Deque<Integer> sents_seg]
 		genera(ec + ": skip");
 		ec.setNl(pc);
 	} decl* sents {
-		backpatch($expr.cierto,ec); // TODO Comprobar si esto es correcto
+		backpatch($expr.cierto,ec);
 		backpatch($sent_seg,ei);
 		$sents_seg=$expr.falso;
 		genera("goto "+ei);
@@ -187,7 +187,7 @@ sent[Deque<Integer> sents_seg]
 	| referencia ASSIGN expr ';' { // TODO Comprobar si esto es suficiente
 		$sent_seg=null;
 		if($referencia.tsub==Simbolo.TSub.BOOLEAN) {
-			Etiqueta ec=new Etiqueta(); // TODO Revisar todos los new Etiqueta()
+			Etiqueta ec=new Etiqueta();
 			Etiqueta ef=new Etiqueta();
 			Etiqueta efin=new Etiqueta();
 			genera(ec+": skip");
