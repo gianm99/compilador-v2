@@ -270,7 +270,8 @@ expr
 		$cierto = $referencia.cierto;
 		$falso = $referencia.falso;
 	} expr_[$r, $cierto, $falso]
-	| literal {		// Añadir para las 3 variables de valores de Simbolo
+	| literal {
+		// TODO Comprobar si hay que hacer esto para las 3 variables de valores de Simbolo
 		Variable t = tv.nuevaVar(pproc.peek(), Simbolo.Tipo.VAR);
 		genera("t"+Variable.getCv()+" = " + $literal.start.getText());
 		$r = t;
