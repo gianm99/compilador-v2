@@ -276,7 +276,7 @@ expr
 		$cierto = $expr.cierto;
 		$falso = $expr.falso;
 	} expr_[$r,$cierto,$falso]
-	| referencia {
+	| referencia { // TODO Comprobar si esto es suficiente
 		$r = $referencia.r;
 		$cierto = $referencia.cierto;
 		$falso = $referencia.falso;
@@ -310,24 +310,24 @@ expr_[Variable r, Deque<Integer> cierto, Deque<Integer> falso]
 		$falso=new ArrayDeque<Integer>();
 		$falso.add(pc);
     } expr_[$r,$cierto,$falso]
-	| AND expr {
+	| AND {
 		Etiqueta e = new Etiqueta();
 		genera("e : skip");
 		e.setNl(pc);
-	} expr_[$r, $cierto, $falso] {
-		backpatch($expr.cierto, e);
-		$falso = concat($expr.falso, $expr_.falso);
-		$cierto = $expr_.cierto;
-	}
-	| OR  expr {
+	} expr {
+		backpatch($cierto, e);
+		$falso = concat($falso, $expr.falso);
+		$cierto = $expr.cierto;
+	} expr_[$r, $cierto, $falso]
+	| OR {
 		Etiqueta e = new Etiqueta();
 		genera("e : skip");
-		e.setNl(pc);	
-	} expr_[$r, $cierto, $falso] {
-		backpatch($expr.cierto, e);
-		$cierto = concat($expr.cierto, $expr_.cierto);
-		$falso = $expr_.falso;
-	}
+		e.setNl(pc);
+	} expr {
+		backpatch($cierto, e); // TODO Preguntar si esto es correcto
+		$cierto = concat($cierto, $expr.cierto);
+		$falso = $expr.falso;
+	} expr_[$r, $cierto, $falso]
 	| MULT expr {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
 		genera("t"+Variable.getCv()+" = " + $r + " * " + $expr.r);
