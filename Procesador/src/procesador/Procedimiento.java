@@ -15,6 +15,7 @@ public class Procedimiento {
     private Simbolo.Tipo tipo;
 
     public Procedimiento(int nivelDecl, Simbolo.Tipo tipo) {
+        // TODO Comprobar el orden de las dos siguientes operaciones
         cp++; // Aumenta la cantidad de procedimientos
         this.np = cp;
         this.tipo = tipo;

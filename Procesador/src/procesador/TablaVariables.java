@@ -11,21 +11,22 @@ public class TablaVariables {
 
     private ArrayList<Variable> tv;
 
+    public TablaVariables(String directorio) {
+        tv = new ArrayList<Variable>();
+    }
+
+    public Variable nuevaVar(Procedimiento sub, Simbolo.Tipo tipo) {
+        Variable var = new Variable(sub, tipo);
+        tv.add(var);
+        return var;
+    }
+
+    // Getters y setters
     public ArrayList<Variable> getTV() {
         return tv;
     }
 
     public void setTV(ArrayList<Variable> tv) {
         this.tv = tv;
-    }
-
-    public TablaVariables(String directorio){
-        
-    }
-
-    public Variable nuevaVar(Procedimiento sub, Simbolo.Tipo tipo){
-        Variable var = new Variable(sub, tipo);
-        tv.add(var);
-        return var;
     }
 }

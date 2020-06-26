@@ -29,8 +29,6 @@ public class Procesador {
         // Se crea el lexer y el CommonTokenStream
         vajaLexer lexer = new vajaLexer(stream);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
-        // Parser para el análisis sintáctico y semántico
-        vajaParser parser = new vajaParser(tokens, buildPath);
         tokens.fill();
         File tokensFile = new File(buildPath + "/tokens.txt");
         try (Writer buffer = new BufferedWriter(new FileWriter(tokensFile))) {
@@ -39,12 +37,13 @@ public class Procesador {
             }
             buffer.close();
         }
+        // Análisis del código fuente
+        vajaParser parser = new vajaParser(tokens, buildPath);
         try {
             tokens.seek(0);
             parser.programa();
-            // System.out.println("Proceso completado con éxito");
-            System.out.println(ConsoleColors.GREEN_BOLD_BRIGHT + "Proceso completado con éxito"
-                    + ConsoleColors.RESET);
+            System.out.println(ConsoleColors.GREEN_BOLD_BRIGHT
+                    + "Proceso de análisis completado con éxito" + ConsoleColors.RESET);
         } catch (RuntimeException e) {
             System.out.println("Se encontraron errores en el código:");
             System.out.println(ConsoleColors.RED_BOLD + e.getMessage() + ConsoleColors.RESET);
@@ -54,6 +53,19 @@ public class Procesador {
                 buffer.write(e.getMessage());
             }
             buffer.close();
+            return;
+        }
+        // Generación de código intermedio
+        vajaC3D parserC3D;
+        parserC3D = new vajaC3D(tokens, buildPath, parser.ts);
+        try {
+            tokens.seek(0);
+            parserC3D.programa();
+            System.out.println(ConsoleColors.BLUE_BOLD_BRIGHT
+                    + "Proceso de generación de código completado con éxito" + ConsoleColors.RESET);
+        } catch (RuntimeException e) {
+            System.out.println(ConsoleColors.RED_BOLD + "Error al generar código: " + e.getMessage()
+                    + ConsoleColors.RESET);
         }
     }
 }
