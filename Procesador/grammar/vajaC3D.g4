@@ -1,7 +1,9 @@
-grammar vajaC3D;
-// options { tokenVocab = vajaNUEVOLexer; }
+parser grammar vajaC3D;
+options {
+	tokenVocab = vajaLexer;
+}
 
-@header {
+@parser::header {
 package antlr;
 import procesador.*;
 import java.io.*;
@@ -20,10 +22,12 @@ ArrayList<StringBuilder> codigoIntermedio = new ArrayList<>(); // TODO Crear cla
 int pc = 0; // program counter
 int profundidad=0;
 
-public vajaC3DParser(TokenStream input, String directorio, TablaSimbolos ts){
+public vajaC3D(TokenStream input, String directorio, TablaSimbolos ts){
 	this(input);
 	this.directorio=directorio;
 	this.ts=ts;
+	this.tv= new TablaVariables(directorio);
+	this.tp= new TablaProcedimientos();
 }
 
 public void genera(String codigo){
@@ -46,9 +50,11 @@ public void imprimirGenera(){
 }
 
 public void backpatch(Deque<Integer> lista, Etiqueta e){
-	while(lista.size()>0) {
-		int instruccion=lista.remove();
-		codigoIntermedio.get(instruccion).append(e.toString());
+	if(lista!=null) {
+		while(lista.size()>0) {
+			int instruccion=lista.remove();
+			codigoIntermedio.get(instruccion).append(e.toString());
+		}
 	}
 }
 
@@ -61,19 +67,42 @@ public Deque<Integer> concat(Deque<Integer> dq1, Deque<Integer> dq2){
 }
 
 programa:
-	decl* sents {
+	{
+		// Poner los métodos de IO en la tabla de procedimientos
+		Simbolo s;
+		try{
+			// Operación de entrada
+			s=ts.consulta("read");
+			s.setNp(tp.nuevoProc(profundidad,s.getT()));
+			// Operaciones de salida
+			for(Simbolo.TSub tsub : Simbolo.TSub.values()) {
+				if(tsub!=Simbolo.TSub.NULL) {
+					s=ts.consulta("print"+tsub);
+					tp.nuevoProc(profundidad,s.getT());
+					s.setNp(tp.nuevoProc(profundidad,s.getT()));					
+				}
+			}
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
+		}
+	} decl* sents EOF {
 	Etiqueta e=new Etiqueta();
 	genera(e+": skip");
 	e.setNl(pc);
 	backpatch($sents.sents_seg,e);
 	// TODO Según los apuntes aquí faltan cosas
-} EOF;
+};
 
 decl:
 	VARIABLE tipo ID ('=' expr)? ';' // TODO Preguntar cómo va esto
 	| CONSTANT tipo ID '=' expr ';'
 	| FUNCTION tipo encabezado BEGIN {
 		profundidad++;
+		try{
+			ts=ts.bajaBloque();
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
+		}
 		pproc.push($encabezado.met);
 		Etiqueta e=new Etiqueta(); // TODO Hacer una tabla de etiquetas y cambiar esto
 		$encabezado.met.setInicio(e);
@@ -82,9 +111,15 @@ decl:
 	} decl* sents {
 		genera("rtn "+$encabezado.met.getNp());
 		profundidad--;
+		ts=ts.subeBloque();
 	} END
 	| PROCEDURE encabezado BEGIN {
 		profundidad++;
+		try{
+			ts=ts.bajaBloque();
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
+		}
 		pproc.push($encabezado.met);
 		Etiqueta e=new Etiqueta();
 		$encabezado.met.setInicio(e);
@@ -94,18 +129,21 @@ decl:
 	} decl* sents {
 		genera("rtn "+$encabezado.met.getNp());
 		profundidad--;
+		ts=ts.subeBloque();
 	} END;
 
 encabezado
 	returns[Procedimiento met]:
 	ID '(' parametros? ')' {
 		Simbolo s=new Simbolo();
+		Procedimiento met;
 		try {
 			s=ts.consulta($ID.getText());
-			$met=tp.nuevoProc(profundidad,s.getT());
-			s.setNp($met);
+			met=tp.nuevoProc(profundidad,s.getT());
+			s.setNp(met);
+			$met = met;
 		} catch(TablaSimbolos.TablaSimbolosException e) {
-			System.out.println("Error con la tabla de símbolos "+e.getMessage());
+			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
 	};
 
@@ -147,14 +185,25 @@ sents_[Deque<Integer> sents_seg]
 sent[Deque<Integer> sents_seg]
 	returns[Deque<Integer> sent_seg]:
 	IF expr BEGIN {
+		try{
+			ts=ts.bajaBloque();
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
+		}
 		Etiqueta ec = new Etiqueta();
 		genera(ec + ": skip");
 		ec.setNl(pc);
 	} decl* sents {
+		ts=ts.subeBloque();
 		backpatch($expr.cierto, ec);
 		$sent_seg = concat($expr.falso, $sents_seg);
 	} END
 	| IF expr BEGIN {
+		try{
+			ts=ts.bajaBloque();
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
+		}
 		Etiqueta ec = new Etiqueta();
 		genera(ec + ": skip");
 		ec.setNl(pc);
@@ -165,11 +214,17 @@ sent[Deque<Integer> sents_seg]
 		genera(ef + ": skip");
 		ef.setNl(pc);
 	} decl* sents END {
+		ts=ts.subeBloque();
 		backpatch($expr.cierto, ec);
 		backpatch($expr.falso, ef);
 		$sent_seg = concat(sents_seg1, $sents.sents_seg);
 	}
 	| WHILE {
+		try{
+			ts=ts.bajaBloque();
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
+		}
 		Etiqueta ei = new Etiqueta();
 		genera(ei + ": skip");
 		ei.setNl(pc);
@@ -178,6 +233,7 @@ sent[Deque<Integer> sents_seg]
 		genera(ec + ": skip");
 		ec.setNl(pc);
 	} decl* sents {
+		ts=ts.subeBloque();
 		backpatch($expr.cierto,ec);
 		backpatch($sent_seg,ei);
 		$sents_seg=$expr.falso;
@@ -229,7 +285,7 @@ referencia
 				$tsub=s.getTsub();
 			}
 		} catch(TablaSimbolos.TablaSimbolosException e) {
-			System.out.println("Error con la tabla de símbolos "+e.getMessage());
+			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
 	}
 	| ID '(' ')' {
@@ -238,7 +294,7 @@ referencia
 			s = ts.consulta($ID.getText());
 			genera("call " + s.getNp());
 		} catch(TablaSimbolos.TablaSimbolosException e) {
-			System.out.println("Error con la tabla de símbolos "+e.getMessage());
+			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
 	}
 	| contIdx ')' {
@@ -249,14 +305,14 @@ referencia
 contIdx
 	returns[Deque<Variable> pparams, Procedimiento met]:
 	ID '(' expr {
-		Simbolo met;
+		Simbolo s=new Simbolo();
 		$pparams = new ArrayDeque<Variable>();
 		try {
-			met = ts.consulta($ID.getText());
+			s = ts.consulta($ID.getText());
+			$met = s.getNp();
 			$pparams.push($expr.r);
-			$met = met.getNp();
 		} catch(TablaSimbolos.TablaSimbolosException e) {
-			System.out.println("Error con la tabla de símbolos "+e.getMessage());
+			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
 	} contIdx_[$pparams];
 
@@ -289,8 +345,13 @@ expr
 	} expr_[$r, $cierto, $falso]
 	| literal {
 		// TODO Comprobar si hay que hacer esto para las 3 variables de valores de Simbolo
-		Variable t = tv.nuevaVar(pproc.peek(), Simbolo.Tipo.VAR);
-		genera("t"+Variable.getCv()+" = " + $literal.start.getText());
+		Variable t;
+		if(pproc.size()!=0) {
+			t = tv.nuevaVar(pproc.peek(), Simbolo.Tipo.VAR);
+		} else {
+			t = tv.nuevaVar(null, Simbolo.Tipo.VAR);
+		}
+		genera("t"+Variable.getCv()+" = " + $literal.text);
 		$r = t;
 		if($literal.tsub == Simbolo.TSub.BOOLEAN){
 			if($literal.start.getText().equals("true")) {
@@ -331,7 +392,7 @@ expr_[Variable r, Deque<Integer> cierto, Deque<Integer> falso]
 		genera("e : skip");
 		e.setNl(pc);
 	} expr {
-		backpatch($cierto, e); // TODO Preguntar si esto es correcto
+		backpatch($falso, e); 
 		$cierto = concat($cierto, $expr.cierto);
 		$falso = $expr.falso;
 	} expr_[$r, $cierto, $falso]
@@ -370,60 +431,3 @@ literal
 	| LiteralString {
 		$tsub=Simbolo.TSub.STRING;
 	};
-
-// Palabras reservadas
-VARIABLE: 'var';
-CONSTANT: 'const';
-FUNCTION: 'func';
-PROCEDURE: 'proc';
-RETURN: 'return';
-// Tipos
-INTEGER: 'int';
-BOOLEAN: 'boolean';
-STRING: 'string';
-// Operaciones
-WHILE: 'while';
-IF: 'if';
-ELSE: 'else';
-// Enteros
-LiteralInteger: DecimalLiteral;
-fragment DecimalLiteral: DecimalPositivo | '0';
-fragment DecimalPositivo: [1-9][0-9]*;
-// Booleans
-LiteralBoolean: 'true' | 'false';
-// Cadenas
-LiteralString: '"' LetrasString? '"';
-fragment LetrasString: LetraString+;
-fragment LetraString: ~["\\\r\n];
-// Separadores
-LPAREN: '(';
-RPAREN: ')';
-BEGIN: '{';
-END: '}';
-COMMA: ',';
-SEMI: ';';
-// Operadores
-OPREL: EQUAL | NOTEQUAL | GT | LT | GE | LE;
-OpBinSum: ADD | SUB;
-ASSIGN: '=';
-EQUAL: '==';
-NOTEQUAL: '!=';
-GT: '<';
-LT: '>';
-GE: '>=';
-LE: '<=';
-ADD: '+';
-SUB: '-';
-MULT: '*';
-DIV: '/';
-AND: '&&';
-OR: '||';
-NOT: '!';
-// Identificador
-ID: LETRA LETRADIGITO*;
-fragment LETRA: [a-zA-Z$_];
-fragment LETRADIGITO: [a-zA-Z$_0-9];
-// Comentarios y espacios en blanco
-WS: [ \r\n\t]+ -> skip;
-BLOCK_COMMENT: '/*' .*? '*/' -> skip;
-LINE_COMMENT: '#' ~[\r\n]* -> skip;
