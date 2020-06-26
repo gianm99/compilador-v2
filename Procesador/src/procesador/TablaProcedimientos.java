@@ -10,20 +10,22 @@ import java.util.ArrayList;
 public class TablaProcedimientos {
     private ArrayList<Procedimiento> tp;
 
+    public TablaProcedimientos() {
+        tp = new ArrayList<Procedimiento>();
+    }
+
+    public Procedimiento nuevoProc(int nivelDecl, Simbolo.Tipo tipo){
+        Procedimiento met=new Procedimiento(nivelDecl,tipo);
+        tp.add(met);
+        return met;
+    }
+
+    // Getters y setters
     public ArrayList<Procedimiento> getTP() {
         return tp;
     }
 
     public void setTP(ArrayList<Procedimiento> tP) {
         this.tp = tP;
-    }
-
-    public TablaProcedimientos() {
-    }
-    
-    public Procedimiento nuevoProc(int nivelDecl, Simbolo.Tipo tipo){
-        Procedimiento met=new Procedimiento(nivelDecl,tipo);
-        tp.add(met);
-        return met;
     }
 }

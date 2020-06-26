@@ -107,7 +107,7 @@ decl:
 		try {
 			ts.inserta($encabezado.met.getId(),$encabezado.met);
 		} catch(TablaSimbolos.TablaSimbolosException e) {
-			errores+="Error semántico - Línea "+$FUNCTION.getLine()+": "+e.getMessage();
+			errores+="Error semántico - Línea "+$FUNCTION.getLine()+": "+e.getMessage()+"\n";
 		}
 		ts=ts.entraBloque();
 		pproc.push($encabezado.met);
@@ -118,7 +118,7 @@ decl:
 			try {
 				ts.inserta(aux.getId(),aux);
 			} catch(TablaSimbolos.TablaSimbolosException e) {
-				errores+="Error semántico - Línea "+$FUNCTION.getLine()+": "+e.getMessage();
+				errores+="Error semántico - Línea "+$FUNCTION.getLine()+": "+e.getMessage()+"\n";
 			}
 			param=param.getNext();
 		}
@@ -138,7 +138,7 @@ decl:
 		try {
 			ts.inserta($encabezado.met.getId(),$encabezado.met);
 		} catch(TablaSimbolos.TablaSimbolosException e) {
-			errores+="Error semántico - Línea "+$PROCEDURE.getLine()+": "+e.getMessage();
+			errores+="Error semántico - Línea "+$PROCEDURE.getLine()+": "+e.getMessage()+"\n";
 		}
 		ts=ts.entraBloque();
 		pproc.push($encabezado.met);
@@ -149,7 +149,7 @@ decl:
 			try {
 				ts.inserta(aux.getId(),aux);
 			} catch(TablaSimbolos.TablaSimbolosException e) {
-				errores+="Error semántico - Línea "+$PROCEDURE.getLine()+": "+e.getMessage();
+				errores+="Error semántico - Línea "+$PROCEDURE.getLine()+": "+e.getMessage()+"\n";
 			}
 			param=param.getNext();
 		}
@@ -282,7 +282,7 @@ referencia
 		try {
 			$s=ts.consulta($ID.getText());
 		} catch(TablaSimbolos.TablaSimbolosException e) {
-			errores+="Error semántico - Línea"+$ID.getLine()+": "+e.getMessage();
+			errores+="Error semántico - Línea "+$ID.getLine()+": "+e.getMessage()+"\n";
 			$s=null;
 		}
 	}

@@ -1,5 +1,6 @@
 package procesador;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.io.*;
 
@@ -13,8 +14,10 @@ public class TablaSimbolos {
 
     private Hashtable<String, Simbolo> tabla;
     private int niveltabla;
+    private int ultimoBloque;
     private TablaSimbolos pre;
     private static Writer buffer;
+    private ArrayList<TablaSimbolos> tablasBloques;
 
     public class TablaSimbolosException extends Exception {
 
@@ -28,6 +31,7 @@ public class TablaSimbolos {
     public TablaSimbolos(String directorio) {
         niveltabla = 0;
         tabla = new Hashtable<>();
+        tablasBloques = new ArrayList<TablaSimbolos>();
         pre = null;
         try {
             // TS output
@@ -47,6 +51,7 @@ public class TablaSimbolos {
     private TablaSimbolos(TablaSimbolos p, int n) {
         niveltabla = n;
         tabla = new Hashtable<>();
+        tablasBloques = new ArrayList<>();
         pre = p;
     }
 
@@ -60,7 +65,17 @@ public class TablaSimbolos {
         } catch (IOException e) {
             System.out.println("error escribiendo la tabla de símbolos: " + e.getMessage());
         }
-        return new TablaSimbolos(this, niveltabla + 1);
+        TablaSimbolos tabla = new TablaSimbolos(this, niveltabla + 1);
+        this.tablasBloques.add(tabla);
+        return tabla;
+    }
+
+    public TablaSimbolos bajaBloque() throws TablaSimbolosException {
+        if (ultimoBloque > this.tablasBloques.size()) {
+            throw new TablaSimbolosException(
+                    "posicion incorrecta de la lista de las tablas de bloques inferiores");
+        }
+        return tablasBloques.get(ultimoBloque);
     }
 
     public TablaSimbolos saleBloque() {
@@ -84,9 +99,13 @@ public class TablaSimbolos {
         return pre;
     }
 
+    public TablaSimbolos subeBloque() {
+        return pre;
+    }
+
     public void inserta(String id, Simbolo s) throws TablaSimbolosException {
         if (this.existe(id)) {
-            throw new TablaSimbolosException("Identificador repetido: " + id);
+            throw new TablaSimbolosException("identificador repetido: " + id);
         }
         tabla.put(id, s);
         try {
