@@ -38,13 +38,13 @@ public void genera(String codigo){
 	c3d.add(aux);
 }
 
-public void imprimirGenera(){
+public void imprimirC3D(){
 	Writer buffer;
 	File interFile = new File(directorio + "/intermedio.txt");
 	try {
 		buffer = new BufferedWriter(new FileWriter(interFile));
 		for(int i=0;i<c3d.size();i++) {
-			buffer.write(c3d.get(i).toString());
+			buffer.write(c3d.get(i).toString()+"\n");
 		}
 		buffer.close();
 	} catch(IOException e) {}
@@ -81,7 +81,6 @@ programa:
 			for(Simbolo.TSub tsub : Simbolo.TSub.values()) {
 				if(tsub!=Simbolo.TSub.NULL) {
 					s=ts.consulta("print"+tsub);
-					tp.nuevoProc(profundidad,s.getT());
 					s.setNp(tp.nuevoProc(profundidad,s.getT()));					
 				}
 			}
@@ -94,23 +93,25 @@ programa:
 	e.setNl(pc);
 	backpatch($sents.sents_seg,e);
 	// TODO Según los apuntes aquí faltan cosas
+	imprimirC3D();
 };
 
 decl:
 	VARIABLE tipo ID {
 		// Asignación de valor por defecto
-		Simbolo s;
+		Simbolo s=new Simbolo();
 		try {
 			s=ts.consulta($ID.getText());
+			s.setNv(tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR));
 			switch(s.getTsub()) {
 				case BOOLEAN:
-					s.setvCB(false);
+					genera(s.getNv()+" = false");
 					break;
 				case INT:
-					s.setvCI(0);
+					genera(s.getNv()+" = 0");
 					break;
 				case STRING:
-					s.setvCS("");
+					genera(s.getNv()+" = \"\"");
 					break;
 			} 
 		} catch(TablaSimbolos.TablaSimbolosException e) {
@@ -118,24 +119,22 @@ decl:
 		}
 	} (
 		'=' expr {
-		// TODO Averiguar si también se tiene que copiar en la tabla de símbolos
-		
-		genera(" = "+$expr.r);
+		genera(s.getNv()+" = "+$expr.r);
 	}
 	)? ';'
-	| CONSTANT tipo ID '=' expr ';' {
+	| CONSTANT tipo ID '=' literal ';' {
 		Simbolo s;
 		try {
 			s = ts.consulta($ID.getText());
 			switch(s.getTsub()) {
 				case BOOLEAN:
-					s.setvCB($expr.r.getR());
+					s.setvCB(Boolean.parseBoolean($literal.text));
 					break;
 				case INT:
-					s.setvCI($expr.r.getR());
+					s.setvCI(Integer.parseInt($literal.text));
 					break;
 				case STRING:
-					s.setvCS($expr.r.getR());
+					s.setvCS($literal.text);
 					break;
 			} 
 		} catch(TablaSimbolos.TablaSimbolosException e) {
@@ -313,26 +312,28 @@ referencia
 	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso, Simbolo.TSub tsub]:
 	ID {
 		Simbolo s;
+		Variable t;
 		try {
 			s = ts.consulta($ID.getText());
 			if (s.getT() == Simbolo.Tipo.CONST){
-				Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.CONST);
+				t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.CONST);
+				t.setTemporal(true);
 				switch(s.getTsub()) {
 					case BOOLEAN:
-						// TODO Comprobar si esto es correcto
-						genera("t"+t+" = " + s.isvCB());
+						genera(t+" = " + s.isvCB());
 						break;
 					case INT:
-						genera("t"+t+" = " + s.getvCI());
+						genera(t+" = " + s.getvCI());
 						break;
 					case STRING:
-						genera("t"+t+" = " + s.getvCS());
+						genera(t+" = " + s.getvCS());
 						break;
 				}
 				$r = t;
 			} else {
-				$tsub=s.getTsub();
+				$r = s.getNv();
 			}
+			$tsub=s.getTsub();
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
@@ -347,7 +348,7 @@ referencia
 		}
 	}
 	| contIdx ')' {
-		while($contIdx.pparams.size()>0) genera("param_s" + $contIdx.pparams.pop());
+		while($contIdx.pparams.size()>0) genera("param_s " + $contIdx.pparams.pop());
 		genera("call "+$contIdx.met.getNp());
 	};
 
@@ -371,39 +372,110 @@ contIdx_[Deque<Variable> pparams]:
 	} contIdx_[$pparams]
 	|; // lambda
 
+
 expr
 	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
+	// Lógicas
 	NOT expr {
 		$cierto = $expr.falso;
 		$falso = $expr.cierto;
-	} expr_[null,$cierto, $falso]
+	}
+	| expr {
+		Variable r = new Variable($expr.r);
+    } OPREL expr {
+		genera("if " + r + " " + $OPREL.getText() + " " + $expr.r + " goto ");
+		$cierto=new ArrayDeque<Integer>();
+ 		$cierto.add(pc);
+		genera("goto ");
+		$falso=new ArrayDeque<Integer>();
+ 		$falso.add(pc);
+
+		$r = $expr.r;
+    }
+	| expr {
+		Deque<Integer> cierto = $expr.cierto;
+		Deque<Integer> falso = $expr.falso;
+	} AND {
+		Etiqueta e = new Etiqueta();
+		genera(e+": skip");
+		e.setNl(pc);
+	} expr {
+		backpatch(cierto, e);
+		$falso = concat(falso, $expr.falso);
+		$cierto = $expr.cierto;
+
+		$r = $expr.r;
+	}
+	| expr {
+		Deque<Integer> cierto = $expr.cierto;
+		Deque<Integer> falso = $expr.falso;
+	} OR {
+		Etiqueta e = new Etiqueta();
+		genera(e+": skip");
+		e.setNl(pc);
+	} expr {
+		backpatch(falso, e); 
+		$cierto = concat(cierto, $expr.cierto);
+		$falso = $expr.falso;
+
+		$r = $expr.r;
+	}
+	// Aritméticas
 	| SUB expr {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
-		genera("t"+t+" = - " + $expr.r);
+		t.setTemporal(true);
+		genera(t+" = - " + $expr.r);
 		$r = t;
-	} expr_[$r,null,null]
+	}
+	| expr {
+		Variable r = new Variable($expr.r);
+	} MULT expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
+		t.setTemporal(true);
+		genera(t+" = " + r + " * " + $expr.r);
+		$r = t;
+	}
+	| expr {
+		Variable r = new Variable($expr.r);
+	} DIV expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
+		t.setTemporal(true);
+		genera(t+" = " + r + " / " + $expr.r);
+		$r = t;
+	}
+	| expr {
+		Variable r = new Variable($expr.r);
+	} ADD expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
+		t.setTemporal(true);
+		genera(t+" = " + r + " + " + $expr.r);
+		$r = t;
+	}
+	| expr {
+		Variable r = new Variable($expr.r);
+	} SUB expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
+		t.setTemporal(true);
+		genera(t+" = " + r + " - " + $expr.r);
+		$r = t;
+	}
 	| '(' expr ')' {
 		$r = $expr.r;
 		$cierto = $expr.cierto;
 		$falso = $expr.falso;
-	} expr_[$r,$cierto,$falso]
-	| referencia { // TODO Comprobar si esto es suficiente
+	}
+	| referencia {
 		$r = $referencia.r;
 		$cierto = $referencia.cierto;
 		$falso = $referencia.falso;
-	} expr_[$r, $cierto, $falso]
+	}
 	| literal {
-		// TODO Comprobar si hay que hacer esto para las 3 variables de valores de Simbolo
-		Variable t;
-		if(pproc.size()!=0) {
-			t = tv.nuevaVar(pproc.peek(), Simbolo.Tipo.VAR);
-		} else {
-			t = tv.nuevaVar(null, Simbolo.Tipo.VAR);
-		}
-		genera("t"+t+" = " + $literal.text);
+		Variable t = tv.nuevaVar(pproc.peek(), Simbolo.Tipo.VAR);
+		genera(t+" = " + $literal.tsub);
+		t.setTemporal(true);
 		$r = t;
 		if($literal.tsub == Simbolo.TSub.BOOLEAN){
-			if($literal.start.getText().equals("true")) {
+			if($literal.text.equals("true")) {
 				genera("goto ");
 				$cierto=new ArrayDeque<Integer>();
 				$cierto.add(pc);
@@ -415,57 +487,8 @@ expr
 				$cierto = null;
 			}
 		}
-	} expr_[$r,$cierto,$falso];
+	};
 
-expr_[Variable r, Deque<Integer> cierto, Deque<Integer> falso]
-	returns[Variable t]:
-	OPREL expr {
-		genera("if " + $r + " " + $OPREL.getText() + " " + $expr.r + " goto ");
-		$cierto=new ArrayDeque<Integer>();
-		$cierto.add(pc);
-		genera("goto ");
-		$falso=new ArrayDeque<Integer>();
-		$falso.add(pc);
-    } expr_[$r,$cierto,$falso]
-	| AND {
-		Etiqueta e = new Etiqueta();
-		genera("e : skip");
-		e.setNl(pc);
-	} expr {
-		backpatch($cierto, e);
-		$falso = concat($falso, $expr.falso);
-		$cierto = $expr.cierto;
-	} expr_[$r, $cierto, $falso]
-	| OR {
-		Etiqueta e = new Etiqueta();
-		genera("e : skip");
-		e.setNl(pc);
-	} expr {
-		backpatch($falso, e); 
-		$cierto = concat($cierto, $expr.cierto);
-		$falso = $expr.falso;
-	} expr_[$r, $cierto, $falso]
-	| MULT expr {
-		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
-		genera("t"+t+" = " + $r + " * " + $expr.r);
-		$t = t;
-	} expr_[$r, null, null]
-	| DIV expr {
-		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
-		genera("t"+t+" = " + $r + " / " + $expr.r);
-		$t = t;
-	} expr_[$r, null, null]
-	| ADD expr {
-		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
-		genera("t"+t+" = " + $r + " + " + $expr.r);
-		$t = t;
-	} expr_[$r,null,null]
-	| SUB expr {
-		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
-		genera("t"+t+" = " + $r + " - " + $expr.r);
-		$t = t;
-	} expr_[$r, null, null]
-	|;
 
 tipo: INTEGER | BOOLEAN | STRING;
 

@@ -1,0 +1,273 @@
+// expr
+// 	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
+// 	NOT expr {
+// 		$cierto = $expr.falso;
+// 		$falso = $expr.cierto;
+// 	} expr_[null,$cierto, $falso] {
+// 		if($expr_.t!=null) {
+// 			$r=$expr_.t;
+// 		}
+// 	}
+// 	| SUB expr {
+// 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
+// 		t.setTemporal(true);
+// 		genera(t+" = - " + $expr.r);
+// 		$r = t;
+// 	} expr_[$r,null,null] {
+// 		if($expr_.t!=null) {
+// 			$r=$expr_.t;
+// 		}
+// 	}
+// 	| '(' expr ')' {
+// 		$r = $expr.r;
+// 		$cierto = $expr.cierto;
+// 		$falso = $expr.falso;
+// 	} expr_[$r,$cierto,$falso] {
+// 		if($expr_.t!=null) {
+// 			$r=$expr_.t;
+// 		}
+// 	}
+// 	| referencia { // TODO Comprobar si esto es suficiente
+// 		$r = $referencia.r;
+// 		$cierto = $referencia.cierto;
+// 		$falso = $referencia.falso;
+// 	} expr_[$r, $cierto, $falso] {
+// 		if($expr_.t!=null) {
+// 			$r=$expr_.t;
+// 		}
+// 	}
+// 	| literal {
+// 		// TODO Comprobar si hay que hacer esto para las 3 variables de valores de Simbolo
+// 		Variable t;
+// 		if(pproc.size()!=0) {
+// 			t = tv.nuevaVar(pproc.peek(), Simbolo.Tipo.VAR);
+// 		} else {
+// 			t = tv.nuevaVar(null, Simbolo.Tipo.VAR);
+// 		}
+// 		t.setTemporal(true);
+// 		genera(t+" = " + $literal.text);
+// 		$r = t;
+// 		if($literal.tsub == Simbolo.TSub.BOOLEAN){
+// 			if($literal.start.getText().equals("true")) {
+// 				genera("goto ");
+// 				$cierto=new ArrayDeque<Integer>();
+// 				$cierto.add(pc);
+// 				$falso = null;
+// 			} else {
+// 				genera("goto ");
+// 				$falso=new ArrayDeque<Integer>();
+// 				$falso.add(pc);
+// 				$cierto = null;
+// 			}
+// 		}
+// 	} expr_[$r,$cierto,$falso]{
+// 		if($expr_.t!=null) {
+// 			$r=$expr_.t;
+// 		}
+// 	};
+
+// expr_[Variable r, Deque<Integer> cierto, Deque<Integer> falso]
+// 	returns[Variable t]:
+// 	OPREL expr {
+// 		genera("if " + $r + " " + $OPREL.getText() + " " + $expr.r + " goto ");
+// 		$cierto=new ArrayDeque<Integer>();
+// 		$cierto.add(pc);
+// 		genera("goto ");
+// 		$falso=new ArrayDeque<Integer>();
+// 		$falso.add(pc);
+//     } expr_[$r,$cierto,$falso] {
+// 		if($expr_.t!=null) {
+// 			$t=$expr_.t;
+// 		}
+// 	}
+// 	| AND {
+// 		Etiqueta e = new Etiqueta();
+// 		genera("e : skip");
+// 		e.setNl(pc);
+// 	} expr {
+// 		backpatch($cierto, e);
+// 		$falso = concat($falso, $expr.falso);
+// 		$cierto = $expr.cierto;
+// 	} expr_[$r, $cierto, $falso]{
+// 		if($expr_.t!=null) {
+// 			$t=$expr_.t;
+// 		}
+// 	}
+// 	| OR {
+// 		Etiqueta e = new Etiqueta();
+// 		genera("e : skip");
+// 		e.setNl(pc);
+// 	} expr {
+// 		backpatch($falso, e); 
+// 		$cierto = concat($cierto, $expr.cierto);
+// 		$falso = $expr.falso;
+// 	} expr_[$r, $cierto, $falso]{
+// 		if($expr_.t!=null) {
+// 			$t=$expr_.t;
+// 		}
+// 	}
+// 	| MULT expr {
+// 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
+// 		t.setTemporal(true);
+// 		genera(t+" = " + $r + " * " + $expr.r);
+// 		$t = t;
+// 	} expr_[$r, null, null]{
+// 		if($expr_.t!=null) {
+// 			$t=$expr_.t;
+// 		}
+// 	}
+// 	| DIV expr {
+// 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
+// 		t.setTemporal(true);
+// 		genera(t+" = " + $r + " / " + $expr.r);
+// 		$t = t;
+// 	} expr_[$r, null, null]{
+// 		if($expr_.t!=null) {
+// 			$t=$expr_.t;
+// 		}
+// 	}
+// 	| ADD expr {
+// 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
+// 		t.setTemporal(true);
+// 		genera(t+" = " + $r + " + " + $expr.r);
+// 		$t = t;
+// 	} expr_[$r,null,null]{
+// 		if($expr_.t!=null) {
+// 			$t=$expr_.t;
+// 		}
+// 	}
+// 	| SUB expr {
+// 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
+// 		t.setTemporal(true);
+// 		genera(t+" = " + $r + " - " + $expr.r);
+// 		$t = t;
+// 	} expr_[$r, null, null] {
+// 		if($expr_.t!=null) {
+// 			$t=$expr_.t;
+// 		}
+// 	}
+// 	|;
+
+
+
+
+
+
+
+
+expr
+	returns[Simbolo.TSub tsub]:
+	NOT expr {
+		if($expr.tsub!=Simbolo.TSub.BOOLEAN) {
+			errores+="Error semántico - Línea "+$expr.start.getLine()+
+			": tipos incompatibles (esperado 'BOOLEAN', encontrado '"+$expr.tsub+"'')\n";
+		}
+		$tsub=Simbolo.TSub.BOOLEAN;
+	} expr_[$tsub] {
+		if($expr_.tsubExpr!=null) $tsub=$expr_.tsubExpr;
+	}
+	| SUB expr {
+		if($expr.tsub!=Simbolo.TSub.INT) {
+			errores+="Error semántico - Línea "+$expr.start.getLine()+
+			": tipos incompatibles (esperado 'INT', encontrado '"+$expr.tsub+"')\n";
+		}
+		$tsub=Simbolo.TSub.INT;
+	} expr_[$tsub] {
+		if($expr_.tsubExpr!=null) $tsub=$expr_.tsubExpr;
+	}
+	| '(' expr ')' {
+		$tsub=$expr.tsub;
+	} expr_[$tsub] {
+		if($expr_.tsubExpr!=null) $tsub=$expr_.tsubExpr;
+	}
+	| referencia {
+		if($referencia.s==null) {
+			errores+="Error semántico - Línea "+$referencia.start.getLine()+
+			": tipos incompatibles (encontrado 'NULL')\n";
+			$tsub=Simbolo.TSub.NULL;
+		} else {
+			$tsub=$referencia.s.getTsub();
+		}
+	} expr_[$tsub] {
+		if($expr_.tsubExpr!=null) $tsub=$expr_.tsubExpr;
+	}
+	| literal {
+		$tsub=$literal.tsub;
+	} expr_[$tsub] {
+		if($expr_.tsubExpr!=null) $tsub=$expr_.tsubExpr;
+	};
+
+expr_[Simbolo.TSub tsub]
+	returns[Simbolo.TSub tsubExpr]:
+	OPREL expr {
+		if($tsub!=Simbolo.TSub.INT) {
+			errores+="Error semántico - Línea "+$OPREL.getLine()+
+			": tipos incompatibles (esperado 'INT', encontrado '"+$tsub+"')\n";
+		} else if($expr.tsub!=Simbolo.TSub.INT) {
+			errores+="Error semántico - Línea "+$OPREL.getLine()+
+			": tipos incompatibles (esperado 'INT', encontrado '"+$expr.tsub+"')\n";
+		}
+		$tsubExpr=Simbolo.TSub.BOOLEAN;
+	} expr_[Simbolo.TSub.BOOLEAN]
+	| AND expr {
+		if($tsub!=Simbolo.TSub.BOOLEAN) {
+			errores+="Error semántico - Línea "+$AND.getLine()+
+			": tipos incompatibles (esperado 'BOOLEAN', encontrado '"+$tsub+"')\n";
+		} else if($expr.tsub!=Simbolo.TSub.BOOLEAN) {
+			errores+="Error semántico - Línea "+$AND.getLine()+
+			": tipos incompatibles (esperado 'BOOLEAN', encontrado '"+$expr.tsub+"')\n";
+		}
+		$tsub=Simbolo.TSub.BOOLEAN;
+	} expr_[Simbolo.TSub.BOOLEAN]
+	| OR expr {
+		if($tsub!=Simbolo.TSub.BOOLEAN) {
+			errores+="Error semántico - Línea "+$OR.getLine()+
+			": tipos incompatibles (esperado 'BOOLEAN', encontrado '"+$tsub+"')\n";
+		} else if($expr.tsub!=Simbolo.TSub.BOOLEAN) {
+			errores+="Error semántico - Línea "+$OR.getLine()+
+			": tipos incompatibles (esperado 'BOOLEAN', encontrado '"+$expr.tsub+"')\n";
+		}
+		$tsub=Simbolo.TSub.BOOLEAN;
+	} expr_[Simbolo.TSub.BOOLEAN]
+	| MULT expr {
+		if($tsub!=Simbolo.TSub.INT||$expr.tsub!=Simbolo.TSub.INT) {
+			errores+="Error semántico - Línea "+$MULT.getLine()+
+			": tipos incompatibles (esperado 'INT', encontrado '"+$tsub+"')\n";
+		} else if($expr.tsub!=Simbolo.TSub.INT) {
+			errores+="Error semántico - Línea "+$MULT.getLine()+
+			": tipos incompatibles (esperado 'INT', encontrado '"+$expr.tsub+"')\n";
+		}
+		$tsub=Simbolo.TSub.INT;
+	} expr_[Simbolo.TSub.INT]
+	| DIV expr {
+		if($tsub!=Simbolo.TSub.INT) {
+			errores+="Error semántico - Línea "+$DIV.getLine()+
+			": tipos incompatibles (esperado 'INT', encontrado '"+$tsub+"')\n";
+		} else if($expr.tsub!=Simbolo.TSub.INT) {
+			errores+="Error semántico - Línea "+$DIV.getLine()+
+			": tipos incompatibles (esperado 'INT', encontrado '"+$expr.tsub+"')\n";
+		}
+		$tsub=Simbolo.TSub.INT;
+	} expr_[Simbolo.TSub.INT]
+	| ADD expr {
+		if($tsub!=Simbolo.TSub.INT) {
+			errores+="Error semántico - Línea "+$ADD.getLine()+
+			": tipos incompatibles (esperado 'INT', encontrado '"+$tsub+"')\n";
+		} else if($expr.tsub!=Simbolo.TSub.INT) {
+			errores+="Error semántico - Línea "+$ADD.getLine()+
+			": tipos incompatibles (esperado 'INT', encontrado '"+$expr.tsub+"')\n";
+		}
+		$tsub=Simbolo.TSub.INT;
+	} expr_[Simbolo.TSub.INT]
+	| SUB expr {
+		if($tsub!=Simbolo.TSub.INT) {
+			errores+="Error semántico - Línea "+$SUB.getLine()+
+			": tipos incompatibles (esperado 'INT', encontrado '"+$tsub+"')\n";
+		} else if($expr.tsub!=Simbolo.TSub.INT) {
+			errores+="Error semántico - Línea "+$SUB.getLine()+
+			": tipos incompatibles (esperado 'INT', encontrado '"+$expr.tsub+"')\n";
+		}
+		$tsub=Simbolo.TSub.INT;
+	} expr_[Simbolo.TSub.INT]
+	|;
+
