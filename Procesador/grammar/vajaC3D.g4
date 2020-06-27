@@ -545,10 +545,7 @@ exprNeg
 		$r = t;
 	}
 	| primario {
-		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
-		t.setTemporal(true);
-		genera(t+" = " + $primario.r);
-		$r = t;
+		$r = $primario.r;
 		$cierto = $primario.cierto;
 		$falso = $primario.falso;
 	};
@@ -561,12 +558,13 @@ primario
 		$falso = $expr.falso;
 	}
 	| referencia {
+		// if($referencia.r!=null) $referencia.r.setTemporal(false); 
 		$r = $referencia.r;
 	}
 	| literal {
 		Variable t = tv.nuevaVar(pproc.peek(), Simbolo.Tipo.VAR);
-		genera(t+" = " + $literal.text);
 		t.setTemporal(true);
+		genera(t+" = " + $literal.text);
 		$r = t;
 		if($literal.tsub == Simbolo.TSub.BOOLEAN){
 			if($literal.text.equals("true")) {
