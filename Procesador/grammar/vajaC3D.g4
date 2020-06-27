@@ -1,5 +1,6 @@
 parser grammar vajaC3D;
-options {
+options
+{
 	tokenVocab = vajaLexer;
 }
 
@@ -53,14 +54,16 @@ public void backpatch(Deque<Integer> lista, Etiqueta e){
 	if(lista!=null) {
 		while(lista.size()>0) {
 			int instruccion=lista.remove();
-			codigoIntermedio.get(instruccion).append(e.toString());
+			c3d.get(instruccion).append(e.toString());
 		}
 	}
 }
 
 public Deque<Integer> concat(Deque<Integer> dq1, Deque<Integer> dq2){
-	while(dq2.size()>0){
+	if(dq2!=null) {
+		while(dq2.size()>0){
 		dq1.add(dq2.removeFirst());
+		}
 	}
 	return dq1;
 }
