@@ -1,0 +1,237 @@
+expr
+	returns[Simbolo.TSub tsub]:
+	// Lógicas
+	NOT expr {
+		if($expr.tsub!=Simbolo.TSub.BOOLEAN) {
+			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
+			": tipos incompatibles (esperado BOOLEAN)\n";
+		}
+		$tsub=Simbolo.TSub.BOOLEAN;
+	}
+	| expr {
+		if($expr.tsub!=Simbolo.TSub.INT) {
+			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
+			": tipos incompatibles (esperado INT)\n";
+		}
+	} OPREL expr {
+		if($expr.tsub!=Simbolo.TSub.INT) {
+			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
+			": tipos incompatibles (esperado INT)\n";
+		}
+		$tsub=Simbolo.TSub.BOOLEAN;
+	}
+	| expr {
+		if($expr.tsub!=Simbolo.TSub.BOOLEAN) {
+			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
+			": tipos incompatibles (esperado BOOLEAN)\n";
+		}
+	} AND expr {
+		if($expr.tsub!=Simbolo.TSub.BOOLEAN) {
+			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
+			": tipos incompatibles (esperado BOOLEAN)\n";
+		}
+		$tsub=Simbolo.TSub.BOOLEAN;
+	}
+	| expr {
+		if($expr.tsub!=Simbolo.TSub.BOOLEAN) {
+			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
+			": tipos incompatibles (esperado BOOLEAN)\n";
+		}
+	} OR expr {
+		if($expr.tsub!=Simbolo.TSub.BOOLEAN) {
+			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
+			": tipos incompatibles (esperado BOOLEAN)\n";
+		}
+		$tsub=Simbolo.TSub.BOOLEAN;
+	}
+	// Aritméticas
+	| SUB expr {
+		if($expr.tsub!=Simbolo.TSub.INT) {
+			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
+			": tipos incompatibles (esperado INT)\n";
+		}
+		$tsub=Simbolo.TSub.INT;
+	}
+	| expr {
+		if($expr.tsub!=Simbolo.TSub.INT) {
+			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
+			": tipos incompatibles (esperado INT)\n";
+		}
+	} MULT expr {
+		if($expr.tsub!=Simbolo.TSub.INT) {
+			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
+			": tipos incompatibles (esperado INT)\n";
+		}
+		$tsub=Simbolo.TSub.INT;
+	}
+	| expr {
+		if($expr.tsub!=Simbolo.TSub.INT) {
+			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
+			": tipos incompatibles (esperado INT)\n";
+		}
+	} DIV expr {
+		if($expr.tsub!=Simbolo.TSub.INT) {
+			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
+			": tipos incompatibles (esperado INT)\n";
+		}
+		$tsub=Simbolo.TSub.INT;
+	}
+	| expr {
+		if($expr.tsub!=Simbolo.TSub.INT) {
+			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
+			": tipos incompatibles (esperado INT)\n";
+		}
+	} ADD expr {
+		if($expr.tsub!=Simbolo.TSub.INT) {
+			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
+			": tipos incompatibles (esperado INT)\n";
+		}
+		$tsub=Simbolo.TSub.INT;
+	}
+	| expr {
+		if($expr.tsub!=Simbolo.TSub.INT) {
+			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
+			": tipos incompatibles (esperado INT)\n";
+		}
+	} SUB expr {
+		if($expr.tsub!=Simbolo.TSub.INT) {
+			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
+			": tipos incompatibles (esperado INT)\n";
+		}
+		$tsub=Simbolo.TSub.INT;
+	}
+	| '(' expr ')' {
+		$tsub=$expr.tsub;
+	}
+	| referencia {
+		if($referencia.s==null) {
+			errores+="ERROR SEMÁNTICO - Línea "+$referencia.start.getLine()+
+			": tipos incompatibles (encontrado NULL)\n";
+			$tsub=Simbolo.TSub.NULL;
+		} else {
+			$tsub=$referencia.s.getTsub();
+		}
+	}
+	| literal {
+		$tsub=$literal.tsub;
+	};
+
+
+
+
+
+expr
+	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
+	// Lógicas
+	NOT expr {
+		$cierto = $expr.falso;
+		$falso = $expr.cierto;
+	}
+	| expr {
+		Variable t1 = new Variable($expr.r);
+    } OPREL expr {
+		genera("if " + t1 + " " + $OPREL.getText() + " " + $expr.r + " goto ");
+		$cierto=new ArrayDeque<Integer>();
+ 		$cierto.add(pc);
+		genera("goto ");
+		$falso=new ArrayDeque<Integer>();
+ 		$falso.add(pc);
+
+		$r = $expr.r;
+    }
+	| expr {
+		Deque<Integer> cierto = $expr.cierto;
+		Deque<Integer> falso = $expr.falso;
+	} AND {
+		Etiqueta e = new Etiqueta();
+		genera(e+": skip");
+		e.setNl(pc);
+	} expr {
+		backpatch(cierto, e);
+		$falso = concat(falso, $expr.falso);
+		$cierto = $expr.cierto;
+
+		$r = $expr.r;
+	}
+	| expr {
+		Deque<Integer> cierto = $expr.cierto;
+		Deque<Integer> falso = $expr.falso;
+	} OR {
+		Etiqueta e = new Etiqueta();
+		genera(e+": skip");
+		e.setNl(pc);
+	} expr {
+		backpatch(falso, e); 
+		$cierto = concat(cierto, $expr.cierto);
+		$falso = $expr.falso;
+
+		$r = $expr.r;
+	}
+	// Aritméticas
+	| SUB expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
+		t.setTemporal(true);
+		genera(t+" = - " + $expr.r);
+		$r = t;
+	}
+	| expr {
+		Variable t1 = new Variable($expr.r);
+	} MULT expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
+		t.setTemporal(true);
+		genera(t+" = " + t1 + " * " + $expr.r);
+		$r = t;
+	}
+	| expr {
+		Variable t1 = new Variable($expr.r);
+	} DIV expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
+		t.setTemporal(true);
+		genera(t+" = " + t1 + " / " + $expr.r);
+		$r = t;
+	}
+	| expr {
+		Variable t1 = new Variable($expr.r);
+	} ADD expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
+		t.setTemporal(true);
+		genera(t+" = " + t1 + " + " + $expr.r);
+		$r = t;
+	}
+	| expr {
+		Variable t1 = new Variable($expr.r);
+	} SUB expr {
+		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
+		t.setTemporal(true);
+		genera(t+" = " + t1 + " - " + $expr.r);
+		$r = t;
+	}
+	| '(' expr ')' {
+		$r = $expr.r;
+		$cierto = $expr.cierto;
+		$falso = $expr.falso;
+	}
+	| referencia {
+		$r = $referencia.r;
+		$cierto = $referencia.cierto;
+		$falso = $referencia.falso;
+	}
+	| literal {
+		Variable t = tv.nuevaVar(pproc.peek(), Simbolo.Tipo.VAR);
+		genera(t+" = " + $literal.tsub);
+		t.setTemporal(true);
+		$r = t;
+		if($literal.tsub == Simbolo.TSub.BOOLEAN){
+			if($literal.text.equals("true")) {
+				genera("goto ");
+				$cierto=new ArrayDeque<Integer>();
+				$cierto.add(pc);
+				$falso = null;
+			} else {
+				genera("goto ");
+				$falso=new ArrayDeque<Integer>();
+				$falso.add(pc);
+				$cierto = null;
+			}
+		}
+	};

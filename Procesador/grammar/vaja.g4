@@ -345,114 +345,201 @@ contIdx_[Deque<Simbolo.TSub> pparams]:
 } contIdx_[$pparams]
 	|; // lambda
 
+// Expresiones
 expr
 	returns[Simbolo.TSub tsub]:
-	// Lógicas
-	NOT expr {
-		if($expr.tsub!=Simbolo.TSub.BOOLEAN) {
-			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
-			": tipos incompatibles (esperado BOOLEAN)\n";
+	exprOr {
+		$tsub=$exprOr.tsub;
+	};
+
+// Expresión de OR
+exprOr
+	returns[Simbolo.TSub tsub]:
+	exprAnd exprOr_ {
+		if($exprOr_.tsub!=null) {
+			if($exprAnd.tsub!=$exprOr_.tsub) {
+				errores+="Error semántico - Línea "+$exprOr_.start.getLine()+
+				": tipos incompatibles (esperado "+$exprAnd.tsub+","+
+				" encontrado "+$exprOr_.tsub+")\n";
+			} 
+			$tsub=$exprOr_.tsub;
+		} else {
+			$tsub=$exprAnd.tsub;
+		}
+	};
+
+exprOr_
+	returns[Simbolo.TSub tsub]:
+	OR exprAnd exprOr_ {
+		if($exprAnd.tsub!=Simbolo.TSub.BOOLEAN){
+			errores+="Error semántico - Línea "+$exprAnd.start.getLine()+
+				": tipos incompatibles (esperado BOOLEAN, encontrado "+$exprAnd.tsub+")\n";
 		}
 		$tsub=Simbolo.TSub.BOOLEAN;
 	}
-	| expr {
-		if($expr.tsub!=Simbolo.TSub.INT) {
-			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
-			": tipos incompatibles (esperado INT)\n";
+	|; //lambda
+
+// Expresión de AND
+exprAnd
+	returns[Simbolo.TSub tsub]:
+	exprNot exprAnd_ {
+		if($exprAnd_.tsub!=null) {
+			if($exprNot.tsub!=$exprAnd_.tsub) {
+				errores+="Error semántico - Línea "+$exprAnd_.start.getLine()+
+				": tipos incompatibles (esperado "+$exprNot.tsub+","+
+				" encontrado "+$exprAnd_.tsub+")\n";
+			}
+			$tsub=$exprAnd_.tsub;
+		} else {
+			$tsub=$exprNot.tsub;
 		}
-	} OPREL expr {
-		if($expr.tsub!=Simbolo.TSub.INT) {
-			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
-			": tipos incompatibles (esperado INT)\n";
-		}
-		$tsub=Simbolo.TSub.BOOLEAN;
-	}
-	| expr {
-		if($expr.tsub!=Simbolo.TSub.BOOLEAN) {
-			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
-			": tipos incompatibles (esperado BOOLEAN)\n";
-		}
-	} AND expr {
-		if($expr.tsub!=Simbolo.TSub.BOOLEAN) {
-			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
-			": tipos incompatibles (esperado BOOLEAN)\n";
-		}
-		$tsub=Simbolo.TSub.BOOLEAN;
-	}
-	| expr {
-		if($expr.tsub!=Simbolo.TSub.BOOLEAN) {
-			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
-			": tipos incompatibles (esperado BOOLEAN)\n";
-		}
-	} OR expr {
-		if($expr.tsub!=Simbolo.TSub.BOOLEAN) {
-			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
-			": tipos incompatibles (esperado BOOLEAN)\n";
+	};
+
+exprAnd_
+	returns[Simbolo.TSub tsub]:
+	AND exprNot exprAnd_ {
+		if($exprNot.tsub!=Simbolo.TSub.BOOLEAN){
+			errores+="Error semántico - Línea "+$exprNot.start.getLine()+
+				": tipos incompatibles (esperado BOOLEAN, encontrado "+$exprNot.tsub+")\n";
 		}
 		$tsub=Simbolo.TSub.BOOLEAN;
 	}
-	// Aritméticas
-	| SUB expr {
-		if($expr.tsub!=Simbolo.TSub.INT) {
-			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
-			": tipos incompatibles (esperado INT)\n";
+	|; //lambda
+
+// Expresión de NOT
+exprNot
+	returns[Simbolo.TSub tsub]:
+	NOT exprComp {
+		if($exprComp.tsub!=Simbolo.TSub.BOOLEAN) {
+			errores+="Error semántico - Línea "+$exprComp.start.getLine()+
+			": tipos incompatibles (esperado BOOLEAN, encontrado "+$exprComp.tsub+")\n";
+		} 		
+		$tsub=Simbolo.TSub.BOOLEAN;
+
+	}
+	| exprComp {
+		$tsub=$exprComp.tsub;
+	};
+
+// Expresión comparativa
+exprComp
+	returns[Simbolo.TSub tsub]:
+	exprAdit exprComp_ {
+		if($exprComp_.tsub!=null) {
+			if($exprAdit.tsub!=Simbolo.TSub.INT) {
+				errores+="Error semántico - Línea "+$exprComp_.start.getLine()+
+				": tipos incompatibles (esperado INT,"+
+				" encontrado "+$exprComp_.tsub+")\n";
+				$tsub=Simbolo.TSub.BOOLEAN;
+			}
+			$tsub=$exprComp_.tsub;
+		} else {
+			$tsub=$exprAdit.tsub;
+		}
+	};
+
+exprComp_
+	returns[Simbolo.TSub tsub]:
+	// OPREL exprAdit exprComp_{
+	OPREL exprAdit {
+		if($exprAdit.tsub!=Simbolo.TSub.INT) {
+			errores+="Error semántico - Línea "+$exprAdit.start.getLine()+
+			": tipos incompatibles (esperado INT, encontrado "+$exprAdit.tsub+")\n";
+		}
+		$tsub=Simbolo.TSub.BOOLEAN;
+	}
+	|; //lambda
+
+// Expresión aditiva
+exprAdit
+	returns[Simbolo.TSub tsub]:
+	exprMult exprAdit_ {
+		if($exprAdit_.tsub!=null) {
+			if($exprMult.tsub!=$exprAdit_.tsub) {
+				errores+="Error semántico - Línea "+$exprAdit_.start.getLine()+
+				": tipos incompatibles (esperado "+$exprMult.tsub+","+
+				" encontrado "+$exprAdit_.tsub+")\n";
+			} 
+			$tsub=$exprAdit_.tsub;
+		} else {
+			$tsub=$exprMult.tsub;
+		}
+	};
+
+exprAdit_
+	returns[Simbolo.TSub tsub]:
+	ADD exprMult exprAdit_ {
+		if($exprMult.tsub!=Simbolo.TSub.INT) {
+			errores+="Error semántico - Línea "+$exprMult.start.getLine()+
+			": tipos incompatibles (esperado INT, encontrado "+$exprMult.tsub+")\n";
 		}
 		$tsub=Simbolo.TSub.INT;
 	}
-	| expr {
-		if($expr.tsub!=Simbolo.TSub.INT) {
-			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
-			": tipos incompatibles (esperado INT)\n";
-		}
-	} MULT expr {
-		if($expr.tsub!=Simbolo.TSub.INT) {
-			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
-			": tipos incompatibles (esperado INT)\n";
+	| SUB exprMult exprAdit_ {
+		if($exprMult.tsub!=Simbolo.TSub.INT) {
+			errores+="Error semántico - Línea "+$exprMult.start.getLine()+
+			": tipos incompatibles (esperado INT, encontrado "+$exprMult.tsub+")\n";
 		}
 		$tsub=Simbolo.TSub.INT;
 	}
-	| expr {
-		if($expr.tsub!=Simbolo.TSub.INT) {
-			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
-			": tipos incompatibles (esperado INT)\n";
+	|; //lambda
+
+// Expresión multiplicativa
+exprMult
+	returns[Simbolo.TSub tsub]:
+	exprNeg exprMult_ {
+		if($exprMult_.tsub!=null) {
+			if($exprNeg.tsub!=$exprMult_.tsub) {
+				errores+="Error semántico - Línea "+$exprMult_.start.getLine()+
+				": tipos incompatibles (esperado "+$exprMult_.tsub+","+
+				" encontrado "+$exprNeg.tsub+")\n";
+			} 
+			$tsub=$exprMult_.tsub;
+		} else {
+			$tsub=$exprNeg.tsub;
 		}
-	} DIV expr {
-		if($expr.tsub!=Simbolo.TSub.INT) {
-			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
-			": tipos incompatibles (esperado INT)\n";
-		}
-		$tsub=Simbolo.TSub.INT;
-	}
-	| expr {
-		if($expr.tsub!=Simbolo.TSub.INT) {
-			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
-			": tipos incompatibles (esperado INT)\n";
-		}
-	} ADD expr {
-		if($expr.tsub!=Simbolo.TSub.INT) {
-			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
-			": tipos incompatibles (esperado INT)\n";
-		}
-		$tsub=Simbolo.TSub.INT;
-	}
-	| expr {
-		if($expr.tsub!=Simbolo.TSub.INT) {
-			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
-			": tipos incompatibles (esperado INT)\n";
-		}
-	} SUB expr {
-		if($expr.tsub!=Simbolo.TSub.INT) {
-			errores+="ERROR SEMÁNTICO - Línea "+$expr.start.getLine()+
-			": tipos incompatibles (esperado INT)\n";
+	};
+
+exprMult_
+	returns[Simbolo.TSub tsub]:
+	MULT exprNeg exprMult_ {
+		if($exprNeg.tsub!=Simbolo.TSub.INT) {
+			errores+="Error semántico - Línea "+$exprNeg.start.getLine()+
+			": tipos incompatibles (esperado INT, encontrado "+$exprNeg.tsub+")\n";
 		}
 		$tsub=Simbolo.TSub.INT;
 	}
-	| '(' expr ')' {
+	| DIV exprNeg exprMult_ {
+		if($exprNeg.tsub!=Simbolo.TSub.INT) {
+			errores+="Error semántico - Línea "+$exprNeg.start.getLine()+
+			": tipos incompatibles (esperado INT, encontrado "+$exprNeg.tsub+")\n";
+		}
+		$tsub=Simbolo.TSub.INT;
+	}
+	|; //lambda
+
+// Expresión de negación
+exprNeg
+	returns[Simbolo.TSub tsub]:
+	SUB primario {
+		if($primario.tsub!=Simbolo.TSub.INT) {
+			errores+="Error semántico - Línea "+$primario.start.getLine()+
+			": tipos incompatibles (esperado INT, encontrado "+$primario.tsub+")\n";
+		}
+		$tsub=Simbolo.TSub.INT;
+	}
+	| primario {
+		$tsub=$primario.tsub;
+	};
+
+primario
+	returns[Simbolo.TSub tsub]:
+	'(' expr ')' {
 		$tsub=$expr.tsub;
 	}
 	| referencia {
 		if($referencia.s==null) {
-			errores+="ERROR SEMÁNTICO - Línea "+$referencia.start.getLine()+
+			errores+="Error semántico - Línea "+$referencia.start.getLine()+
 			": tipos incompatibles (encontrado NULL)\n";
 			$tsub=Simbolo.TSub.NULL;
 		} else {
@@ -462,7 +549,6 @@ expr
 	| literal {
 		$tsub=$literal.tsub;
 	};
-
 
 tipo
 	returns[Simbolo.TSub tsub]:

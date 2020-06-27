@@ -1,6 +1,5 @@
 parser grammar vajaC3D;
-options
-{
+options {
 	tokenVocab = vajaLexer;
 }
 
@@ -18,7 +17,7 @@ TablaSimbolos ts;
 TablaVariables tv;
 TablaProcedimientos tp;
 String directorio;
-ArrayList<StringBuilder> c3d = new ArrayList<>(); // TODO Crear clase propia
+ArrayList<StringBuilder> c3d; // TODO Crear clase propia
 // TODO Asegurarse de que no tenga que ser -1 en vez de 0
 int pc = 0; // program counter
 int profundidad=0;
@@ -27,6 +26,7 @@ public vajaC3D(TokenStream input, String directorio, TablaSimbolos ts){
 	this(input);
 	this.directorio=directorio;
 	this.ts=ts;
+	this.c3d = new ArrayList<StringBuilder>();
 	this.tv= new TablaVariables(directorio);
 	this.tp= new TablaProcedimientos();
 }
@@ -44,7 +44,7 @@ public void imprimirC3D(){
 	try {
 		buffer = new BufferedWriter(new FileWriter(interFile));
 		for(int i=0;i<c3d.size();i++) {
-			buffer.write(c3d.get(i).toString()+"\n");
+			buffer.write(c3d.get(i).toString() + "\n");
 		}
 		buffer.close();
 	} catch(IOException e) {}
@@ -81,7 +81,7 @@ programa:
 			for(Simbolo.TSub tsub : Simbolo.TSub.values()) {
 				if(tsub!=Simbolo.TSub.NULL) {
 					s=ts.consulta("print"+tsub);
-					s.setNp(tp.nuevoProc(profundidad,s.getT()));					
+					s.setNp(tp.nuevoProc(profundidad,s.getT()));
 				}
 			}
 		} catch(TablaSimbolos.TablaSimbolosException e) {
@@ -113,7 +113,7 @@ decl:
 				case STRING:
 					genera(s.getNv()+" = \"\"");
 					break;
-			} 
+			}
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
@@ -136,7 +136,7 @@ decl:
 				case STRING:
 					s.setvCS($literal.text);
 					break;
-			} 
+			}
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
@@ -303,13 +303,14 @@ sent[Deque<Integer> sents_seg]
 			backpatch($expr.cierto,ec);
 			backpatch($expr.falso,ef);
 		} else {
-			genera($referencia.r+" = "+$expr.r);		
+			genera($referencia.r+" = "+$expr.r.toString());
 		}
 	}
 	| referencia ';';
 
 referencia
-	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso, Simbolo.TSub tsub]:
+// returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso, Simbolo.TSub tsub]:
+	returns[Variable r, Simbolo.TSub tsub]:
 	ID {
 		Simbolo s;
 		Variable t;
@@ -372,106 +373,199 @@ contIdx_[Deque<Variable> pparams]:
 	} contIdx_[$pparams]
 	|; // lambda
 
-
 expr
 	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
-	// Lógicas
-	NOT expr {
-		$cierto = $expr.falso;
-		$falso = $expr.cierto;
+	exprOr {
+		$r=$exprOr.r;
+		$cierto=$exprOr.cierto;
+		$falso=$exprOr.falso;
+	};
+
+// Expresión de OR
+exprOr
+	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
+	exprAnd {
+		$r=$exprAnd.r;
+		$cierto=$exprAnd.cierto;
+		$falso=$exprAnd.falso;
+	} exprOr_[$r,$cierto,$falso] {
+		if($exprOr_.cierto!=null || $exprOr_.falso!=null) {
+			$r = $exprOr_.r;
+			$cierto=$exprOr_.cierto;
+			$falso=$exprOr_.falso;
+		}
+	};
+
+exprOr_[Variable t1, Deque<Integer> cierto1, Deque<Integer> falso1]
+	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
+	OR {
+		Etiqueta e = new Etiqueta();
+		genera("e : skip");
+		e.setNl(pc);
+	} exprAnd {
+		backpatch($falso1, e);
+		$cierto = concat($cierto1, $exprAnd.cierto);
+		$falso = $exprAnd.falso;
+	} exprOr_[$r,$cierto,$falso]{
+		if($exprOr_.cierto!=null || $exprOr_.falso!=null) {
+			$r = $exprOr_.r;
+			$cierto=$exprOr_.cierto;
+			$falso=$exprOr_.falso;
+		}
 	}
-	| expr {
-		Variable r = new Variable($expr.r);
-    } OPREL expr {
-		genera("if " + r + " " + $OPREL.getText() + " " + $expr.r + " goto ");
+	|; //lambda
+
+// Expresión de AND
+exprAnd
+	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
+	exprNot {
+		$r=$exprNot.r;
+		$cierto=$exprNot.cierto;
+		$falso=$exprNot.falso;
+	} exprAnd_[$r,$cierto,$falso] {
+		if($exprAnd_.cierto!=null || $exprAnd_.falso!=null) {
+			$r = $exprAnd_.r;
+			$cierto=$exprAnd_.cierto;
+			$falso=$exprAnd_.falso;
+		}
+	};
+
+exprAnd_[Variable t1, Deque<Integer> cierto1, Deque<Integer> falso1]
+	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
+	AND {
+		Etiqueta e = new Etiqueta();
+		genera("e : skip");
+		e.setNl(pc);
+	} exprNot {
+		backpatch($cierto1, e);
+		$falso = concat($falso1, $exprNot.falso);
+		$cierto = $exprNot.cierto;
+	} exprAnd_[$r, $cierto, $falso]{
+		if($exprAnd_.cierto!=null || $exprAnd_.falso!=null) {
+			$r = $exprAnd_.r;
+			$cierto=$exprAnd_.cierto;
+			$falso=$exprAnd_.falso;
+		}
+	}
+	|; //lambda
+
+// Expresión de NOT
+exprNot
+	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
+	NOT exprComp {
+		$cierto=$exprComp.falso;
+		$falso=$exprComp.cierto;
+		$r=$exprComp.r;
+	}
+	| exprComp {
+		$cierto=$exprComp.cierto;
+		$falso=$exprComp.falso;
+		$r=$exprComp.r;
+	};
+
+// Expresión comparativa
+exprComp
+	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
+	exprAdit {
+		$r=$exprAdit.r;
+		$cierto=$exprAdit.cierto;
+		$falso=$exprAdit.falso;
+	} exprComp_[$r]{
+		if($exprComp_.cierto!=null || $exprComp_.falso!=null) {
+			$cierto=$exprComp_.cierto;
+			$falso=$exprComp_.falso;
+		}
+	};
+
+exprComp_[Variable t1]
+	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
+	OPREL exprAdit {
+		genera("if " + $t1 + " " + $OPREL.getText() + " " + $exprAdit.r + " goto ");
 		$cierto=new ArrayDeque<Integer>();
  		$cierto.add(pc);
 		genera("goto ");
 		$falso=new ArrayDeque<Integer>();
  		$falso.add(pc);
-
-		$r = $expr.r;
+		$r = $exprAdit.r;
     }
-	| expr {
-		Deque<Integer> cierto = $expr.cierto;
-		Deque<Integer> falso = $expr.falso;
-	} AND {
-		Etiqueta e = new Etiqueta();
-		genera(e+": skip");
-		e.setNl(pc);
-	} expr {
-		backpatch(cierto, e);
-		$falso = concat(falso, $expr.falso);
-		$cierto = $expr.cierto;
+	// exprComp_
+	|; //lambda
 
-		$r = $expr.r;
-	}
-	| expr {
-		Deque<Integer> cierto = $expr.cierto;
-		Deque<Integer> falso = $expr.falso;
-	} OR {
-		Etiqueta e = new Etiqueta();
-		genera(e+": skip");
-		e.setNl(pc);
-	} expr {
-		backpatch(falso, e); 
-		$cierto = concat(cierto, $expr.cierto);
-		$falso = $expr.falso;
+// Expresión aditiva
+exprAdit
+	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
+	exprMult {
+		$r = $exprMult.r;
+		$cierto=$exprMult.cierto;
+		$falso=$exprMult.falso;
+	} exprAdit_[$r];
 
-		$r = $expr.r;
-	}
-	// Aritméticas
-	| SUB expr {
+exprAdit_[Variable t1]:
+	ADD exprMult {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
 		t.setTemporal(true);
-		genera(t+" = - " + $expr.r);
-		$r = t;
-	}
-	| expr {
-		Variable r = new Variable($expr.r);
-	} MULT expr {
+		genera(t+" = " + $t1 + " + " + $exprMult.r);
+	} exprAdit_[t]
+	| SUB exprMult {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
 		t.setTemporal(true);
-		genera(t+" = " + r + " * " + $expr.r);
-		$r = t;
-	}
-	| expr {
-		Variable r = new Variable($expr.r);
-	} DIV expr {
+		genera(t+" = " + $t1 + " - " + $exprMult.r);
+	} exprAdit_[t]
+	|; //lambda
+
+// Expresión multiplicativa
+exprMult
+	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
+	exprNeg {
+		$r = $exprNeg.r;
+		$cierto=$exprNeg.cierto;
+		$falso=$exprNeg.falso;
+	} exprMult_[$r];
+
+exprMult_[Variable t1]:
+	MULT exprNeg {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
 		t.setTemporal(true);
-		genera(t+" = " + r + " / " + $expr.r);
-		$r = t;
-	}
-	| expr {
-		Variable r = new Variable($expr.r);
-	} ADD expr {
+		genera(t+" = " + $t1 + " * " + $exprNeg.r);
+	} exprMult_[t]
+	| DIV exprNeg {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
 		t.setTemporal(true);
-		genera(t+" = " + r + " + " + $expr.r);
-		$r = t;
-	}
-	| expr {
-		Variable r = new Variable($expr.r);
-	} SUB expr {
+		genera(t+" = " + $t1 + " / " + $exprNeg.r);
+	} exprMult_[t]
+	|; //lambda
+
+// Expresión de negación
+exprNeg
+	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
+	SUB primario {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
 		t.setTemporal(true);
-		genera(t+" = " + r + " - " + $expr.r);
+		genera(t+" = - " + $primario.r);
 		$r = t;
 	}
-	| '(' expr ')' {
+	| primario {
+		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
+		t.setTemporal(true);
+		genera(t+" = " + $primario.r);
+		$r = t;
+		$cierto = $primario.cierto;
+		$falso = $primario.falso;
+	};
+
+primario
+	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
+	'(' expr ')' {
 		$r = $expr.r;
 		$cierto = $expr.cierto;
 		$falso = $expr.falso;
 	}
 	| referencia {
 		$r = $referencia.r;
-		$cierto = $referencia.cierto;
-		$falso = $referencia.falso;
 	}
 	| literal {
 		Variable t = tv.nuevaVar(pproc.peek(), Simbolo.Tipo.VAR);
-		genera(t+" = " + $literal.tsub);
+		genera(t+" = " + $literal.text);
 		t.setTemporal(true);
 		$r = t;
 		if($literal.tsub == Simbolo.TSub.BOOLEAN){
@@ -489,17 +583,16 @@ expr
 		}
 	};
 
-
 tipo: INTEGER | BOOLEAN | STRING;
 
 literal
 	returns[Simbolo.TSub tsub]:
 	LiteralInteger {
-		$tsub=Simbolo.TSub.INT;
-	}
+			$tsub=Simbolo.TSub.INT;
+		}
 	| LiteralBoolean {
-		$tsub=Simbolo.TSub.BOOLEAN;
-	}
+			$tsub=Simbolo.TSub.BOOLEAN;
+		}
 	| LiteralString {
-		$tsub=Simbolo.TSub.STRING;
+			$tsub=Simbolo.TSub.STRING;
 	};
