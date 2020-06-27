@@ -10,6 +10,7 @@ public class Variable {
     private int nv; // Número de variable
     private Procedimiento sub; // Subprograma que la ha declarado
     private Simbolo.Tipo tipo; // Tipo: variable, constante o argumento
+    private boolean temporal;
     private static int cv = 0; // Cantidad de variables creadas
 
     public Variable(Procedimiento sub, Simbolo.Tipo tipo) {
@@ -17,6 +18,22 @@ public class Variable {
         this.nv = cv;
         this.tipo = tipo;
         this.sub = sub;
+    }
+
+    public Variable(Variable v) {
+        this.r=v.r;
+        this.nv=v.nv;
+        this.sub=v.sub;
+        this.tipo=v.tipo;
+        this.temporal=v.temporal;
+    }
+
+    public boolean isTemporal() {
+        return temporal;
+    }
+
+    public void setTemporal(boolean temporal) {
+        this.temporal = temporal;
     }
 
     public int getR() {
@@ -61,6 +78,10 @@ public class Variable {
 
     @Override
     public String toString() {
-        return String.valueOf(nv);
+        if (temporal) {
+            return "t"+nv;
+        } else {
+            return "v"+nv;
+        }
     }
 }

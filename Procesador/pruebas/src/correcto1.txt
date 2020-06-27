@@ -23,8 +23,8 @@ var int z =2+10;
 
 if(true){
 	var boolean b;
-	a=78000000000000000000000000;
+	a=78;
+z=z/8+z+89*58;
 }
-z=z+8+z+89-58;
 printINT(z);
 main();

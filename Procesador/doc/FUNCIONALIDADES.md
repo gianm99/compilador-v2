@@ -60,4 +60,5 @@ Como detalles a destacar del lenguaje tenemos los siguientes:
 - El compilador detecta los errores léxicos, sintácticos y semánticos. 
   - Si detecta un error sintáctico deja de ejecutarse.
   - Si detecta un error semántico sigue evaluando el restro del programa para encontrar el resto.
-- Al imprimir los mensajes se muestran con colores distintos dependiendo de si el proceso de compilación ha sido exitoso. Se muestra en verde si se ha compilado correctamente y en rojo si ha habido algún error. 
+- Al imprimir los mensajes se muestran con colores distintos dependiendo de si el proceso de compilación ha sido exitoso. Se muestra en verde si se ha compilado correctamente y en rojo si ha habido algún error.
+- Si cuando se declara una variable no se inicializa, se le asigna el valor por defecto para cada tipo subyacente. Para boolean es `false`, para integer es `0` y para string es `""` (el string vacío).
