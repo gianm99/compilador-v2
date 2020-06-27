@@ -58,14 +58,14 @@ public class Procesador {
         // Generación de código intermedio
         vajaC3D parserC3D;
         parserC3D = new vajaC3D(tokens, buildPath, parser.ts);
-        try {
+        // try {
             tokens.seek(0);
             parserC3D.programa();
             System.out.println(ConsoleColors.BLUE_BOLD_BRIGHT
                     + "Proceso de generación de código completado con éxito" + ConsoleColors.RESET);
-        } catch (RuntimeException e) {
-            System.out.println(ConsoleColors.RED_BOLD + "Error al generar código: " + e.getMessage()
-                    + ConsoleColors.RESET);
-        }
+        // } catch (RuntimeException e) {
+        //     System.out.println(ConsoleColors.RED_BOLD + "Error al generar código: " + e.getMessage()
+        //             + ConsoleColors.RESET);
+        // }
     }
 }
