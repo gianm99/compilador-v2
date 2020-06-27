@@ -286,8 +286,8 @@ sent[Deque<Integer> sents_seg]
 		genera("goto "+ei);
 	} END
 	| RETURN expr ';'
-	| referencia ASSIGN expr ';' { // TODO Comprobar si esto es suficiente
-		$sent_seg=null;
+	| referencia '=' expr ';' {
+		// $sent_seg=null;
 		if($referencia.tsub==Simbolo.TSub.BOOLEAN) {
 			Etiqueta ec=new Etiqueta();
 			Etiqueta ef=new Etiqueta();
@@ -303,6 +303,8 @@ sent[Deque<Integer> sents_seg]
 			efin.setNl(pc);
 			backpatch($expr.cierto,ec);
 			backpatch($expr.falso,ef);
+		} else {
+			genera($referencia.r+" = "+$expr.r);		
 		}
 	}
 	| referencia ';';
