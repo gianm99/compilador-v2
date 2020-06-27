@@ -97,8 +97,51 @@ programa:
 };
 
 decl:
-	VARIABLE tipo ID ('=' expr)? ';' // TODO Preguntar cómo va esto
-	| CONSTANT tipo ID '=' expr ';'
+	VARIABLE tipo ID {
+		// Asignación de valor por defecto
+		Simbolo s;
+		try {
+			s=ts.consulta($ID.getText());
+			switch(s.getTsub()) {
+				case BOOLEAN:
+					s.setvCB(false);
+					break;
+				case INT:
+					s.setvCI(0);
+					break;
+				case STRING:
+					s.setvCS("");
+					break;
+			} 
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
+		}
+	} (
+		'=' expr {
+		// TODO Averiguar si también se tiene que copiar en la tabla de símbolos
+		
+		genera(" = "+$expr.r);
+	}
+	)? ';'
+	| CONSTANT tipo ID '=' expr ';' {
+		Simbolo s;
+		try {
+			s = ts.consulta($ID.getText());
+			switch(s.getTsub()) {
+				case BOOLEAN:
+					s.setvCB($expr.r.getR());
+					break;
+				case INT:
+					s.setvCI($expr.r.getR());
+					break;
+				case STRING:
+					s.setvCS($expr.r.getR());
+					break;
+			} 
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
+		}
+	}
 	| FUNCTION tipo encabezado BEGIN {
 		profundidad++;
 		try{
