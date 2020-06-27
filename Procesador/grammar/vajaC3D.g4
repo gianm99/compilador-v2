@@ -319,13 +319,14 @@ referencia
 				Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.CONST);
 				switch(s.getTsub()) {
 					case BOOLEAN:
-						genera("t"+Variable.getCv()+" = " + s.isvCB());
+						// TODO Comprobar si esto es correcto
+						genera("t"+t+" = " + s.isvCB());
 						break;
 					case INT:
-						genera("t"+Variable.getCv()+" = " + s.getvCI());
+						genera("t"+t+" = " + s.getvCI());
 						break;
 					case STRING:
-						genera("t"+Variable.getCv()+" = " + s.getvCS());
+						genera("t"+t+" = " + s.getvCS());
 						break;
 				}
 				$r = t;
@@ -378,7 +379,7 @@ expr
 	} expr_[null,$cierto, $falso]
 	| SUB expr {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
-		genera("t"+Variable.getCv()+" = - " + $expr.r);
+		genera("t"+t+" = - " + $expr.r);
 		$r = t;
 	} expr_[$r,null,null]
 	| '(' expr ')' {
@@ -399,7 +400,7 @@ expr
 		} else {
 			t = tv.nuevaVar(null, Simbolo.Tipo.VAR);
 		}
-		genera("t"+Variable.getCv()+" = " + $literal.text);
+		genera("t"+t+" = " + $literal.text);
 		$r = t;
 		if($literal.tsub == Simbolo.TSub.BOOLEAN){
 			if($literal.start.getText().equals("true")) {
@@ -446,22 +447,22 @@ expr_[Variable r, Deque<Integer> cierto, Deque<Integer> falso]
 	} expr_[$r, $cierto, $falso]
 	| MULT expr {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
-		genera("t"+Variable.getCv()+" = " + $r + " * " + $expr.r);
+		genera("t"+t+" = " + $r + " * " + $expr.r);
 		$t = t;
 	} expr_[$r, null, null]
 	| DIV expr {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
-		genera("t"+Variable.getCv()+" = " + $r + " / " + $expr.r);
+		genera("t"+t+" = " + $r + " / " + $expr.r);
 		$t = t;
 	} expr_[$r, null, null]
 	| ADD expr {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
-		genera("t"+Variable.getCv()+" = " + $r + " + " + $expr.r);
+		genera("t"+t+" = " + $r + " + " + $expr.r);
 		$t = t;
 	} expr_[$r,null,null]
 	| SUB expr {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
-		genera("t"+Variable.getCv()+" = " + $r + " - " + $expr.r);
+		genera("t"+t+" = " + $r + " - " + $expr.r);
 		$t = t;
 	} expr_[$r, null, null]
 	|;
