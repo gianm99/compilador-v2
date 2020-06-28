@@ -202,6 +202,7 @@ sents
 		genera(ec + ": skip");
 		ec.setNl(pc);
 	} sents_[$sents_seg] {
+		// TODO Comprobar si esto es correcto
 		backpatch($sent.sent_seg, ec);
 		if($sents_.sents_seg_!=null) {
 			$sents_seg = $sents_.sents_seg_;
