@@ -361,6 +361,7 @@ contIdx
 		try {
 			s = ts.consulta($ID.getText());
 			$met = s.getNp();
+			// TODO Comprobar si esto funciona con booleans
 			$pparams.push($expr.r);
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
