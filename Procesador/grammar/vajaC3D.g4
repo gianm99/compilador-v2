@@ -1,10 +1,10 @@
 parser grammar vajaC3D;
-options {
+options
+{
 	tokenVocab = vajaLexer;
 }
 
 @parser::header {
-package antlr;
 import procesador.*;
 import java.io.*;
 import java.util.*;
@@ -498,19 +498,44 @@ exprAdit
 		$r = $exprMult.r;
 		$cierto=$exprMult.cierto;
 		$falso=$exprMult.falso;
-	} exprAdit_[$r];
+	} exprAdit_[$r] {
+		if($exprAdit_.cierto!=null || $exprAdit_.falso!=null || $exprAdit_.r!=null) {
+			$r=$exprAdit_.r;
+			$cierto=$exprAdit_.cierto;
+			$falso=$exprAdit_.falso;
+		}
+	};
 
-exprAdit_[Variable t1]:
+exprAdit_[Variable t1]
+	returns[Variable r, Deque<Integer> cierto, Deque<Integer falso>]:
 	ADD exprMult {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
 		t.setTemporal(true);
 		genera(t+" = " + $t1 + " + " + $exprMult.r);
-	} exprAdit_[t]
+		$r=t;
+		$cierto=$exprMult.cierto;
+		$falso=$exprMult.falso;
+	} exprAdit_[$r] {
+		if($exprAdit_.r!=null || $exprAdit_.cierto!=null || $exprAdit_.falso!=null) {
+			$r=$exprAdit_.r;
+			$cierto=$exprAdit_.cierto;
+			$falso=$exprAdit_.falso;
+		}
+	}
 	| SUB exprMult {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
 		t.setTemporal(true);
 		genera(t+" = " + $t1 + " - " + $exprMult.r);
-	} exprAdit_[t]
+		$r=t;
+		$cierto=$exprMult.cierto;
+		$falso=$exprMult.falso;
+	} exprAdit_[$r] {
+		if($exprAdit_.r!=null || $exprAdit_.cierto!=null || $exprAdit_.falso!=null) {
+			$r=$exprAdit_.r;
+			$cierto=$exprAdit_.cierto;
+			$falso=$exprAdit_.falso;
+		}
+	}
 	|; //lambda
 
 // Expresión multiplicativa
@@ -520,19 +545,44 @@ exprMult
 		$r = $exprNeg.r;
 		$cierto=$exprNeg.cierto;
 		$falso=$exprNeg.falso;
-	} exprMult_[$r];
+	} exprMult_[$r] {
+		if($exprMult_.r!=null || $exprMult_.cierto!=null || $exprMult_.falso!=null) {
+			$r=$exprMult_.r;
+			$cierto=$exprMult_.cierto;
+			$falso=$exprMult_.falso;
+		}
+	};
 
-exprMult_[Variable t1]:
+exprMult_[Variable t1]
+	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
 	MULT exprNeg {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
 		t.setTemporal(true);
 		genera(t+" = " + $t1 + " * " + $exprNeg.r);
-	} exprMult_[t]
+		$r=t;
+		$cierto=$exprNeg.cierto;
+		$falso=$exprNeg.falso;
+	} exprMult_[$r] {
+		if($exprMult_.r!=null || $exprMult_.cierto!=null || $exprMult_.falso!=null) {
+			$r=$exprMult_.r;
+			$cierto=$exprMult_.cierto;
+			$falso=$exprMult_.falso;
+		}
+	}
 	| DIV exprNeg {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
 		t.setTemporal(true);
 		genera(t+" = " + $t1 + " / " + $exprNeg.r);
-	} exprMult_[t]
+		$r=t;
+		$cierto=$exprNeg.cierto;
+		$falso=$exprNeg.falso;
+	} exprMult_[$r] {
+		if($exprMult_.r!=null || $exprMult_.cierto!=null || $exprMult_.falso!=null) {
+			$r=$exprMult_.r;
+			$cierto=$exprMult_.cierto;
+			$falso=$exprMult_.falso;
+		}
+	}
 	|; //lambda
 
 // Expresión de negación
@@ -543,6 +593,8 @@ exprNeg
 		t.setTemporal(true);
 		genera(t+" = - " + $primario.r);
 		$r = t;
+		$cierto = $primario.cierto;
+		$falso = $primario.falso;
 	}
 	| primario {
 		$r = $primario.r;
