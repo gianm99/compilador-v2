@@ -7,4 +7,4 @@
 - ~~No funcionan las operaciones lógicas.~~
 - ~~Hay errores cuando se usa una variable no inicializada.~~
 - Algunos goto no se están completando con el backpatching.
-- Hay asignaciones de literales a variables temporales que se repiten.
+- ~~Hay asignaciones de literales a variables temporales que se repiten~~.
