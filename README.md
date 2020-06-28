@@ -52,5 +52,5 @@ Una vez entregada la práctica se tendrá que realizar una entrevista para discu
 - Documentación correctamente escrita en la que se describan las técnicas utilizadas, el diseño y cualquier aspecto que se desee destacar. No constará de los listados de código fuente. Si por algún motivo especial se considera de especial interés alguna parte del código, sí que se podrá adjuntar.
 - Código fuente completo. Instrucciones para la correcta ejecución. La compilación del código fuente o la interpretación no deben generar errores ni excepciones no controladas. El código ensamblador se tendrá que poder compilar sin que se genere ningún error o mensaje de aviso. La ejecución del programa optimizado tendrá que dar el mismo resultado que el del programa no optimizado.
 - Como mínimo, **3 casos de prueba correctos** y **3 casos de prueba incorrectos**. Todos los casos se deben poder reproducir. El resultado de la ejecución será:
-  - Para los casos correctos el fichero de código de tres direcciones, el de ensamblador no optimizado y el de ensamblador optimizado. Además de la tabla de símbolos y el archivo con los tokens.
-  - Para los casos erróneos el código y los mensajes de error obtenidos.
+  - Para los casos correctos: el fichero de código de tres direcciones, el de ensamblador no optimizado y el de ensamblador optimizado. Además de la tabla de símbolos y el archivo con los tokens.
+  - Para los casos erróneos: el código y los mensajes de error obtenidos.
