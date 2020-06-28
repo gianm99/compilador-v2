@@ -303,7 +303,13 @@ sent[Deque<Integer> sents_seg]
 			backpatch($expr.cierto,ec);
 			backpatch($expr.falso,ef);
 		} else {
-			genera($referencia.r+" = "+$expr.r.toString());
+			if( !($referencia.r.isTemporal() && $expr.r.isTemporal()) ){
+				if( $referencia.r.getNv() == $expr.r.getNv()){
+					genera($referencia.r+" = "+tv.getAnt().toString());
+				} else {
+					//genera($referencia.r+" = "+tv.getAnt().toString());
+				}
+			}
 		}
 	}
 	| referencia ';';
@@ -488,7 +494,7 @@ exprComp_[Variable t1]
  		$falso.add(pc);
 		$r = $exprAdit.r;
     }
-	// exprComp_
+	//exprComp_
 	|; //lambda
 
 // Expresión aditiva
@@ -567,13 +573,16 @@ primario
 		genera(t+" = " + $literal.text);
 		$r = t;
 		if($literal.tsub == Simbolo.TSub.BOOLEAN){
+			Etiqueta e = new Etiqueta();
 			if($literal.text.equals("true")) {
-				genera("goto ");
+				genera("goto "+ e);
+				e.setNl(pc);
 				$cierto=new ArrayDeque<Integer>();
 				$cierto.add(pc);
 				$falso = null;
 			} else {
-				genera("goto ");
+				genera("goto "+ e);
+				e.setNl(pc);
 				$falso=new ArrayDeque<Integer>();
 				$falso.add(pc);
 				$cierto = null;

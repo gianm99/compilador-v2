@@ -10,6 +10,7 @@ import java.util.ArrayList;
 public class TablaVariables {
 
     private ArrayList<Variable> tv;
+    private Variable ant = null;
 
     public TablaVariables(String directorio) {
         tv = new ArrayList<Variable>();
@@ -18,6 +19,7 @@ public class TablaVariables {
     public Variable nuevaVar(Procedimiento sub, Simbolo.Tipo tipo) {
         Variable var = new Variable(sub, tipo);
         tv.add(var);
+        if(tv.size()>2) ant = tv.get(tv.size()-1);
         return var;
     }
 
@@ -28,5 +30,9 @@ public class TablaVariables {
 
     public void setTV(ArrayList<Variable> tv) {
         this.tv = tv;
+    }
+
+    public Variable getAnt() {
+        return ant;
     }
 }
