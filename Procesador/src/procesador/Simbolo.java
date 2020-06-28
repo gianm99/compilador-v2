@@ -13,6 +13,7 @@ public class Simbolo {
 	private Tipo t;
 	private TSub tsub;
 	private boolean returnEncontrado;
+	// TODO #35 Crear herencias para Simbolo en las que guardar información específica
 	private boolean vCB;
 	private int vCI;
 	private String vCS;
