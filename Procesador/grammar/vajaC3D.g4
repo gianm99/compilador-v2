@@ -303,7 +303,7 @@ sent[Deque<Integer> sents_seg]
 			backpatch($expr.cierto,ec);
 			backpatch($expr.falso,ef);
 		} else {
-			genera($referencia.r+" = "+$expr.r.toString());
+			genera($referencia.r+" = "+$expr.r);
 		}
 	}
 	| referencia ';';
