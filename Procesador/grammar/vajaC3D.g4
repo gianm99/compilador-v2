@@ -18,7 +18,6 @@ TablaVariables tv;
 TablaProcedimientos tp;
 String directorio;
 ArrayList<StringBuilder> c3d; // TODO Crear clase propia
-// TODO Asegurarse de que no tenga que ser -1 en vez de 0
 int pc = 0; // program counter
 int profundidad=0;
 
@@ -92,7 +91,6 @@ programa:
 	genera(e+": skip");
 	e.setNl(pc);
 	backpatch($sents.sents_seg,e);
-	// TODO Según los apuntes aquí faltan cosas
 	imprimirC3D();
 };
 
@@ -152,7 +150,8 @@ decl:
 		Etiqueta e=new Etiqueta(); // TODO Hacer una tabla de etiquetas y cambiar esto
 		$encabezado.met.setInicio(e);
 		genera(e+": skip");
-		genera("pmb "+$encabezado.met.getNp()); // TODO Comprobar si esto se hace aquí
+		e.setNl(pc);
+		genera("pmb "+$encabezado.met.getNp());
 	} decl* sents {
 		genera("rtn "+$encabezado.met.getNp());
 		profundidad--;
