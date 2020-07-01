@@ -238,11 +238,17 @@ sent:
 		ts=ts.saleBloque();
 	} END
 	| RETURN expr ';' {
+		Simbolo funcion;
 		if(pproc.size()==0) {
 			// Return fuera de una función
 			errores+="Error semántico - Línea "+$RETURN.getLine()+": return fuera de función\n";
 		} else {
-			if(pproc.peek().getTsub()!=$expr.tsub) {
+			funcion=pproc.peek();
+			if (funcion.getT()==Simbolo.Tipo.PROC) {
+				// Return no vacío en un procedimiento
+				errores+="Error semántico - Línea "+$RETURN.getLine()+
+				": return de expresión en un procedimiento\n";
+			} else if(funcion.getTsub()!=$expr.tsub) {
 				// Return de tipo incorrecto
 				errores+="Error semántico - Línea "+$RETURN.getLine()+
 				": return de tipo incorrecto (esperado '"+pproc.peek().getTsub()+
@@ -253,6 +259,21 @@ sent:
 			}
 		}
 	}
+	| RETURN ';' {
+		Simbolo procedure;
+		if(pproc.size()==0) {
+			// Return fuera de una función
+			errores+="Error semántico - Línea "+$RETURN.getLine()+": return fuera de función\n";
+		} else {
+			procedure=pproc.peek();
+			if (procedure.getT()==Simbolo.Tipo.FUNC) {
+				// Return vacío en una función
+				errores+="Error semántico - Línea "+$RETURN.getLine()+
+				": return vacío en una función)\n";
+			}
+		}
+	}
+	
 	| referencia ASSIGN expr ';' {
 		if($referencia.s!=null) {
 			if($referencia.s.getT()==Simbolo.Tipo.CONST) {

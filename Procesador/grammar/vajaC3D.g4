@@ -18,7 +18,6 @@ TablaVariables tv;
 TablaProcedimientos tp;
 String directorio;
 ArrayList<StringBuilder> c3d; // TODO Crear clase propia
-// TODO Asegurarse de que no tenga que ser -1 en vez de 0
 int pc = 0; // program counter
 int profundidad=0;
 
@@ -53,7 +52,7 @@ public void imprimirC3D(){
 public void backpatch(Deque<Integer> lista, Etiqueta e){
 	if(lista!=null) {
 		while(lista.size()>0) {
-			int instruccion=lista.remove();
+			int instruccion=lista.remove()-1;
 			c3d.get(instruccion).append(e.toString());
 		}
 	}
@@ -92,7 +91,6 @@ programa:
 	genera(e+": skip");
 	e.setNl(pc);
 	backpatch($sents.sents_seg,e);
-	// TODO Según los apuntes aquí faltan cosas
 	imprimirC3D();
 };
 
@@ -105,7 +103,7 @@ decl:
 			s.setNv(tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR));
 			switch(s.getTsub()) {
 				case BOOLEAN:
-					genera(s.getNv()+" = false");
+					genera(s.getNv()+" = 0");
 					break;
 				case INT:
 					genera(s.getNv()+" = 0");
@@ -141,7 +139,7 @@ decl:
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
 	}
-	| FUNCTION tipo encabezado BEGIN {
+	| FUNCTION tipo encabezado BEGIN { // TODO Ocupación de variables locales y número de parámetros
 		profundidad++;
 		try{
 			ts=ts.bajaBloque();
@@ -149,16 +147,24 @@ decl:
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
 		pproc.push($encabezado.met);
+		// Crear variables para los parámetros
+		Simbolo aux=$encabezado.s.getNext();
+		while(aux!=null) {
+			aux.setNv(tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR));
+			aux=aux.getNext();
+		}
 		Etiqueta e=new Etiqueta(); // TODO Hacer una tabla de etiquetas y cambiar esto
 		$encabezado.met.setInicio(e);
 		genera(e+": skip");
-		genera("pmb "+$encabezado.met.getNp()); // TODO Comprobar si esto se hace aquí
+		e.setNl(pc);
+		genera("pmb "+$encabezado.met.getNp());
 	} decl* sents {
-		genera("rtn "+$encabezado.met.getNp());
+		// genera("rtn "+$encabezado.met.getNp());
+		pproc.pop();
 		profundidad--;
 		ts=ts.subeBloque();
 	} END
-	| PROCEDURE encabezado BEGIN {
+	| PROCEDURE encabezado BEGIN { // TODO Ocupación de variables locales y número de parámetros
 		profundidad++;
 		try{
 			ts=ts.bajaBloque();
@@ -166,6 +172,12 @@ decl:
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
 		pproc.push($encabezado.met);
+		// Crear variables para los parámetros
+		Simbolo aux=$encabezado.s.getNext();
+		while(aux!=null) {
+			aux.setNv(tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR));
+			aux=aux.getNext();
+		}
 		Etiqueta e=new Etiqueta();
 		$encabezado.met.setInicio(e);
 		genera(e+": skip");
@@ -173,12 +185,13 @@ decl:
 		genera("pmb "+$encabezado.met.getNp());
 	} decl* sents {
 		genera("rtn "+$encabezado.met.getNp());
+		pproc.pop();
 		profundidad--;
 		ts=ts.subeBloque();
 	} END;
 
 encabezado
-	returns[Procedimiento met]:
+	returns[Procedimiento met, Simbolo s]:
 	ID '(' parametros? ')' {
 		Simbolo s=new Simbolo();
 		Procedimiento met;
@@ -187,6 +200,7 @@ encabezado
 			met=tp.nuevoProc(profundidad,s.getT());
 			s.setNp(met);
 			$met = met;
+			$s=s;
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
@@ -203,6 +217,7 @@ sents
 		genera(ec + ": skip");
 		ec.setNl(pc);
 	} sents_[$sents_seg] {
+		// TODO Comprobar si esto es correcto
 		backpatch($sent.sent_seg, ec);
 		if($sents_.sents_seg_!=null) {
 			$sents_seg = $sents_.sents_seg_;
@@ -281,10 +296,15 @@ sent[Deque<Integer> sents_seg]
 		ts=ts.subeBloque();
 		backpatch($expr.cierto,ec);
 		backpatch($sent_seg,ei);
-		$sents_seg=$expr.falso;
+		$sent_seg=$expr.falso;
 		genera("goto "+ei);
 	} END
-	| RETURN expr ';'
+	| RETURN expr ';' {
+		genera("rtn "+pproc.peek().getNp()+", "+$expr.r);
+	}
+	| RETURN ';' {
+		genera("rtn "+pproc.peek().getNp());
+	}
 	| referencia '=' expr ';' {
 		// $sent_seg=null;
 		if($referencia.tsub==Simbolo.TSub.BOOLEAN) {
@@ -293,11 +313,11 @@ sent[Deque<Integer> sents_seg]
 			Etiqueta efin=new Etiqueta();
 			genera(ec+": skip");
 			ec.setNl(pc);
-			genera($referencia.r+"= -1");
+			genera($referencia.r+" = -1");
 			genera("goto "+efin);
 			genera(ef+": skip");
 			ef.setNl(pc);
-			genera($referencia.r+"= 0");
+			genera($referencia.r+" = 0");
 			genera(efin+": skip");
 			efin.setNl(pc);
 			backpatch($expr.cierto,ec);
@@ -611,8 +631,15 @@ primario
 		$falso = $expr.falso;
 	}
 	| referencia {
-		// if($referencia.r!=null) $referencia.r.setTemporal(false); 
 		$r = $referencia.r;
+		if($referencia.tsub==Simbolo.TSub.BOOLEAN) {
+			genera("if "+$r+" = -1 goto ");
+			$cierto=new ArrayDeque<Integer>();
+			$cierto.add(pc);
+			genera("goto ");
+			$falso=new ArrayDeque<Integer>();
+			$falso.add(pc);
+		}
 	}
 	| literal {
 		Variable t = tv.nuevaVar(pproc.peek(), Simbolo.Tipo.VAR);
