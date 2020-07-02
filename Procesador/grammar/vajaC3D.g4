@@ -69,22 +69,22 @@ public Instruccion.OP valorSaltoCond(String s){
 	Instruccion.OP op = null;
 	switch(s){
 		case "==":
-			op = Instruccion.OP.condEQ;
+			op = Instruccion.OP.ifEQ;
 			break;
 		case "!=":
-			op = Instruccion.OP.condNEQ;
+			op = Instruccion.OP.ifNE;
 			break;
 		case "<":
-			op = Instruccion.OP.condLT;
+			op = Instruccion.OP.ifLT;
 			break;
 		case ">":
-			op = Instruccion.OP.condGT;
+			op = Instruccion.OP.ifGT;
 			break;
 		case ">=":
-			op = Instruccion.OP.condGE;
+			op = Instruccion.OP.ifGE;
 			break;
 		case "<=":
-			op = Instruccion.OP.condLE;
+			op = Instruccion.OP.ifLE;
 			break;
 	}
 	return op;
@@ -141,7 +141,7 @@ decl:
 				//genera(s.getNv()+" = -1");
 				genera(Instruccion.OP.copy, "-1", "", s.getNv().toString());
 				//genera("goto "+efin);
-				genera(Instruccion.OP.incond, "", "", efin.toString());
+				genera(Instruccion.OP.jump, "", "", efin.toString());
 				//genera(ef+": skip");
 				genera(Instruccion.OP.et, "", "", ef.toString());
 				ef.setNl(pc);
@@ -368,7 +368,7 @@ sent[Deque<Integer> sents_seg]
 		backpatch($sent_seg,ei);
 		$sent_seg=$expr.falso;
 		//genera("goto "+ei);
-		genera(Instruccion.OP.incond, "", "", ei.toString());
+		genera(Instruccion.OP.jump, "", "", ei.toString());
 	} END
 	| RETURN expr ';' {
 		if($expr.cierto!=null || $expr.falso!=null) {//cambiar
@@ -381,7 +381,7 @@ sent[Deque<Integer> sents_seg]
 			//genera($expr.r+" = -1");
 			genera(Instruccion.OP.copy, "-1", "", $expr.r.toString());
 			//genera("goto "+efin);
-			genera(Instruccion.OP.incond, "", "", efin.toString());
+			genera(Instruccion.OP.jump, "", "", efin.toString());
 			//genera(ef+": skip");
 			genera(Instruccion.OP.et, "", "", ef.toString());
 			ef.setNl(pc);
@@ -411,7 +411,7 @@ sent[Deque<Integer> sents_seg]
 			//genera($referencia.r+" = -1");
 			genera(Instruccion.OP.copy, "-1", "", $referencia.r.toString());
 			//genera("goto "+efin);
-			genera(Instruccion.OP.incond, "", "", ef.toString());
+			genera(Instruccion.OP.jump, "", "", ef.toString());
 			//genera(ef+": skip");
 			genera(Instruccion.OP.et, "", "", ef.toString());
 			ef.setNl(pc);
@@ -501,7 +501,7 @@ contIdx
 				//genera($expr.r+" = -1");
 				genera(Instruccion.OP.copy, "-1", "", $expr.r.toString());
 				//genera("goto "+efin);
-				genera(Instruccion.OP.incond, "", "", efin.toString());
+				genera(Instruccion.OP.jump, "", "", efin.toString());
 				//genera(ef+": skip");
 				genera(Instruccion.OP.et, "", "", ef.toString());
 				ef.setNl(pc);
@@ -532,7 +532,7 @@ contIdx_[Deque<Variable> pparams]:
 			//genera($expr.r+" = -1");
 			genera(Instruccion.OP.copy, "-1", "", $expr.r.toString());
 			//genera("goto "+efin);
-			genera(Instruccion.OP.incond, "", "", efin.toString());
+			genera(Instruccion.OP.jump, "", "", efin.toString());
 			//genera(ef+": skip");
 			genera(Instruccion.OP.et, "", "", ef.toString());
 			ef.setNl(pc);
@@ -661,7 +661,7 @@ exprComp_[Variable t1]
 		$cierto=new ArrayDeque<Integer>();
  		$cierto.add(pc);
 		//genera("goto ");
-		genera(Instruccion.OP.incond, "", "", "");
+		genera(Instruccion.OP.jump, "", "", "");
 		$falso=new ArrayDeque<Integer>();
  		$falso.add(pc);
 		$r = $exprAdit.r;
@@ -796,11 +796,11 @@ primario
 		$r = $referencia.r;
 		if($referencia.tsub==Simbolo.TSub.BOOLEAN) {
 			//genera("if "+$r+" = -1 goto ");
-			genera(Instruccion.OP.condEQ, $r.toString(), "-1", "");
+			genera(Instruccion.OP.ifEQ, $r.toString(), "-1", "");
 			$cierto=new ArrayDeque<Integer>();
 			$cierto.add(pc);
 			//genera("goto ");
-			genera(Instruccion.OP.incond, "", "", "");
+			genera(Instruccion.OP.jump, "", "", "");
 			$falso=new ArrayDeque<Integer>();
 			$falso.add(pc);
 		}
@@ -808,39 +808,29 @@ primario
 	| literal {
 		Variable t = tv.nuevaVar(pproc.peek(), Simbolo.Tipo.VAR);
 		t.setTemporal(true);
-<<<<<<< Updated upstream
-=======
-		//genera(t+" = " + $literal.text);
-		genera(Instruccion.OP.copy, $literal.text, "", "");
->>>>>>> Stashed changes
 		$r = t;
 		if($literal.tsub == Simbolo.TSub.BOOLEAN){
 			Etiqueta e = new Etiqueta();
 			if($literal.text.equals("true")) {
-<<<<<<< Updated upstream
-				genera(t+" = -1");
-				genera("goto ");
-=======
+				//genera(t+" = -1");
+				genera(Instruccion.OP.copy, "-1", "", t.toString());
 				//genera("goto ");
-				genera(Instruccion.OP.incond, "", "", "");
->>>>>>> Stashed changes
+				genera(Instruccion.OP.jump, "", "", "");
 				$cierto=new ArrayDeque<Integer>();
 				$cierto.add(pc);
 				$falso = null;
 			} else {
-<<<<<<< Updated upstream
-				genera(t+" = 0");
-				genera("goto ");
-=======
+				//genera(t+" = 0");
+				genera(Instruccion.OP.copy, "0", "", t.toString());
 				//genera("goto ");
-				genera(Instruccion.OP.incond, "", "", "");
->>>>>>> Stashed changes
+				genera(Instruccion.OP.jump, "", "", "");
 				$falso=new ArrayDeque<Integer>();
 				$falso.add(pc);
 				$cierto = null;
 			}
 		} else {
-			genera(t+" = " + $literal.text);
+			//genera(t+" = " + $literal.text);
+			genera(Instruccion.OP.copy, $literal.text, "", t.toString());
 		}
 	};
 

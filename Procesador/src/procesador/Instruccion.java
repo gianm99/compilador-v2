@@ -6,7 +6,7 @@ public class Instruccion {
     private String[] instruccion = new String[4];
 
     public enum OP {
-        copy, add, sub, mult, div, mod, neg, and, or, not, et, condLT, condLE, condEQ, condNEQ, condGE, condGT, incond, LT, LE, EQ, NEQ, GE, GT, init, call, ret, params
+        copy, add, sub, mult, div, neg, and, or, not, et, ifLT, ifLE, ifEQ, ifNE, ifGE, ifGT, jump, LT, LE, EQ, NEQ, GE, GT, init, call, ret, params
     }
 
     public Instruccion(OP codigo, String op1, String op2, String op3) {
@@ -61,25 +61,25 @@ public class Instruccion {
             case et:
                 instruccion[0] = "skip";
                 break;
-            case condLT:
+            case ifLT:
                 instruccion[0] = "<";
                 break;
-            case condLE:
+            case ifLE:
                 instruccion[0] = "<=";
                 break;
-            case condEQ:
+            case ifEQ:
                 instruccion[0] = "==";
                 break;
-            case condNEQ:
+            case ifNE:
                 instruccion[0] = "!=";
                 break;
-            case condGE:
+            case ifGE:
                 instruccion[0] = ">=";
                 break;
-            case condGT:
+            case ifGT:
                 instruccion[0] = ">";
                 break;
-            case incond:
+            case jump:
                 instruccion[0] = "goto";
                 break;
             case init:
@@ -130,16 +130,16 @@ public class Instruccion {
             case et:
                 s = instruccion[3] + ": " + instruccion[0];
                 break;
-            case condLT:
-            case condLE:
-            case condEQ:
-            case condNEQ:
-            case condGE:
-            case condGT:
+            case ifLT:
+            case ifLE:
+            case ifEQ:
+            case ifNE:
+            case ifGE:
+            case ifGT:
                 s = "if " + instruccion[1] + " " + instruccion[0] + " "
                         + instruccion[2] + " goto " + instruccion[3];
                 break;
-            case incond:
+            case jump:
             case init:
             case call:
             case ret:
