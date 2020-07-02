@@ -386,6 +386,23 @@ contIdx
 			s = ts.consulta($ID.getText());
 			$met = s.getNp();
 			$pparams.push($expr.r);
+			// Boolean parámetro
+			if($expr.cierto!=null || $expr.falso!=null) {
+				Etiqueta ec=new Etiqueta();
+				Etiqueta ef=new Etiqueta();
+				Etiqueta efin=new Etiqueta();
+				genera(ec+": skip");
+				ec.setNl(pc);
+				genera($expr.r+" = -1");
+				genera("goto "+efin);
+				genera(ef+": skip");
+				ef.setNl(pc);
+				genera($expr.r+" = 0");
+				genera(efin+": skip");
+				efin.setNl(pc);
+				backpatch($expr.cierto,ec);
+				backpatch($expr.falso,ef);
+			}
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
@@ -394,6 +411,23 @@ contIdx
 contIdx_[Deque<Variable> pparams]:
 	',' expr {
 		$pparams.push($expr.r);
+		// Boolean parámetro
+		if($expr.cierto!=null || $expr.falso!=null) {
+			Etiqueta ec=new Etiqueta();
+			Etiqueta ef=new Etiqueta();
+			Etiqueta efin=new Etiqueta();
+			genera(ec+": skip");
+			ec.setNl(pc);
+			genera($expr.r+" = -1");
+			genera("goto "+efin);
+			genera(ef+": skip");
+			ef.setNl(pc);
+			genera($expr.r+" = 0");
+			genera(efin+": skip");
+			efin.setNl(pc);
+			backpatch($expr.cierto,ec);
+			backpatch($expr.falso,ef);
+		}
 	} contIdx_[$pparams]
 	|; // lambda
 
