@@ -647,20 +647,23 @@ primario
 	| literal {
 		Variable t = tv.nuevaVar(pproc.peek(), Simbolo.Tipo.VAR);
 		t.setTemporal(true);
-		genera(t+" = " + $literal.text);
 		$r = t;
 		if($literal.tsub == Simbolo.TSub.BOOLEAN){
 			if($literal.text.equals("true")) {
+				genera(t+" = -1");
 				genera("goto ");
 				$cierto=new ArrayDeque<Integer>();
 				$cierto.add(pc);
 				$falso = null;
 			} else {
+				genera(t+" = 0");
 				genera("goto ");
 				$falso=new ArrayDeque<Integer>();
 				$falso.add(pc);
 				$cierto = null;
 			}
+		} else {
+			genera(t+" = " + $literal.text);
 		}
 	};
 
