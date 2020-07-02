@@ -135,19 +135,26 @@ decl:
 				Etiqueta ec=new Etiqueta();
 				Etiqueta ef=new Etiqueta();
 				Etiqueta efin=new Etiqueta();
-				genera(ec+": skip");
+				//genera(ec+": skip");
+				genera(Instruccion.OP.et, "", "", ec.toString());
 				ec.setNl(pc);
-				genera(s.getNv()+" = -1");
-				genera("goto "+efin);
-				genera(ef+": skip");
+				//genera(s.getNv()+" = -1");
+				genera(Instruccion.OP.copy, "-1", "", s.getNv().toString());
+				//genera("goto "+efin);
+				genera(Instruccion.OP.incond, "", "", efin.toString());
+				//genera(ef+": skip");
+				genera(Instruccion.OP.et, "", "", ef.toString());
 				ef.setNl(pc);
-				genera(s.getNv()+" = 0");
-				genera(efin+": skip");
+				//genera(s.getNv()+" = 0");
+				genera(Instruccion.OP.copy, "0", "", s.getNv().toString());
+				//genera(efin+": skip");
+				genera(Instruccion.OP.et, "", "", efin.toString());
 				efin.setNl(pc);
 				backpatch($expr.cierto,ec);
 				backpatch($expr.falso,ef);
 			} else {
-				genera(s.getNv()+" = "+$expr.r);
+				//genera(s.getNv()+" = "+$expr.r);
+				genera(Instruccion.OP.copy, $expr.r.toString(), "", s.getNv().toString());
 			}
 	}
 	)? {
@@ -368,19 +375,26 @@ sent[Deque<Integer> sents_seg]
 			Etiqueta ec=new Etiqueta();
 			Etiqueta ef=new Etiqueta();
 			Etiqueta efin=new Etiqueta();
-			genera(ec+": skip");
+			//genera(ec+": skip");
+			genera(Instruccion.OP.et, "", "", ec.toString());
 			ec.setNl(pc);
-			genera($expr.r+" = -1");
-			genera("goto "+efin);
-			genera(ef+": skip");
+			//genera($expr.r+" = -1");
+			genera(Instruccion.OP.copy, "-1", "", $expr.r.toString());
+			//genera("goto "+efin);
+			genera(Instruccion.OP.incond, "", "", efin.toString());
+			//genera(ef+": skip");
+			genera(Instruccion.OP.et, "", "", ef.toString());
 			ef.setNl(pc);
-			genera($expr.r+" = 0");
-			genera(efin+": skip");
+			//genera($expr.r+" = 0");
+			genera(Instruccion.OP.copy, "0", "", $expr.r.toString());
+			//genera(efin+": skip");
+			genera(Instruccion.OP.et, "", "", efin.toString());
 			efin.setNl(pc);
 			backpatch($expr.cierto,ec);
 			backpatch($expr.falso,ef);
 		}
-		genera("rtn "+pproc.peek().getNp()+", "+$expr.r);
+		//genera("rtn "+pproc.peek().getNp()+", "+$expr.r);
+		genera(Instruccion.OP.ret, $expr.r.toString(), "", String.valueOf(pproc.peek().getNp()));
 	}
 	| RETURN ';' {
 		//genera("rtn "+pproc.peek().getNp());
@@ -464,7 +478,7 @@ referencia
 			//genera("param_s " + $contIdx.pparams.pop());
 			genera(Instruccion.OP.params, "", "", $contIdx.pparams.pop().toString());
 		//genera("call "+$contIdx.met.getNp());
-		genera(Instruccion.OP.call, "", "", $contIdx.met.getNp().toString());
+		genera(Instruccion.OP.call, "", "", String.valueOf($contIdx.met.getNp()));
 	};
 
 contIdx
@@ -481,14 +495,20 @@ contIdx
 				Etiqueta ec=new Etiqueta();
 				Etiqueta ef=new Etiqueta();
 				Etiqueta efin=new Etiqueta();
-				genera(ec+": skip");
+				//genera(ec+": skip");
+				genera(Instruccion.OP.et, "", "", ec.toString());
 				ec.setNl(pc);
-				genera($expr.r+" = -1");
-				genera("goto "+efin);
-				genera(ef+": skip");
+				//genera($expr.r+" = -1");
+				genera(Instruccion.OP.copy, "-1", "", $expr.r.toString());
+				//genera("goto "+efin);
+				genera(Instruccion.OP.incond, "", "", efin.toString());
+				//genera(ef+": skip");
+				genera(Instruccion.OP.et, "", "", ef.toString());
 				ef.setNl(pc);
-				genera($expr.r+" = 0");
-				genera(efin+": skip");
+				//genera($expr.r+" = 0");
+				genera(Instruccion.OP.copy, "0", "", $expr.r.toString());
+				//genera(efin+": skip");
+				genera(Instruccion.OP.et, "", "", efin.toString());
 				efin.setNl(pc);
 				backpatch($expr.cierto,ec);
 				backpatch($expr.falso,ef);
@@ -506,14 +526,20 @@ contIdx_[Deque<Variable> pparams]:
 			Etiqueta ec=new Etiqueta();
 			Etiqueta ef=new Etiqueta();
 			Etiqueta efin=new Etiqueta();
-			genera(ec+": skip");
+			//genera(ec+": skip");
+			genera(Instruccion.OP.et, "", "", ec.toString());
 			ec.setNl(pc);
-			genera($expr.r+" = -1");
-			genera("goto "+efin);
-			genera(ef+": skip");
+			//genera($expr.r+" = -1");
+			genera(Instruccion.OP.copy, "-1", "", $expr.r.toString());
+			//genera("goto "+efin);
+			genera(Instruccion.OP.incond, "", "", efin.toString());
+			//genera(ef+": skip");
+			genera(Instruccion.OP.et, "", "", ef.toString());
 			ef.setNl(pc);
-			genera($expr.r+" = 0");
-			genera(efin+": skip");
+			//genera($expr.r+" = 0");
+			genera(Instruccion.OP.copy, "0", "", $expr.r.toString());
+			//genera(efin+": skip");
+			genera(Instruccion.OP.et, "", "", efin.toString());
 			efin.setNl(pc);
 			backpatch($expr.cierto,ec);
 			backpatch($expr.falso,ef);
