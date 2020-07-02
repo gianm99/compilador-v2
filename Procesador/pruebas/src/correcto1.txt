@@ -14,6 +14,7 @@ func boolean function1(string str, int i, boolean foo){
 		b = !b;
 		a = a-1;
 	}
+	foo = true;
 	return foo;
 }
 proc main(){
@@ -28,3 +29,4 @@ z=z/8+z+89*58;
 }
 printINT(z);
 main();
+function1("HOLA",89,true);
