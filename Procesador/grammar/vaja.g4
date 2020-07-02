@@ -1,6 +1,7 @@
 grammar vaja;
 
 @header {
+package antlr;
 import procesador.*;
 import java.io.*;
 import java.util.*;
