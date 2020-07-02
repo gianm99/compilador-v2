@@ -17,7 +17,7 @@ TablaSimbolos ts;
 TablaVariables tv;
 TablaProcedimientos tp;
 String directorio;
-ArrayList<StringBuilder> c3d; // TODO Crear clase propia
+ArrayList<StringBuilder> c3d;
 int pc = 0; // program counter
 int profundidad=0;
 
@@ -177,7 +177,7 @@ decl:
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
-		Etiqueta e=new Etiqueta(); // TODO Hacer una tabla de etiquetas y cambiar esto
+		Etiqueta e=new Etiqueta();
 		$encabezado.met.setInicio(e);
 		genera(e+": skip");
 		e.setNl(pc);
@@ -241,7 +241,6 @@ sents
 		genera(ec + ": skip");
 		ec.setNl(pc);
 	} sents_[$sents_seg] {
-		// TODO Comprobar si esto es correcto
 		backpatch($sent.sent_seg, ec);
 		if($sents_.sents_seg_!=null) {
 			$sents_seg = $sents_.sents_seg_;
