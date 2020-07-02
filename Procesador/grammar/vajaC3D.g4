@@ -111,7 +111,6 @@ programa:
 		}
 	} decl* sents EOF {
 	Etiqueta e=new Etiqueta();
-	//genera(e+": skip");
 	genera(Instruccion.OP.et, "", "", e.toString());
 	e.setNl(pc);
 	backpatch($sents.sents_seg,e);
@@ -135,25 +134,18 @@ decl:
 				Etiqueta ec=new Etiqueta();
 				Etiqueta ef=new Etiqueta();
 				Etiqueta efin=new Etiqueta();
-				//genera(ec+": skip");
 				genera(Instruccion.OP.et, "", "", ec.toString());
 				ec.setNl(pc);
-				//genera(s.getNv()+" = -1");
 				genera(Instruccion.OP.copy, "-1", "", s.getNv().toString());
-				//genera("goto "+efin);
 				genera(Instruccion.OP.jump, "", "", efin.toString());
-				//genera(ef+": skip");
 				genera(Instruccion.OP.et, "", "", ef.toString());
 				ef.setNl(pc);
-				//genera(s.getNv()+" = 0");
 				genera(Instruccion.OP.copy, "0", "", s.getNv().toString());
-				//genera(efin+": skip");
 				genera(Instruccion.OP.et, "", "", efin.toString());
 				efin.setNl(pc);
 				backpatch($expr.cierto,ec);
 				backpatch($expr.falso,ef);
 			} else {
-				//genera(s.getNv()+" = "+$expr.r);
 				genera(Instruccion.OP.copy, $expr.r.toString(), "", s.getNv().toString());
 			}
 	}
@@ -163,11 +155,9 @@ decl:
 			switch(s.getTsub()) {
 				case BOOLEAN:
 				case INT:
-					//genera(s.getNv()+" = 0");
 					genera(Instruccion.OP.copy, "0", "", s.getNv().toString());
 					break;
 				case STRING:
-					//genera(s.getNv()+" = \"\"");
 					genera(Instruccion.OP.copy, "\"\"", "", s.getNv().toString());
 					break;
 			}
@@ -212,10 +202,8 @@ decl:
 		}
 		Etiqueta e=new Etiqueta(); // TODO Hacer una tabla de etiquetas y cambiar esto
 		$encabezado.met.setInicio(e);
-		//genera(e+": skip");
 		genera(Instruccion.OP.et, "", "", e.toString());
 		e.setNl(pc);
-		//genera("pmb "+$encabezado.met.getNp());
 		genera(Instruccion.OP.init, "", "", String.valueOf($encabezado.met.getNp()));
 	} decl* sents {
 		// genera("rtn "+$encabezado.met.getNp());
@@ -240,13 +228,10 @@ decl:
 		}
 		Etiqueta e=new Etiqueta();
 		$encabezado.met.setInicio(e);
-		//genera(e+": skip");
 		genera(Instruccion.OP.et, "", "", e.toString());
 		e.setNl(pc);
-		//genera("pmb "+$encabezado.met.getNp());
 		genera(Instruccion.OP.init, "", "", String.valueOf($encabezado.met.getNp()));;
 	} decl* sents {
-		// genera("rtn "+$encabezado.met.getNp());
 		genera(Instruccion.OP.ret, "", "", String.valueOf($encabezado.met.getNp()));
 		pproc.pop();
 		profundidad--;
@@ -277,7 +262,6 @@ sents
 	returns[Deque<Integer> sents_seg]:
 	sent[$sents_seg] {
 		Etiqueta ec = new Etiqueta();
-		//genera(ec + ": skip");
 		genera(Instruccion.OP.et, "", "", ec.toString());
 		ec.setNl(pc);
 	} sents_[$sents_seg] {
@@ -294,7 +278,6 @@ sents_[Deque<Integer> sents_seg]
 	returns[Deque<Integer> sents_seg_]:
 	sent[$sents_seg] {
 		Etiqueta ec = new Etiqueta();
-		//genera(ec + ": skip");
 		genera(Instruccion.OP.et, "", "", ec.toString());
 		ec.setNl(pc);
 	} sents_[$sents_seg] {
@@ -316,7 +299,6 @@ sent[Deque<Integer> sents_seg]
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
 		Etiqueta ec = new Etiqueta();
-		//genera(ec + ": skip");
 		genera(Instruccion.OP.et, "", "", ec.toString());
 		ec.setNl(pc);
 	} decl* sents {
@@ -331,14 +313,12 @@ sent[Deque<Integer> sents_seg]
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
 		Etiqueta ec = new Etiqueta();
-		//genera(ec + ": skip");
 		genera(Instruccion.OP.et, "", "", ec.toString());
 		ec.setNl(pc);
 	} decl* sents {
 		Deque<Integer> sents_seg1 = $sents.sents_seg;
 	} END ELSE BEGIN {
 		Etiqueta ef = new Etiqueta();
-		//genera(ef + ": skip");
 		genera(Instruccion.OP.et, "", "", ef.toString());
 		ef.setNl(pc);
 	} decl* sents END {
@@ -354,12 +334,10 @@ sent[Deque<Integer> sents_seg]
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
 		Etiqueta ei = new Etiqueta();
-		//genera(ei + ": skip");
 		genera(Instruccion.OP.et, "", "", ei.toString());
 		ei.setNl(pc);
 	} expr BEGIN {
 		Etiqueta ec = new Etiqueta();
-		//genera(ec + ": skip");
 		genera(Instruccion.OP.et, "", "", ec.toString());
 		ec.setNl(pc);
 	} decl* sents {
@@ -367,7 +345,6 @@ sent[Deque<Integer> sents_seg]
 		backpatch($expr.cierto,ec);
 		backpatch($sent_seg,ei);
 		$sent_seg=$expr.falso;
-		//genera("goto "+ei);
 		genera(Instruccion.OP.jump, "", "", ei.toString());
 	} END
 	| RETURN expr ';' {
@@ -375,29 +352,21 @@ sent[Deque<Integer> sents_seg]
 			Etiqueta ec=new Etiqueta();
 			Etiqueta ef=new Etiqueta();
 			Etiqueta efin=new Etiqueta();
-			//genera(ec+": skip");
 			genera(Instruccion.OP.et, "", "", ec.toString());
 			ec.setNl(pc);
-			//genera($expr.r+" = -1");
 			genera(Instruccion.OP.copy, "-1", "", $expr.r.toString());
-			//genera("goto "+efin);
 			genera(Instruccion.OP.jump, "", "", efin.toString());
-			//genera(ef+": skip");
 			genera(Instruccion.OP.et, "", "", ef.toString());
 			ef.setNl(pc);
-			//genera($expr.r+" = 0");
 			genera(Instruccion.OP.copy, "0", "", $expr.r.toString());
-			//genera(efin+": skip");
 			genera(Instruccion.OP.et, "", "", efin.toString());
 			efin.setNl(pc);
 			backpatch($expr.cierto,ec);
 			backpatch($expr.falso,ef);
 		}
-		//genera("rtn "+pproc.peek().getNp()+", "+$expr.r);
 		genera(Instruccion.OP.ret, $expr.r.toString(), "", String.valueOf(pproc.peek().getNp()));
 	}
 	| RETURN ';' {
-		//genera("rtn "+pproc.peek().getNp());
 		genera(Instruccion.OP.ret, "", "", String.valueOf(pproc.peek().getNp()));
 	}
 	| referencia '=' expr ';' {
@@ -405,25 +374,18 @@ sent[Deque<Integer> sents_seg]
 			Etiqueta ec=new Etiqueta();
 			Etiqueta ef=new Etiqueta();
 			Etiqueta efin=new Etiqueta();
-			//genera(ec+": skip");
 			genera(Instruccion.OP.et, "", "", ec.toString());
 			ec.setNl(pc);
-			//genera($referencia.r+" = -1");
 			genera(Instruccion.OP.copy, "-1", "", $referencia.r.toString());
-			//genera("goto "+efin);
-			genera(Instruccion.OP.jump, "", "", ef.toString());
-			//genera(ef+": skip");
+			genera(Instruccion.OP.jump, "", "", efin.toString());
 			genera(Instruccion.OP.et, "", "", ef.toString());
 			ef.setNl(pc);
-			//genera($referencia.r+" = 0");
 			genera(Instruccion.OP.copy, "0", "", $referencia.r.toString());
-			//genera(efin+": skip");
 			genera(Instruccion.OP.et, "", "", efin.toString());
 			efin.setNl(pc);
 			backpatch($expr.cierto,ec);
 			backpatch($expr.falso,ef);
 		} else {
-			//genera($referencia.r+" = "+$expr.r);
 			genera(Instruccion.OP.copy, $expr.r.toString(), "", $referencia.r.toString());
 		}
 	}
@@ -442,15 +404,12 @@ referencia
 				t.setTemporal(true);
 				switch(s.getTsub()) {
 					case BOOLEAN:
-						//genera(t+" = " + s.isvCB());
 						genera(Instruccion.OP.copy, String.valueOf(s.isvCB()), "", t.toString());
 						break;
 					case INT:
-						//genera(t+" = " + s.getvCI());
 						genera(Instruccion.OP.copy, String.valueOf(s.getvCI()), "", t.toString());
 						break;
 					case STRING:
-						//genera(t+" = " + s.getvCS());
 						genera(Instruccion.OP.copy, s.getvCS(), "", t.toString());
 						break;
 				}
@@ -467,7 +426,6 @@ referencia
 		Simbolo s;
 		try {
 			s = ts.consulta($ID.getText());
-			//genera("call " + s.getNp());
 			genera(Instruccion.OP.call, "", "", s.getNp().toString());
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
@@ -475,9 +433,7 @@ referencia
 	}
 	| contIdx ')' {
 		while($contIdx.pparams.size()>0) 
-			//genera("param_s " + $contIdx.pparams.pop());
-			genera(Instruccion.OP.params, "", "", $contIdx.pparams.pop().toString());
-		//genera("call "+$contIdx.met.getNp());
+		genera(Instruccion.OP.params, "", "", $contIdx.pparams.pop().toString());
 		genera(Instruccion.OP.call, "", "", String.valueOf($contIdx.met.getNp()));
 	};
 
@@ -495,19 +451,13 @@ contIdx
 				Etiqueta ec=new Etiqueta();
 				Etiqueta ef=new Etiqueta();
 				Etiqueta efin=new Etiqueta();
-				//genera(ec+": skip");
 				genera(Instruccion.OP.et, "", "", ec.toString());
 				ec.setNl(pc);
-				//genera($expr.r+" = -1");
 				genera(Instruccion.OP.copy, "-1", "", $expr.r.toString());
-				//genera("goto "+efin);
 				genera(Instruccion.OP.jump, "", "", efin.toString());
-				//genera(ef+": skip");
 				genera(Instruccion.OP.et, "", "", ef.toString());
 				ef.setNl(pc);
-				//genera($expr.r+" = 0");
 				genera(Instruccion.OP.copy, "0", "", $expr.r.toString());
-				//genera(efin+": skip");
 				genera(Instruccion.OP.et, "", "", efin.toString());
 				efin.setNl(pc);
 				backpatch($expr.cierto,ec);
@@ -526,19 +476,13 @@ contIdx_[Deque<Variable> pparams]:
 			Etiqueta ec=new Etiqueta();
 			Etiqueta ef=new Etiqueta();
 			Etiqueta efin=new Etiqueta();
-			//genera(ec+": skip");
 			genera(Instruccion.OP.et, "", "", ec.toString());
 			ec.setNl(pc);
-			//genera($expr.r+" = -1");
 			genera(Instruccion.OP.copy, "-1", "", $expr.r.toString());
-			//genera("goto "+efin);
 			genera(Instruccion.OP.jump, "", "", efin.toString());
-			//genera(ef+": skip");
 			genera(Instruccion.OP.et, "", "", ef.toString());
 			ef.setNl(pc);
-			//genera($expr.r+" = 0");
 			genera(Instruccion.OP.copy, "0", "", $expr.r.toString());
-			//genera(efin+": skip");
 			genera(Instruccion.OP.et, "", "", efin.toString());
 			efin.setNl(pc);
 			backpatch($expr.cierto,ec);
@@ -574,7 +518,6 @@ exprOr_[Variable t1, Deque<Integer> cierto1, Deque<Integer> falso1]
 	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
 	OR {
 		Etiqueta e = new Etiqueta();
-		//genera("e : skip");
 		genera(Instruccion.OP.et, "", "", e.toString());
 		e.setNl(pc);
 	} exprAnd {
@@ -609,7 +552,6 @@ exprAnd_[Variable t1, Deque<Integer> cierto1, Deque<Integer> falso1]
 	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
 	AND {
 		Etiqueta e = new Etiqueta();
-		//genera("e : skip");
 		genera(Instruccion.OP.et, "", "", e.toString());
 		e.setNl(pc);
 	} exprNot {
@@ -656,11 +598,9 @@ exprComp
 exprComp_[Variable t1]
 	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
 	OPREL exprAdit {
-		//genera("if " + $t1 + " " + $OPREL.getText() + " " + $exprAdit.r + " goto ");
 		genera(valorSaltoCond($OPREL.getText()), $t1.toString(), $exprAdit.r.toString(), "");
 		$cierto=new ArrayDeque<Integer>();
  		$cierto.add(pc);
-		//genera("goto ");
 		genera(Instruccion.OP.jump, "", "", "");
 		$falso=new ArrayDeque<Integer>();
  		$falso.add(pc);
@@ -689,7 +629,6 @@ exprAdit_[Variable t1]
 	ADD exprMult {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
 		t.setTemporal(true);
-		//genera(t+" = " + $t1 + " + " + $exprMult.r);
 		genera(Instruccion.OP.add, $t1.toString(), $exprMult.r.toString(), t.toString());
 		$r=t;
 		$cierto=$exprMult.cierto;
@@ -704,7 +643,6 @@ exprAdit_[Variable t1]
 	| SUB exprMult {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
 		t.setTemporal(true);
-		//genera(t+" = " + $t1 + " - " + $exprMult.r);
 		genera(Instruccion.OP.sub, $t1.toString(), $exprMult.r.toString(), t.toString());
 		$r=t;
 		$cierto=$exprMult.cierto;
@@ -738,7 +676,6 @@ exprMult_[Variable t1]
 	MULT exprNeg {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
 		t.setTemporal(true);
-		//genera(t+" = " + $t1 + " * " + $exprNeg.r);
 		genera(Instruccion.OP.mult, $t1.toString(), $exprNeg.r.toString(), t.toString());
 		$r=t;
 		$cierto=$exprNeg.cierto;
@@ -753,7 +690,6 @@ exprMult_[Variable t1]
 	| DIV exprNeg {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
 		t.setTemporal(true);
-		//genera(t+" = " + $t1 + " / " + $exprNeg.r);
 		genera(Instruccion.OP.div, $t1.toString(), $exprNeg.r.toString(), t.toString());
 		$r=t;
 		$cierto=$exprNeg.cierto;
@@ -773,7 +709,6 @@ exprNeg
 	SUB primario {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
 		t.setTemporal(true);
-		//genera(t+" = - " + $primario.r);
 		genera(Instruccion.OP.neg, $primario.r.toString(), "", t.toString());
 		$r = t;
 		$cierto = $primario.cierto;
@@ -795,11 +730,9 @@ primario
 	| referencia {
 		$r = $referencia.r;
 		if($referencia.tsub==Simbolo.TSub.BOOLEAN) {
-			//genera("if "+$r+" = -1 goto ");
 			genera(Instruccion.OP.ifEQ, $r.toString(), "-1", "");
 			$cierto=new ArrayDeque<Integer>();
 			$cierto.add(pc);
-			//genera("goto ");
 			genera(Instruccion.OP.jump, "", "", "");
 			$falso=new ArrayDeque<Integer>();
 			$falso.add(pc);
@@ -810,26 +743,20 @@ primario
 		t.setTemporal(true);
 		$r = t;
 		if($literal.tsub == Simbolo.TSub.BOOLEAN){
-			Etiqueta e = new Etiqueta();
 			if($literal.text.equals("true")) {
-				//genera(t+" = -1");
 				genera(Instruccion.OP.copy, "-1", "", t.toString());
-				//genera("goto ");
 				genera(Instruccion.OP.jump, "", "", "");
 				$cierto=new ArrayDeque<Integer>();
 				$cierto.add(pc);
 				$falso = null;
 			} else {
-				//genera(t+" = 0");
 				genera(Instruccion.OP.copy, "0", "", t.toString());
-				//genera("goto ");
 				genera(Instruccion.OP.jump, "", "", "");
 				$falso=new ArrayDeque<Integer>();
 				$falso.add(pc);
 				$cierto = null;
 			}
 		} else {
-			//genera(t+" = " + $literal.text);
 			genera(Instruccion.OP.copy, $literal.text, "", t.toString());
 		}
 	};
