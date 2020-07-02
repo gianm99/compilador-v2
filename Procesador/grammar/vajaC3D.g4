@@ -304,6 +304,22 @@ sent[Deque<Integer> sents_seg]
 		genera("goto "+ei);
 	} END
 	| RETURN expr ';' {
+		if($expr.cierto!=null || $expr.falso!=null) {
+			Etiqueta ec=new Etiqueta();
+			Etiqueta ef=new Etiqueta();
+			Etiqueta efin=new Etiqueta();
+			genera(ec+": skip");
+			ec.setNl(pc);
+			genera($expr.r+" = -1");
+			genera("goto "+efin);
+			genera(ef+": skip");
+			ef.setNl(pc);
+			genera($expr.r+" = 0");
+			genera(efin+": skip");
+			efin.setNl(pc);
+			backpatch($expr.cierto,ec);
+			backpatch($expr.falso,ef);
+		}
 		genera("rtn "+pproc.peek().getNp()+", "+$expr.r);
 	}
 	| RETURN ';' {
