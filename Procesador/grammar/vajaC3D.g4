@@ -149,9 +149,13 @@ decl:
 		pproc.push($encabezado.met);
 		// Crear variables para los parámetros
 		Simbolo aux=$encabezado.s.getNext();
-		while(aux!=null) {
-			aux.setNv(tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR));
-			aux=aux.getNext();
+		try {
+			while(aux!=null) {
+				ts.consulta(aux.getId()).setNv(tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR));
+				aux=aux.getNext();
+			}
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
 		Etiqueta e=new Etiqueta(); // TODO Hacer una tabla de etiquetas y cambiar esto
 		$encabezado.met.setInicio(e);
