@@ -8,4 +8,4 @@
 - ~~Hay errores cuando se usa una variable no inicializada.~~
 - ~~Hay asignaciones de literales a variables temporales que se repiten~~.
 - ~~Algunos goto no se están completando con el backpatching.~~
-- Hay problemas con el paso de parámetros y la instrucción de return para `booleans`.
+- ~~Hay problemas con el paso de parámetros y la instrucción de return para `booleans`.~~
