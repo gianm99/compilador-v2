@@ -206,7 +206,6 @@ decl:
 		e.setNl(pc);
 		genera(Instruccion.OP.init, "", "", String.valueOf($encabezado.met.getNp()));
 	} decl* sents {
-		// genera("rtn "+$encabezado.met.getNp());
 		genera(Instruccion.OP.ret, "", "", String.valueOf($encabezado.met.getNp()));
 		pproc.pop();
 		profundidad--;

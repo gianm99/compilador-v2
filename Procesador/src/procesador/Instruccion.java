@@ -95,7 +95,7 @@ public class Instruccion {
                 instruccion[0] = "param_s";
                 break;
         }
-    };
+    }
 
     @Override
     public String toString() {
