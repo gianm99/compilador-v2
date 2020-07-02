@@ -346,7 +346,6 @@ sent[Deque<Integer> sents_seg]
 		genera("rtn "+pproc.peek().getNp());
 	}
 	| referencia '=' expr ';' {
-		// $sent_seg=null;
 		if($referencia.tsub==Simbolo.TSub.BOOLEAN) {
 			Etiqueta ec=new Etiqueta();
 			Etiqueta ef=new Etiqueta();
