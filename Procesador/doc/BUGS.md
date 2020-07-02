@@ -6,5 +6,6 @@
 - ~~No funciona la evaluación de operaciones relacionales.~~
 - ~~No funcionan las operaciones lógicas.~~
 - ~~Hay errores cuando se usa una variable no inicializada.~~
-- Algunos goto no se están completando con el backpatching.
-- Hay asignaciones de literales a variables temporales que se repiten.
+- ~~Hay asignaciones de literales a variables temporales que se repiten~~.
+- ~~Algunos goto no se están completando con el backpatching.~~
+- ~~Hay problemas con el paso de parámetros y la instrucción de return para `booleans`.~~

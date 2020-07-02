@@ -52,6 +52,7 @@ Como detalles a destacar del lenguaje tenemos los siguientes:
 - La estructura de los programas, subprogramas y sentencias complejas (condicionales e iterativas) tiene que ser esta:
   1. *Declaraciones*. Puede no haber ninguna declaración.
   2. *Sentencias*. Tiene que haber como mínimo una.
+- Se pueden hacer returns a mitad de función o a mitad de procedimiento. En el caso del procedimiento tiene que ser un return vacío que no devuelva ninguna expresión.
 
 ## Compilador
 

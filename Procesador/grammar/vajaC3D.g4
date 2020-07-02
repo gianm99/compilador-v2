@@ -1,10 +1,10 @@
 parser grammar vajaC3D;
-options {
+options
+{
 	tokenVocab = vajaLexer;
 }
 
 @parser::header {
-package antlr;
 import procesador.*;
 import java.io.*;
 import java.util.*;
@@ -18,7 +18,6 @@ TablaVariables tv;
 TablaProcedimientos tp;
 String directorio;
 ArrayList<StringBuilder> c3d; // TODO Crear clase propia
-// TODO Asegurarse de que no tenga que ser -1 en vez de 0
 int pc = 0; // program counter
 int profundidad=0;
 
@@ -53,7 +52,7 @@ public void imprimirC3D(){
 public void backpatch(Deque<Integer> lista, Etiqueta e){
 	if(lista!=null) {
 		while(lista.size()>0) {
-			int instruccion=lista.remove();
+			int instruccion=lista.remove()-1;
 			c3d.get(instruccion).append(e.toString());
 		}
 	}
@@ -92,21 +91,46 @@ programa:
 	genera(e+": skip");
 	e.setNl(pc);
 	backpatch($sents.sents_seg,e);
-	// TODO Según los apuntes aquí faltan cosas
 	imprimirC3D();
 };
 
 decl:
 	VARIABLE tipo ID {
-		// Asignación de valor por defecto
 		Simbolo s=new Simbolo();
+		boolean inicializada=false;
 		try {
 			s=ts.consulta($ID.getText());
 			s.setNv(tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR));
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
+		}
+	} (
+		'=' expr {
+			inicializada=true;
+			if(s.getTsub()==Simbolo.TSub.BOOLEAN) {
+				Etiqueta ec=new Etiqueta();
+				Etiqueta ef=new Etiqueta();
+				Etiqueta efin=new Etiqueta();
+				genera(ec+": skip");
+				ec.setNl(pc);
+				genera(s.getNv()+" = -1");
+				genera("goto "+efin);
+				genera(ef+": skip");
+				ef.setNl(pc);
+				genera(s.getNv()+" = 0");
+				genera(efin+": skip");
+				efin.setNl(pc);
+				backpatch($expr.cierto,ec);
+				backpatch($expr.falso,ef);
+			} else {
+				genera(s.getNv()+" = "+$expr.r);
+			}
+	}
+	)? {
+		// Asignación de valor por defecto
+		if(!inicializada) {
 			switch(s.getTsub()) {
 				case BOOLEAN:
-					genera(s.getNv()+" = false");
-					break;
 				case INT:
 					genera(s.getNv()+" = 0");
 					break;
@@ -114,14 +138,8 @@ decl:
 					genera(s.getNv()+" = \"\"");
 					break;
 			}
-		} catch(TablaSimbolos.TablaSimbolosException e) {
-			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
-	} (
-		'=' expr {
-		genera(s.getNv()+" = "+$expr.r);
-	}
-	)? ';'
+	} ';'
 	| CONSTANT tipo ID '=' literal ';' {
 		Simbolo s;
 		try {
@@ -141,7 +159,7 @@ decl:
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
 	}
-	| FUNCTION tipo encabezado BEGIN {
+	| FUNCTION tipo encabezado BEGIN { // TODO Ocupación de variables locales y número de parámetros
 		profundidad++;
 		try{
 			ts=ts.bajaBloque();
@@ -149,16 +167,28 @@ decl:
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
 		pproc.push($encabezado.met);
+		// Crear variables para los parámetros
+		Simbolo aux=$encabezado.s.getNext();
+		try {
+			while(aux!=null) {
+				ts.consulta(aux.getId()).setNv(tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR));
+				aux=aux.getNext();
+			}
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
+		}
 		Etiqueta e=new Etiqueta(); // TODO Hacer una tabla de etiquetas y cambiar esto
 		$encabezado.met.setInicio(e);
 		genera(e+": skip");
-		genera("pmb "+$encabezado.met.getNp()); // TODO Comprobar si esto se hace aquí
+		e.setNl(pc);
+		genera("pmb "+$encabezado.met.getNp());
 	} decl* sents {
-		genera("rtn "+$encabezado.met.getNp());
+		// genera("rtn "+$encabezado.met.getNp());
+		pproc.pop();
 		profundidad--;
 		ts=ts.subeBloque();
 	} END
-	| PROCEDURE encabezado BEGIN {
+	| PROCEDURE encabezado BEGIN { // TODO Ocupación de variables locales y número de parámetros
 		profundidad++;
 		try{
 			ts=ts.bajaBloque();
@@ -166,6 +196,12 @@ decl:
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
 		pproc.push($encabezado.met);
+		// Crear variables para los parámetros
+		Simbolo aux=$encabezado.s.getNext();
+		while(aux!=null) {
+			aux.setNv(tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR));
+			aux=aux.getNext();
+		}
 		Etiqueta e=new Etiqueta();
 		$encabezado.met.setInicio(e);
 		genera(e+": skip");
@@ -173,12 +209,13 @@ decl:
 		genera("pmb "+$encabezado.met.getNp());
 	} decl* sents {
 		genera("rtn "+$encabezado.met.getNp());
+		pproc.pop();
 		profundidad--;
 		ts=ts.subeBloque();
 	} END;
 
 encabezado
-	returns[Procedimiento met]:
+	returns[Procedimiento met, Simbolo s]:
 	ID '(' parametros? ')' {
 		Simbolo s=new Simbolo();
 		Procedimiento met;
@@ -187,6 +224,7 @@ encabezado
 			met=tp.nuevoProc(profundidad,s.getT());
 			s.setNp(met);
 			$met = met;
+			$s=s;
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
@@ -203,6 +241,7 @@ sents
 		genera(ec + ": skip");
 		ec.setNl(pc);
 	} sents_[$sents_seg] {
+		// TODO Comprobar si esto es correcto
 		backpatch($sent.sent_seg, ec);
 		if($sents_.sents_seg_!=null) {
 			$sents_seg = $sents_.sents_seg_;
@@ -281,35 +320,49 @@ sent[Deque<Integer> sents_seg]
 		ts=ts.subeBloque();
 		backpatch($expr.cierto,ec);
 		backpatch($sent_seg,ei);
-		$sents_seg=$expr.falso;
+		$sent_seg=$expr.falso;
 		genera("goto "+ei);
 	} END
-	| RETURN expr ';'
+	| RETURN expr ';' {
+		if($expr.cierto!=null || $expr.falso!=null) {
+			Etiqueta ec=new Etiqueta();
+			Etiqueta ef=new Etiqueta();
+			Etiqueta efin=new Etiqueta();
+			genera(ec+": skip");
+			ec.setNl(pc);
+			genera($expr.r+" = -1");
+			genera("goto "+efin);
+			genera(ef+": skip");
+			ef.setNl(pc);
+			genera($expr.r+" = 0");
+			genera(efin+": skip");
+			efin.setNl(pc);
+			backpatch($expr.cierto,ec);
+			backpatch($expr.falso,ef);
+		}
+		genera("rtn "+pproc.peek().getNp()+", "+$expr.r);
+	}
+	| RETURN ';' {
+		genera("rtn "+pproc.peek().getNp());
+	}
 	| referencia '=' expr ';' {
-		// $sent_seg=null;
 		if($referencia.tsub==Simbolo.TSub.BOOLEAN) {
 			Etiqueta ec=new Etiqueta();
 			Etiqueta ef=new Etiqueta();
 			Etiqueta efin=new Etiqueta();
 			genera(ec+": skip");
 			ec.setNl(pc);
-			genera($referencia.r+"= -1");
+			genera($referencia.r+" = -1");
 			genera("goto "+efin);
 			genera(ef+": skip");
 			ef.setNl(pc);
-			genera($referencia.r+"= 0");
+			genera($referencia.r+" = 0");
 			genera(efin+": skip");
 			efin.setNl(pc);
 			backpatch($expr.cierto,ec);
 			backpatch($expr.falso,ef);
 		} else {
-			if( !($referencia.r.isTemporal() && $expr.r.isTemporal()) ){
-				if( $referencia.r.getNv() == $expr.r.getNv()){
-					genera($referencia.r+" = "+tv.getAnt().toString());
-				} else {
-					//genera($referencia.r+" = "+tv.getAnt().toString());
-				}
-			}
+			genera($referencia.r+" = "+$expr.r);
 		}
 	}
 	| referencia ';';
@@ -368,6 +421,23 @@ contIdx
 			s = ts.consulta($ID.getText());
 			$met = s.getNp();
 			$pparams.push($expr.r);
+			// Boolean parámetro
+			if($expr.cierto!=null || $expr.falso!=null) {
+				Etiqueta ec=new Etiqueta();
+				Etiqueta ef=new Etiqueta();
+				Etiqueta efin=new Etiqueta();
+				genera(ec+": skip");
+				ec.setNl(pc);
+				genera($expr.r+" = -1");
+				genera("goto "+efin);
+				genera(ef+": skip");
+				ef.setNl(pc);
+				genera($expr.r+" = 0");
+				genera(efin+": skip");
+				efin.setNl(pc);
+				backpatch($expr.cierto,ec);
+				backpatch($expr.falso,ef);
+			}
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
@@ -376,6 +446,23 @@ contIdx
 contIdx_[Deque<Variable> pparams]:
 	',' expr {
 		$pparams.push($expr.r);
+		// Boolean parámetro
+		if($expr.cierto!=null || $expr.falso!=null) {
+			Etiqueta ec=new Etiqueta();
+			Etiqueta ef=new Etiqueta();
+			Etiqueta efin=new Etiqueta();
+			genera(ec+": skip");
+			ec.setNl(pc);
+			genera($expr.r+" = -1");
+			genera("goto "+efin);
+			genera(ef+": skip");
+			ef.setNl(pc);
+			genera($expr.r+" = 0");
+			genera(efin+": skip");
+			efin.setNl(pc);
+			backpatch($expr.cierto,ec);
+			backpatch($expr.falso,ef);
+		}
 	} contIdx_[$pparams]
 	|; // lambda
 
@@ -504,19 +591,44 @@ exprAdit
 		$r = $exprMult.r;
 		$cierto=$exprMult.cierto;
 		$falso=$exprMult.falso;
-	} exprAdit_[$r];
+	} exprAdit_[$r] {
+		if($exprAdit_.cierto!=null || $exprAdit_.falso!=null || $exprAdit_.r!=null) {
+			$r=$exprAdit_.r;
+			$cierto=$exprAdit_.cierto;
+			$falso=$exprAdit_.falso;
+		}
+	};
 
-exprAdit_[Variable t1]:
+exprAdit_[Variable t1]
+	returns[Variable r, Deque<Integer> cierto, Deque<Integer falso>]:
 	ADD exprMult {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
 		t.setTemporal(true);
 		genera(t+" = " + $t1 + " + " + $exprMult.r);
-	} exprAdit_[t]
+		$r=t;
+		$cierto=$exprMult.cierto;
+		$falso=$exprMult.falso;
+	} exprAdit_[$r] {
+		if($exprAdit_.r!=null || $exprAdit_.cierto!=null || $exprAdit_.falso!=null) {
+			$r=$exprAdit_.r;
+			$cierto=$exprAdit_.cierto;
+			$falso=$exprAdit_.falso;
+		}
+	}
 	| SUB exprMult {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
 		t.setTemporal(true);
 		genera(t+" = " + $t1 + " - " + $exprMult.r);
-	} exprAdit_[t]
+		$r=t;
+		$cierto=$exprMult.cierto;
+		$falso=$exprMult.falso;
+	} exprAdit_[$r] {
+		if($exprAdit_.r!=null || $exprAdit_.cierto!=null || $exprAdit_.falso!=null) {
+			$r=$exprAdit_.r;
+			$cierto=$exprAdit_.cierto;
+			$falso=$exprAdit_.falso;
+		}
+	}
 	|; //lambda
 
 // Expresión multiplicativa
@@ -526,19 +638,44 @@ exprMult
 		$r = $exprNeg.r;
 		$cierto=$exprNeg.cierto;
 		$falso=$exprNeg.falso;
-	} exprMult_[$r];
+	} exprMult_[$r] {
+		if($exprMult_.r!=null || $exprMult_.cierto!=null || $exprMult_.falso!=null) {
+			$r=$exprMult_.r;
+			$cierto=$exprMult_.cierto;
+			$falso=$exprMult_.falso;
+		}
+	};
 
-exprMult_[Variable t1]:
+exprMult_[Variable t1]
+	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
 	MULT exprNeg {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
 		t.setTemporal(true);
 		genera(t+" = " + $t1 + " * " + $exprNeg.r);
-	} exprMult_[t]
+		$r=t;
+		$cierto=$exprNeg.cierto;
+		$falso=$exprNeg.falso;
+	} exprMult_[$r] {
+		if($exprMult_.r!=null || $exprMult_.cierto!=null || $exprMult_.falso!=null) {
+			$r=$exprMult_.r;
+			$cierto=$exprMult_.cierto;
+			$falso=$exprMult_.falso;
+		}
+	}
 	| DIV exprNeg {
 		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
 		t.setTemporal(true);
 		genera(t+" = " + $t1 + " / " + $exprNeg.r);
-	} exprMult_[t]
+		$r=t;
+		$cierto=$exprNeg.cierto;
+		$falso=$exprNeg.falso;
+	} exprMult_[$r] {
+		if($exprMult_.r!=null || $exprMult_.cierto!=null || $exprMult_.falso!=null) {
+			$r=$exprMult_.r;
+			$cierto=$exprMult_.cierto;
+			$falso=$exprMult_.falso;
+		}
+	}
 	|; //lambda
 
 // Expresión de negación
@@ -549,6 +686,8 @@ exprNeg
 		t.setTemporal(true);
 		genera(t+" = - " + $primario.r);
 		$r = t;
+		$cierto = $primario.cierto;
+		$falso = $primario.falso;
 	}
 	| primario {
 		$r = $primario.r;
@@ -564,29 +703,37 @@ primario
 		$falso = $expr.falso;
 	}
 	| referencia {
-		// if($referencia.r!=null) $referencia.r.setTemporal(false); 
 		$r = $referencia.r;
+		if($referencia.tsub==Simbolo.TSub.BOOLEAN) {
+			genera("if "+$r+" = -1 goto ");
+			$cierto=new ArrayDeque<Integer>();
+			$cierto.add(pc);
+			genera("goto ");
+			$falso=new ArrayDeque<Integer>();
+			$falso.add(pc);
+		}
 	}
 	| literal {
 		Variable t = tv.nuevaVar(pproc.peek(), Simbolo.Tipo.VAR);
 		t.setTemporal(true);
-		genera(t+" = " + $literal.text);
 		$r = t;
 		if($literal.tsub == Simbolo.TSub.BOOLEAN){
 			Etiqueta e = new Etiqueta();
 			if($literal.text.equals("true")) {
-				genera("goto "+ e);
-				e.setNl(pc);
+				genera(t+" = -1");
+				genera("goto ");
 				$cierto=new ArrayDeque<Integer>();
 				$cierto.add(pc);
 				$falso = null;
 			} else {
-				genera("goto "+ e);
-				e.setNl(pc);
+				genera(t+" = 0");
+				genera("goto ");
 				$falso=new ArrayDeque<Integer>();
 				$falso.add(pc);
 				$cierto = null;
 			}
+		} else {
+			genera(t+" = " + $literal.text);
 		}
 	};
 
