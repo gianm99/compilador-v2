@@ -2,6 +2,7 @@ var int a;
 const string s1 = "Hola mundo";
 var string s2 = s1;
 var int c;
+var boolean par = true;
 func boolean function1(string str, int i, boolean foo){
 	var int a = 2;
 	var boolean b;
@@ -11,11 +12,12 @@ func boolean function1(string str, int i, boolean foo){
 	}
 	a = 5;
 	while(a>0){
-		b = !b;
+		b = par;
+		par=false;
 		a = a-1;
 	}
 	foo = true;
-	return foo;
+	return false;
 }
 proc main(){
 	printINT(c);
