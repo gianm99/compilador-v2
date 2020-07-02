@@ -63,23 +63,23 @@ public class Instruccion {
             case et:
                 instruccion[0] = "skip";
                 break;
-            case condLT:    //TODO Cambiar los strings para cada tipo de salto condicional.
-                instruccion[0] = "if " + codigo + " goto";
+            case condLT:
+                instruccion[0] = "<";
                 break;
             case condLE:
-                instruccion[0] = "if " + codigo + " goto";
+                instruccion[0] = "<=";
                 break;
             case condEQ:
-                instruccion[0] = "if " + codigo + " goto";
+                instruccion[0] = "==";
                 break;
             case condNEQ:
-                instruccion[0] = "if " + codigo + " goto";
+                instruccion[0] = "!=";
                 break;
             case condGE:
-                instruccion[0] = "if " + codigo + " goto";
+                instruccion[0] = ">=";
                 break;
             case condGT:
-                instruccion[0] = "if " + codigo + " goto";
+                instruccion[0] = ">";
                 break;
             case incond:
                 instruccion[0] = "goto";
@@ -133,22 +133,13 @@ public class Instruccion {
                 s = instruccion[3] + ": " + instruccion[0];
                 break;
             case condLT:
-                instruccion[0] = "if " + codigo + " goto";
-                break;
             case condLE:
-                instruccion[0] = "if " + codigo + " goto";
-                break;
             case condEQ:
-                instruccion[0] = "if " + codigo + " goto";
-                break;
             case condNEQ:
-                instruccion[0] = "if " + codigo + " goto";
-                break;
             case condGE:
-                instruccion[0] = "if " + codigo + " goto";
-                break;
             case condGT:
-                instruccion[0] = "if " + codigo + " goto";
+                instruccion[0] = "if " + instruccion[1] + " " + instruccion[0] + " "
+                        + instruccion[2] + " goto " + instruccion[3];
                 break;
             case incond:
             case init:

@@ -17,7 +17,7 @@ TablaSimbolos ts;
 TablaVariables tv;
 TablaProcedimientos tp;
 String directorio;
-ArrayList<StringBuilder> c3d; // TODO Crear clase propia
+ArrayList<StringBuilder> c3d;
 int pc = 0; // program counter
 int profundidad=0;
 
@@ -96,15 +96,41 @@ programa:
 
 decl:
 	VARIABLE tipo ID {
-		// Asignación de valor por defecto
 		Simbolo s=new Simbolo();
+		boolean inicializada=false;
 		try {
 			s=ts.consulta($ID.getText());
 			s.setNv(tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR));
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
+		}
+	} (
+		'=' expr {
+			inicializada=true;
+			if(s.getTsub()==Simbolo.TSub.BOOLEAN) {
+				Etiqueta ec=new Etiqueta();
+				Etiqueta ef=new Etiqueta();
+				Etiqueta efin=new Etiqueta();
+				genera(ec+": skip");
+				ec.setNl(pc);
+				genera(s.getNv()+" = -1");
+				genera("goto "+efin);
+				genera(ef+": skip");
+				ef.setNl(pc);
+				genera(s.getNv()+" = 0");
+				genera(efin+": skip");
+				efin.setNl(pc);
+				backpatch($expr.cierto,ec);
+				backpatch($expr.falso,ef);
+			} else {
+				genera(s.getNv()+" = "+$expr.r);
+			}
+	}
+	)? {
+		// Asignación de valor por defecto
+		if(!inicializada) {
 			switch(s.getTsub()) {
 				case BOOLEAN:
-					genera(s.getNv()+" = 0");
-					break;
 				case INT:
 					genera(s.getNv()+" = 0");
 					break;
@@ -112,14 +138,8 @@ decl:
 					genera(s.getNv()+" = \"\"");
 					break;
 			}
-		} catch(TablaSimbolos.TablaSimbolosException e) {
-			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
-	} (
-		'=' expr {
-		genera(s.getNv()+" = "+$expr.r);
-	}
-	)? ';'
+	} ';'
 	| CONSTANT tipo ID '=' literal ';' {
 		Simbolo s;
 		try {
@@ -149,11 +169,15 @@ decl:
 		pproc.push($encabezado.met);
 		// Crear variables para los parámetros
 		Simbolo aux=$encabezado.s.getNext();
-		while(aux!=null) {
-			aux.setNv(tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR));
-			aux=aux.getNext();
+		try {
+			while(aux!=null) {
+				ts.consulta(aux.getId()).setNv(tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR));
+				aux=aux.getNext();
+			}
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
-		Etiqueta e=new Etiqueta(); // TODO Hacer una tabla de etiquetas y cambiar esto
+		Etiqueta e=new Etiqueta();
 		$encabezado.met.setInicio(e);
 		genera(e+": skip");
 		e.setNl(pc);
@@ -217,7 +241,6 @@ sents
 		genera(ec + ": skip");
 		ec.setNl(pc);
 	} sents_[$sents_seg] {
-		// TODO Comprobar si esto es correcto
 		backpatch($sent.sent_seg, ec);
 		if($sents_.sents_seg_!=null) {
 			$sents_seg = $sents_.sents_seg_;
@@ -300,13 +323,28 @@ sent[Deque<Integer> sents_seg]
 		genera("goto "+ei);
 	} END
 	| RETURN expr ';' {
+		if($expr.cierto!=null || $expr.falso!=null) {
+			Etiqueta ec=new Etiqueta();
+			Etiqueta ef=new Etiqueta();
+			Etiqueta efin=new Etiqueta();
+			genera(ec+": skip");
+			ec.setNl(pc);
+			genera($expr.r+" = -1");
+			genera("goto "+efin);
+			genera(ef+": skip");
+			ef.setNl(pc);
+			genera($expr.r+" = 0");
+			genera(efin+": skip");
+			efin.setNl(pc);
+			backpatch($expr.cierto,ec);
+			backpatch($expr.falso,ef);
+		}
 		genera("rtn "+pproc.peek().getNp()+", "+$expr.r);
 	}
 	| RETURN ';' {
 		genera("rtn "+pproc.peek().getNp());
 	}
 	| referencia '=' expr ';' {
-		// $sent_seg=null;
 		if($referencia.tsub==Simbolo.TSub.BOOLEAN) {
 			Etiqueta ec=new Etiqueta();
 			Etiqueta ef=new Etiqueta();
@@ -383,6 +421,23 @@ contIdx
 			$met = s.getNp();
 			// TODO Comprobar si esto funciona con booleans
 			$pparams.push($expr.r);
+			// Boolean parámetro
+			if($expr.cierto!=null || $expr.falso!=null) {
+				Etiqueta ec=new Etiqueta();
+				Etiqueta ef=new Etiqueta();
+				Etiqueta efin=new Etiqueta();
+				genera(ec+": skip");
+				ec.setNl(pc);
+				genera($expr.r+" = -1");
+				genera("goto "+efin);
+				genera(ef+": skip");
+				ef.setNl(pc);
+				genera($expr.r+" = 0");
+				genera(efin+": skip");
+				efin.setNl(pc);
+				backpatch($expr.cierto,ec);
+				backpatch($expr.falso,ef);
+			}
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
@@ -391,6 +446,23 @@ contIdx
 contIdx_[Deque<Variable> pparams]:
 	',' expr {
 		$pparams.push($expr.r);
+		// Boolean parámetro
+		if($expr.cierto!=null || $expr.falso!=null) {
+			Etiqueta ec=new Etiqueta();
+			Etiqueta ef=new Etiqueta();
+			Etiqueta efin=new Etiqueta();
+			genera(ec+": skip");
+			ec.setNl(pc);
+			genera($expr.r+" = -1");
+			genera("goto "+efin);
+			genera(ef+": skip");
+			ef.setNl(pc);
+			genera($expr.r+" = 0");
+			genera(efin+": skip");
+			efin.setNl(pc);
+			backpatch($expr.cierto,ec);
+			backpatch($expr.falso,ef);
+		}
 	} contIdx_[$pparams]
 	|; // lambda
 
@@ -644,20 +716,23 @@ primario
 	| literal {
 		Variable t = tv.nuevaVar(pproc.peek(), Simbolo.Tipo.VAR);
 		t.setTemporal(true);
-		genera(t+" = " + $literal.text);
 		$r = t;
 		if($literal.tsub == Simbolo.TSub.BOOLEAN){
 			if($literal.text.equals("true")) {
+				genera(t+" = -1");
 				genera("goto ");
 				$cierto=new ArrayDeque<Integer>();
 				$cierto.add(pc);
 				$falso = null;
 			} else {
+				genera(t+" = 0");
 				genera("goto ");
 				$falso=new ArrayDeque<Integer>();
 				$falso.add(pc);
 				$cierto = null;
 			}
+		} else {
+			genera(t+" = " + $literal.text);
 		}
 	};
 
