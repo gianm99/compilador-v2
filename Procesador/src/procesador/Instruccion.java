@@ -1,7 +1,5 @@
 package procesador;
 
-import java.util.Arrays;
-
 public class Instruccion {
 
     private OP codigo;
@@ -91,7 +89,7 @@ public class Instruccion {
                 instruccion[0] = "call";
                 break;
             case ret:
-                instruccion[0] = "ret";
+                instruccion[0] = "rtn";
                 break;
             case params:
                 instruccion[0] = "param_s";
@@ -138,7 +136,7 @@ public class Instruccion {
             case condNEQ:
             case condGE:
             case condGT:
-                instruccion[0] = "if " + instruccion[1] + " " + instruccion[0] + " "
+                s = "if " + instruccion[1] + " " + instruccion[0] + " "
                         + instruccion[2] + " goto " + instruccion[3];
                 break;
             case incond:
@@ -169,5 +167,9 @@ public class Instruccion {
 
     public void setOperando(String[] instruccion) {
         this.instruccion = instruccion;
+    }
+
+    public void setInstruccion3(String instruccion) {
+        this.instruccion[3] = instruccion;
     }
 }
