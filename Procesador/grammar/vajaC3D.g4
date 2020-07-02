@@ -19,6 +19,7 @@ TablaVariables tv;
 TablaProcedimientos tp;
 String directorio;
 ArrayList<Instruccion> c3d;
+Optimizador opt;
 int pc = 0; // program counter
 int profundidad=0;
 
@@ -43,6 +44,18 @@ public void imprimirC3D(){
 		buffer = new BufferedWriter(new FileWriter(interFile));
 		for(int i=0;i<c3d.size();i++) {
 			buffer.write(c3d.get(i).toString() + "\n");
+		}
+		buffer.close();
+	} catch(IOException e) {}
+}
+
+public void imprimirC3D_Opt(){
+	Writer buffer;
+	File interFile = new File(directorio + "/intermedioOptimo.txt");
+	try {
+		buffer = new BufferedWriter(new FileWriter(interFile));
+		for(int i=0;i<opt.getCodigo().size();i++) {
+			buffer.write(opt.getCodigo().get(i).toString() + "\n");
 		}
 		buffer.close();
 	} catch(IOException e) {}
@@ -115,7 +128,10 @@ programa:
 	genera(Instruccion.OP.et, "", "", e.toString());
 	e.setNl(pc);
 	backpatch($sents.sents_seg,e);
+	opt = new Optimizador(c3d, tv);
 	imprimirC3D();
+	opt.optimizarCodigo();
+	imprimirC3D_Opt();
 };
 
 decl:
@@ -138,16 +154,20 @@ decl:
 				genera(Instruccion.OP.et, "", "", ec.toString());
 				ec.setNl(pc);
 				genera(Instruccion.OP.copy, "-1", "", s.getNv().toString());
+				s.getNv().setR(-1);
 				genera(Instruccion.OP.jump, "", "", efin.toString());
 				genera(Instruccion.OP.et, "", "", ef.toString());
 				ef.setNl(pc);
 				genera(Instruccion.OP.copy, "0", "", s.getNv().toString());
+				s.getNv().setR(0);
 				genera(Instruccion.OP.et, "", "", efin.toString());
 				efin.setNl(pc);
 				backpatch($expr.cierto,ec);
 				backpatch($expr.falso,ef);
 			} else {
 				genera(Instruccion.OP.copy, $expr.r.toString(), "", s.getNv().toString());
+				if(s.getTsub()==Simbolo.TSub.INT)
+					s.getNv().setR($expr.r.getR());
 			}
 	}
 	)? {
@@ -157,6 +177,7 @@ decl:
 				case BOOLEAN:
 				case INT:
 					genera(Instruccion.OP.copy, "0", "", s.getNv().toString());
+					s.getNv().setR(0);
 					break;
 				case STRING:
 					genera(Instruccion.OP.copy, "\"\"", "", s.getNv().toString());
@@ -355,10 +376,12 @@ sent[Deque<Integer> sents_seg]
 			genera(Instruccion.OP.et, "", "", ec.toString());
 			ec.setNl(pc);
 			genera(Instruccion.OP.copy, "-1", "", $expr.r.toString());
+			$expr.r.setR(-1);
 			genera(Instruccion.OP.jump, "", "", efin.toString());
 			genera(Instruccion.OP.et, "", "", ef.toString());
 			ef.setNl(pc);
 			genera(Instruccion.OP.copy, "0", "", $expr.r.toString());
+			$expr.r.setR(0);
 			genera(Instruccion.OP.et, "", "", efin.toString());
 			efin.setNl(pc);
 			backpatch($expr.cierto,ec);
@@ -377,16 +400,19 @@ sent[Deque<Integer> sents_seg]
 			genera(Instruccion.OP.et, "", "", ec.toString());
 			ec.setNl(pc);
 			genera(Instruccion.OP.copy, "-1", "", $referencia.r.toString());
+			$referencia.r.setR(-1);
 			genera(Instruccion.OP.jump, "", "", efin.toString());
 			genera(Instruccion.OP.et, "", "", ef.toString());
 			ef.setNl(pc);
 			genera(Instruccion.OP.copy, "0", "", $referencia.r.toString());
+			$referencia.r.setR(0);
 			genera(Instruccion.OP.et, "", "", efin.toString());
 			efin.setNl(pc);
 			backpatch($expr.cierto,ec);
 			backpatch($expr.falso,ef);
 		} else {
 			genera(Instruccion.OP.copy, $expr.r.toString(), "", $referencia.r.toString());
+			$referencia.r.setR($expr.r.getR());
 		}
 	}
 	| referencia ';';
@@ -405,9 +431,15 @@ referencia
 				switch(s.getTsub()) {
 					case BOOLEAN:
 						genera(Instruccion.OP.copy, String.valueOf(s.isvCB()), "", t.toString());
+						if(s.isvCB()){
+							t.setR(-1);
+						} else {
+							t.setR(0);
+						}
 						break;
 					case INT:
 						genera(Instruccion.OP.copy, String.valueOf(s.getvCI()), "", t.toString());
+						t.setR(s.getvCI());
 						break;
 					case STRING:
 						genera(Instruccion.OP.copy, s.getvCS(), "", t.toString());
@@ -454,10 +486,12 @@ contIdx
 				genera(Instruccion.OP.et, "", "", ec.toString());
 				ec.setNl(pc);
 				genera(Instruccion.OP.copy, "-1", "", $expr.r.toString());
+				$expr.r.setR(-1);
 				genera(Instruccion.OP.jump, "", "", efin.toString());
 				genera(Instruccion.OP.et, "", "", ef.toString());
 				ef.setNl(pc);
 				genera(Instruccion.OP.copy, "0", "", $expr.r.toString());
+				$expr.r.setR(0);
 				genera(Instruccion.OP.et, "", "", efin.toString());
 				efin.setNl(pc);
 				backpatch($expr.cierto,ec);
@@ -479,10 +513,12 @@ contIdx_[Deque<Variable> pparams]:
 			genera(Instruccion.OP.et, "", "", ec.toString());
 			ec.setNl(pc);
 			genera(Instruccion.OP.copy, "-1", "", $expr.r.toString());
+			$expr.r.setR(-1);
 			genera(Instruccion.OP.jump, "", "", efin.toString());
 			genera(Instruccion.OP.et, "", "", ef.toString());
 			ef.setNl(pc);
 			genera(Instruccion.OP.copy, "0", "", $expr.r.toString());
+			$expr.r.setR(0);
 			genera(Instruccion.OP.et, "", "", efin.toString());
 			efin.setNl(pc);
 			backpatch($expr.cierto,ec);
@@ -745,12 +781,14 @@ primario
 		if($literal.tsub == Simbolo.TSub.BOOLEAN){
 			if($literal.text.equals("true")) {
 				genera(Instruccion.OP.copy, "-1", "", t.toString());
+				t.setR(-1);
 				genera(Instruccion.OP.jump, "", "", "");
 				$cierto=new ArrayDeque<Integer>();
 				$cierto.add(pc);
 				$falso = null;
 			} else {
 				genera(Instruccion.OP.copy, "0", "", t.toString());
+				t.setR(0);
 				genera(Instruccion.OP.jump, "", "", "");
 				$falso=new ArrayDeque<Integer>();
 				$falso.add(pc);
@@ -758,6 +796,15 @@ primario
 			}
 		} else {
 			genera(Instruccion.OP.copy, $literal.text, "", t.toString());
+			if($literal.tsub==Simbolo.TSub.BOOLEAN){
+				if(Boolean.parseBoolean($literal.text)){
+					t.setR(-1);
+				} else {
+					t.setR(0);
+				}
+			} else if($literal.tsub==Simbolo.TSub.INT){
+				t.setR(Integer.parseInt($literal.text));
+			}	
 		}
 	};
 

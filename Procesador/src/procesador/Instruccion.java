@@ -161,11 +161,11 @@ public class Instruccion {
         this.codigo = codigo;
     }
 
-    public String[] getOperando() {
+    public String[] getInstruccion() {
         return instruccion;
     }
 
-    public void setOperando(String[] instruccion) {
+    public void setInstruccion(String[] instruccion) {
         this.instruccion = instruccion;
     }
 
