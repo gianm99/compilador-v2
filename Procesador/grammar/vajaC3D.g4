@@ -96,15 +96,41 @@ programa:
 
 decl:
 	VARIABLE tipo ID {
-		// Asignación de valor por defecto
 		Simbolo s=new Simbolo();
+		boolean inicializada=false;
 		try {
 			s=ts.consulta($ID.getText());
 			s.setNv(tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR));
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
+		}
+	} (
+		'=' expr {
+			inicializada=true;
+			if(s.getTsub()==Simbolo.TSub.BOOLEAN) {
+				Etiqueta ec=new Etiqueta();
+				Etiqueta ef=new Etiqueta();
+				Etiqueta efin=new Etiqueta();
+				genera(ec+": skip");
+				ec.setNl(pc);
+				genera(s.getNv()+" = -1");
+				genera("goto "+efin);
+				genera(ef+": skip");
+				ef.setNl(pc);
+				genera(s.getNv()+" = 0");
+				genera(efin+": skip");
+				efin.setNl(pc);
+				backpatch($expr.cierto,ec);
+				backpatch($expr.falso,ef);
+			} else {
+				genera(s.getNv()+" = "+$expr.r);
+			}
+	}
+	)? {
+		// Asignación de valor por defecto
+		if(!inicializada) {
 			switch(s.getTsub()) {
 				case BOOLEAN:
-					genera(s.getNv()+" = 0");
-					break;
 				case INT:
 					genera(s.getNv()+" = 0");
 					break;
@@ -112,14 +138,8 @@ decl:
 					genera(s.getNv()+" = \"\"");
 					break;
 			}
-		} catch(TablaSimbolos.TablaSimbolosException e) {
-			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
-	} (
-		'=' expr {
-		genera(s.getNv()+" = "+$expr.r);
-	}
-	)? ';'
+	} ';'
 	| CONSTANT tipo ID '=' literal ';' {
 		Simbolo s;
 		try {
