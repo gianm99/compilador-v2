@@ -22,12 +22,12 @@ func boolean function1(string str, int i, boolean foo){
 proc main(){
 	printINT(c);
 }
-var int z =2+10;
+var int z = 2+10;
 
-if(true){
+if(3>5){
 	var boolean b;
 	a=78;
-z=z/8+z+89*58;
+	z=z/8+z+89*58;
 }
 printINT(z);
 main();
