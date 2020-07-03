@@ -39,9 +39,6 @@ public void notifyErrorListeners(Token offendingToken, String msg, RecognitionEx
 	notificacion = notificacion.replaceAll("OpBinSum","+, -");
 	throw new RuntimeException(notificacion);
 }
-// DOT
-Writer writer;
-int dot = 0;
 }
 
 @lexer::members {
