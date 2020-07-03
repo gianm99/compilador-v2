@@ -9,12 +9,12 @@ import java.util.ArrayList;
 
 public class Ensamblador {
 
-    public void ensamblar(String directorio, ArrayList<Instruccion> c3d) {
+    public static void ensamblar(String directorio, ArrayList<Instruccion> c3d) {
         generarASM(directorio, c3d);
         generarEXE(directorio);
     }
 
-    public void generarEXE(String directorio) {
+    public static void generarEXE(String directorio) {
         try {
             Process compilado = Runtime.getRuntime().exec("ml /c /Zd /coff " + directorio + ".asm");
             compilado.waitFor();
@@ -30,7 +30,7 @@ public class Ensamblador {
         }
     }
 
-    public void generarASM(String directorio, ArrayList<Instruccion> c3d) {
+    public static void generarASM(String directorio, ArrayList<Instruccion> c3d) {
         Writer buffer;
         File asmFile = new File(directorio + ".asm");
         ArrayList<String> asm = traducir(c3d);
@@ -44,7 +44,7 @@ public class Ensamblador {
         }
     }
 
-    public ArrayList<String> traducir(ArrayList<Instruccion> c3d) {
+    public static ArrayList<String> traducir(ArrayList<Instruccion> c3d) {
         ArrayList<String> asm = new ArrayList<>();
         // TODO Hacer la traducción a x86
         return asm;
