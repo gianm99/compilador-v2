@@ -1,0 +1,8 @@
+1. Instalar NASM para Windows (https://www.nasm.us/pub/nasm/releasebuilds/2.15.02/win64/)
+2. Poner NASM en el path
+3. Instalar Golink para Windows (http://www.godevtool.com/)
+4. Poner Golink en el path
+5. Para compilar usar: nasm -f win32 <archivo>.asm -o <archivo>.obj
+6. Para enlazar (link): Golink.exe /console <archivo>.obj kernel32.dll
+
+https://stackoverflow.com/a/12575061/9664778
