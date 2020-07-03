@@ -7,7 +7,8 @@ options
 @parser::header {
 import procesador.*;
 import java.io.*;
-import java.util.*;
+import java.util.Deque;
+import java.util.ArrayDeque;
 import procesador.*;
 }
 

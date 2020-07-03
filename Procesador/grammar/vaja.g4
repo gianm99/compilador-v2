@@ -3,7 +3,8 @@ grammar vaja;
 @header {
 import procesador.*;
 import java.io.*;
-import java.util.*;
+import java.util.Deque;
+import java.util.ArrayDeque;
 }
 
 @parser::members {
