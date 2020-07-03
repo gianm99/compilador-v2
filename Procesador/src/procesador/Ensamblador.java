@@ -46,6 +46,15 @@ public class Ensamblador {
 
     public static ArrayList<String> traducir(ArrayList<Instruccion> c3d) {
         ArrayList<String> asm = new ArrayList<>();
+        asm.add(".386");
+        asm.add(".model flat, stdcall");
+        asm.add("option casemap: none");
+        asm.add("include \\masm32\\include\\windows.inc");
+        asm.add("include \\masm32\\include\\kernel32.inc");
+        asm.add("include \\masm32\\include\\masm32.inc");
+        asm.add("includelib \\masm32\\lib\\kernel32.lib");
+        asm.add("includelib \\masm32\\lib\\masm32.lib");
+        asm.add("");
         // TODO Hacer la traducción a x86
         return asm;
     }
