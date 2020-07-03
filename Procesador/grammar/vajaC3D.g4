@@ -44,7 +44,7 @@ public ArrayList<Instruccion> getC3D() {
 
 public void imprimirC3D(){
 	Writer buffer;
-	File interFile = new File(directorio + "/intermedio.txt");
+	File interFile = new File(directorio+"C3D.txt");
 	try {
 		buffer = new BufferedWriter(new FileWriter(interFile));
 		for(int i=0;i<c3d.size();i++) {

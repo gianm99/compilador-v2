@@ -18,7 +18,8 @@ public class Procesador {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws Exception {
-        String buildPath = "pruebas/build/" + FilenameUtils.getBaseName(args[0]);
+        String filename = FilenameUtils.getBaseName(args[0]);
+        String buildPath = "pruebas/build/" + filename + "/";
         File buildDir = new File(buildPath);
         if (!buildDir.mkdirs()) {
             // Si ya existe la carpeta, se vacía
@@ -30,7 +31,7 @@ public class Procesador {
         vajaLexer lexer = new vajaLexer(stream);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         tokens.fill();
-        File tokensFile = new File(buildPath + "/tokens.txt");
+        File tokensFile = new File(buildPath + "tokens.txt");
         try (Writer buffer = new BufferedWriter(new FileWriter(tokensFile))) {
             for (Token tok : tokens.getTokens()) {
                 buffer.write(tok.getText() + '\n');
@@ -47,7 +48,7 @@ public class Procesador {
         } catch (RuntimeException e) {
             System.out.println("Se encontraron errores en el código:");
             System.out.println(ConsoleColors.RED_BOLD + e.getMessage() + ConsoleColors.RESET);
-            File erroresFile = new File(buildPath + "/errores.txt");
+            File erroresFile = new File(buildPath + "errores.txt");
             Writer buffer = new BufferedWriter(new FileWriter(erroresFile));
             if (e != null) {
                 buffer.write(e.getMessage());
@@ -57,7 +58,7 @@ public class Procesador {
         }
         // Generación de código intermedio
         vajaC3D parserC3D;
-        parserC3D = new vajaC3D(tokens, buildPath, parser.ts);
+        parserC3D = new vajaC3D(tokens, buildPath + filename, parser.ts);
         try {
             tokens.seek(0);
             parserC3D.programa();
@@ -66,7 +67,11 @@ public class Procesador {
         } catch (RuntimeException e) {
             System.out.println(ConsoleColors.RED_BOLD + "Error al generar código: " + e.getMessage()
                     + ConsoleColors.RESET);
-            throw e;
+            return;
         }
+        // Ensamblado de código
+        Ensamblador.ensamblar(buildPath+filename,parserC3D.getC3D());
+        // Optimización de código
+        // Ensamblado de código optimizado
     }
 }
