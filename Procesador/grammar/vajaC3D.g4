@@ -13,14 +13,14 @@ import procesador.*;
 }
 
 @parser::members {
-Deque<Procedimiento> pproc=new ArrayDeque<Procedimiento>(); // Pila de procedimientos
-TablaSimbolos ts;
-TablaVariables tv;
-TablaProcedimientos tp;
-String directorio;
-ArrayList<StringBuilder> c3d;
-int pc = 0; // program counter
-int profundidad=0;
+private Deque<Procedimiento> pproc=new ArrayDeque<Procedimiento>(); // Pila de procedimientos
+private TablaSimbolos ts;
+private TablaVariables tv;
+private TablaProcedimientos tp;
+private String directorio;
+private ArrayList<Instruccion> c3d;
+private int pc = 0; // program counter
+private int profundidad=0;
 
 public vajaC3D(TokenStream input, String directorio, TablaSimbolos ts){
 	this(input);
@@ -36,6 +36,10 @@ public void genera(String codigo){
 	StringBuilder aux=new StringBuilder();
 	aux.append(codigo);
 	c3d.add(aux);
+}
+
+public ArrayList<Instruccion> getC3D() {
+	return c3d;
 }
 
 public void imprimirC3D(){
