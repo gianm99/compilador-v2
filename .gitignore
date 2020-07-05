@@ -4,3 +4,4 @@ Procesador/pruebas/build/
 Procesador/grammar/.antlr/
 Procesador/src/antlr/
 Procesador/.vscode/
+Procesador/eclipse-formatter.xml
