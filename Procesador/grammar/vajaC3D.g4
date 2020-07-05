@@ -150,6 +150,7 @@ decl:
 		}
 	} (
 		'=' expr {
+			// TODO Quitar esto y no generar código para inicializaciones
 			inicializada=true;
 			if(s.getTsub()==Simbolo.TSub.BOOLEAN) {
 				Etiqueta ec=new Etiqueta();
@@ -411,7 +412,6 @@ sent[Deque<Integer> sents_seg]
 	| referencia ';';
 
 referencia
-// returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso, Simbolo.TSub tsub]:
 	returns[Variable r, Simbolo.TSub tsub]:
 	ID {
 		Simbolo s;

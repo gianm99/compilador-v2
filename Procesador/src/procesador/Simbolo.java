@@ -48,15 +48,6 @@ public class Simbolo {
 
 	public void setNv(Variable nv) {
 		this.nv = nv;
-		/*if(tsub == TSub.BOOLEAN){
-			if(vCB == true){
-				this.nv.setR(-1);
-			} else {
-				this.nv.setR(0);
-			}
-		} else if(tsub == TSub.INT){
-			this.nv.setR(vCI);
-		}*/
 	}
 
 	public enum Tipo {
