@@ -1,8 +1,8 @@
 package procesador;
 
 /**
- * Simbolo. Clase que sirve para gestionar la información relacionada con los símbolos que aparecen
- * en el código fuente.
+ * Simbolo. Clase que sirve para gestionar la información relacionada con los
+ * símbolos que aparecen en el código fuente.
  * 
  * @author Gian Lucas Martín Chamorro
  * @author Jordi Antoni Sastre Moll
@@ -14,8 +14,16 @@ public class Simbolo {
 	private TSub tsub;
 	private boolean returnEncontrado;
 	private String valor;
-	private Variable nv;
+	private int nv;
 	private Procedimiento np;
+
+	public enum Tipo {
+		CONST, VAR, PROC, FUNC, ARG, NULO;
+	}
+
+	public enum TSub {
+		BOOLEAN, INT, STRING, NULL;
+	}
 
 	public Simbolo(String id, Simbolo next, Tipo t, TSub tsub) {
 		this.id = id;
@@ -40,22 +48,6 @@ public class Simbolo {
 
 	public void setNp(Procedimiento np) {
 		this.np = np;
-	}
-
-	public Variable getNv() {
-		return nv;
-	}
-
-	public void setNv(Variable nv) {
-		this.nv = nv;
-	}
-
-	public enum Tipo {
-		CONST, VAR, PROC, FUNC, ARG, NULO;
-	}
-
-	public enum TSub {
-		BOOLEAN, INT, STRING, NULL;
 	}
 
 	public String getId() {
@@ -104,5 +96,13 @@ public class Simbolo {
 
 	public void setValor(String valor) {
 		this.valor = valor;
+	}
+
+	public int getNv() {
+		return nv;
+	}
+
+	public void setNv(int nv) {
+		this.nv = nv;
 	}
 }
