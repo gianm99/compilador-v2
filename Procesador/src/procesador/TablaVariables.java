@@ -16,8 +16,8 @@ public class TablaVariables {
         tv = new ArrayList<Variable>();
     }
 
-    public Variable nuevaVar(Procedimiento sub, Simbolo.Tipo tipo) {
-        Variable var = new Variable(sub, tipo);
+    public Variable nuevaVar(Procedimiento sub, Simbolo.Tipo tipo, Simbolo.TSub tsub) {
+        Variable var = new Variable(sub, tipo, tsub);
         tv.add(var);
         if(tv.size()>2) ant = tv.get(tv.size()-1);
         return var;
