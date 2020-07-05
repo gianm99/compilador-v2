@@ -7,45 +7,53 @@ package procesador;
  * @author Gian Lucas Martín Chamorro
  */
 public class Variable {
-    private int r;
     private int nv; // Número de variable
-    private Procedimiento proc; // Procedimiento que la ha declarado
+    private boolean temporal; // Si la variable es temporal
+    private int proc; // Número del procedimiento que la ha declarado
     private Simbolo.Tipo tipo; // Tipo: variable, constante o argumento
     private Simbolo.TSub tsub; // Tipo subyacente
-    private boolean temporal;
-    private static boolean inicializada;
-    private static int cv = 0; // Cantidad de variables creadas
+    // TODO #48 Comprobar que las variables estén inicializadas
+    private boolean inicializada; // Si ha sido inicializada
+    private String id; // Identificador de la variable (t si es temporal)
+    private String valor;
 
     public Variable(Variable v) {
-        this.r = v.r;
+        this.valor = v.valor;
         this.nv = v.nv;
         this.proc = v.proc;
         this.tipo = v.tipo;
         this.temporal = v.temporal;
     }
 
-    public Variable(Procedimiento proc, Simbolo.Tipo tipo, Simbolo.TSub tsub) {
-        cv++; // Aumenta la cantidad de variables
-        this.nv = cv;
-        this.tipo = tipo;
-        this.setTsub(tsub);
+    public Variable(int nv, boolean temporal, int proc, Simbolo.Tipo tipo, Simbolo.TSub tsub) {
+        this.nv = nv;
+        this.temporal = temporal;
         this.proc = proc;
+        this.tipo = tipo;
+        this.tsub = tsub;
+        if (temporal) {
+            id="t";
+        }
+    }
+
+    public String getValor() {
+        return valor;
+    }
+
+    public void setValor(String valor) {
+        this.valor = valor;
     }
 
     public Simbolo.TSub getTsub() {
         return tsub;
     }
 
-    public void setTsub(Simbolo.TSub tsub) {
-        this.tsub = tsub;
-    }
-
-    public static boolean isInicializada() {
+    public boolean isInicializada() {
         return inicializada;
     }
 
-    public static void setInicializada(boolean inicializada) {
-        Variable.inicializada = inicializada;
+    public void setInicializada(boolean inicializada) {
+        this.inicializada = inicializada;
     }
 
     public boolean isTemporal() {
@@ -56,14 +64,6 @@ public class Variable {
         this.temporal = temporal;
     }
 
-    public int getR() {
-        return r;
-    }
-
-    public void setR(int r) {
-        this.r = r;
-    }
-
     public int getNv() {
         return nv;
     }
@@ -72,36 +72,24 @@ public class Variable {
         this.nv = nv;
     }
 
-    public Simbolo.Tipo getTipo() {
+    public Simbolo.Tipo tipo() {
         return tipo;
     }
 
-    public void setTipo(Simbolo.Tipo tipo) {
-        this.tipo = tipo;
-    }
-
-    public static int getCv() {
-        return cv;
-    }
-
-    public static void setCv(int cv) {
-        Variable.cv = cv;
+    public int proc() {
+        return proc;
     }
 
     @Override
     public String toString() {
-        if (temporal) {
-            return "t" + nv;
-        } else {
-            return "v" + nv;
-        }
+        return id+"$"+nv;
     }
 
-    public Procedimiento getProc() {
-        return proc;
+    public String getId() {
+        return id;
     }
 
-    public void setProc(Procedimiento proc) {
-        this.proc = proc;
+    public void setId(String id) {
+        this.id = id;
     }
 }
