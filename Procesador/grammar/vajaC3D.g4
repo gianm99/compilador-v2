@@ -120,10 +120,7 @@ programa:
 	genera(Instruccion.OP.et, "", "", e.toString());
 	e.setNl(pc);
 	backpatch($sents.sents_seg,e);
-	opt = new Optimizador(c3d, tv);
 	imprimirC3D();
-	opt.optimizarCodigo();
-	imprimirC3D_Opt();
 };
 
 decl:
