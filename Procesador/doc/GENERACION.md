@@ -3,15 +3,15 @@
 - Declaracion
   - ~~Funcion~~
   - ~~Procedure~~
-  - Variable
-  - Constante
+  - ~~Variable~~
+  - ~~Constante~~
 - ~~Encabezado~~
-- Sentencia
+- ~~Sentencia~~
   - ~~Asignación~~
   - ~~If~~
   - ~~If else~~
   - ~~While~~
-  - Return
+  - ~~Return~~
   - ~~Referencia~~
 - ~~Expresiones~~
 - ~~Literal~~
