@@ -126,12 +126,12 @@ public class Ensamblador {
     }
 
     /**
-     * Lectura de memoria a registro. Implementa la lectura de una posición de memoria a 
-     * un registro.
+     * Lectura de memoria a registro. Implementa la lectura de una posición de
+     * memoria a un registro.
      */
     private void lecturaMemReg(Variable x, String R) {
-        if(x.getTipo()==Simbolo.Tipo.CONST) {
-            
+        if (x.tipo() == Simbolo.Tipo.CONST) {
+
         }
     }
 }
