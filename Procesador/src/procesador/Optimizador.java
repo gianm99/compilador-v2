@@ -10,16 +10,18 @@ import java.util.List;
 
 public class Optimizador {
 
-    private ArrayList<Instruccion> codigo;
+    private String directorio;
+    private ArrayList<Instruccion> C3D;
     private TablaVariables tv;
 
-    public Optimizador(final ArrayList<Instruccion> codigo, TablaVariables tv) {
-        this.codigo = codigo;
+    public Optimizador(String directorio, final ArrayList<Instruccion> C3D, TablaVariables tv) {
+        this.directorio = directorio;
+        this.C3D = C3D;
         this.tv = tv;
     }
 
-    public ArrayList<Instruccion> getCodigo() {
-        return codigo;
+    public ArrayList<Instruccion> getC3D() {
+        return C3D;
     }
 
 
@@ -28,25 +30,19 @@ public class Optimizador {
         File interFile = new File(directorio + "/intermedioOptimo.txt");
         try {
             buffer = new BufferedWriter(new FileWriter(interFile));
-            for (int i = 0; i < codigo.size(); i++) {
-                buffer.write(codigo.get(i).toString() + "\n");
+            for (int i = 0; i < C3D.size(); i++) {
+                buffer.write(C3D.get(i).toString() + "\n");
             }
             buffer.close();
         } catch (IOException e) {
         }
     }
 
-    public void optimizarCodigo() {
-        eliminaCodigoInaccesible();
-        eliminaEtiquetasInecesarias();
-    }
-
-
     public void eliminaCodigoInaccesible() {
-        for (int i = 0; i < codigo.size(); i++) {
-            Instruccion ins = codigo.get(i);
+        for (int i = 0; i < C3D.size(); i++) {
+            Instruccion ins = C3D.get(i);
             if (esIf(ins)) {
-                if (esValorConstante(ins, i)) {
+                if (operandosConstantes(ins, i)) {
                     i += ejecutaIf(ins, i);
                 }
             }
@@ -56,25 +52,25 @@ public class Optimizador {
     public void eliminaEtiquetasInecesarias() {
         ArrayList<String> skips = new ArrayList<String>();
         ArrayList<String> gotos = new ArrayList<String>();
-        for (int i = 0; i < codigo.size(); i++) {
-            Instruccion ins = codigo.get(i);
-            if (ins.getCodigo() == Instruccion.OP.et) {
-                skips.add(ins.getInstruccion3());
-            } else if (ins.getCodigo() == Instruccion.OP.jump || esIf(ins)) {
-                gotos.add(ins.getInstruccion3());
+        for (int i = 0; i < C3D.size(); i++) {
+            Instruccion ins = C3D.get(i);
+            if (ins.getOpCode() == Instruccion.OP.skip) {
+                skips.add(ins.destino());
+            } else if (ins.getOpCode() == Instruccion.OP.jump || esIf(ins)) {
+                gotos.add(ins.destino());
             }
         }
         skips.removeAll(gotos);
         Instruccion aux;
         int i = 0;
         boolean borrado;
-        while (i < codigo.size()) {
-            aux = codigo.get(i);
+        while (i < C3D.size()) {
+            aux = C3D.get(i);
             borrado = false;
-            if (aux.getCodigo() == Instruccion.OP.et) {
+            if (aux.getOpCode() == Instruccion.OP.skip) {
                 for (int j = 0; j < skips.size(); j++) {
-                    if (skips.get(j).equals(aux.getInstruccion3())) {
-                        codigo.remove(i);
+                    if (skips.get(j).equals(aux.destino())) {
+                        C3D.remove(i);
                         j = skips.size();
                         borrado = true;
                     }
@@ -85,15 +81,15 @@ public class Optimizador {
         }
         i = 0;
         borrado = false;
-        while (i < codigo.size() - 1) { // TODO ¿Puede haber dos gotos en este caso?
+        while (i < C3D.size() - 1) { // TODO Puede haber más gotos en este caso
             if (borrado)
-                codigo.remove(i - 1);
+                C3D.remove(i - 1);
             borrado = false;
-            if (codigo.get(i).getCodigo() == Instruccion.OP.jump) {
-                if (codigo.get(i + 1).getCodigo() == Instruccion.OP.et && codigo.get(i)
-                        .getInstruccion3().equals(codigo.get(i + 1).getInstruccion3())) {
+            if (C3D.get(i).getOpCode() == Instruccion.OP.jump) {
+                if (C3D.get(i + 1).getOpCode() == Instruccion.OP.skip
+                        && C3D.get(i).destino().equals(C3D.get(i + 1).destino())) {
                     borrado = true;
-                    codigo.remove(i);
+                    C3D.remove(i);
                 }
             }
             i++;
@@ -103,11 +99,11 @@ public class Optimizador {
     public void eliminaAsignacionesInecesarias() {
         ArrayList<Instruccion> vars = new ArrayList<Instruccion>();
         int i = 0;
-        while (i < codigo.size()) {
-            if (codigo.get(i).getCodigo() == Instruccion.OP.copy
-                    && codigo.get(i).getInstruccion3().charAt(0) == 't') {
-                if (!vars.contains(codigo.get(i))) {
-                    vars.add(codigo.get(i));
+        while (i < C3D.size()) {
+            if (C3D.get(i).getOpCode() == Instruccion.OP.copy
+                    && C3D.get(i).destino().charAt(0) == 't') {
+                if (!vars.contains(C3D.get(i))) {
+                    vars.add(C3D.get(i));
                 }
             }
             i++;
@@ -116,16 +112,16 @@ public class Optimizador {
         boolean primerEncuentro;
         for (i = 0; i < vars.size(); i++) {
             primerEncuentro = false;
-            while (j < codigo.size()) {
-                if (codigo.get(j).getCodigo() == Instruccion.OP.copy) {
+            while (j < C3D.size()) {
+                if (C3D.get(j).getOpCode() == Instruccion.OP.copy) {
                     if (!primerEncuentro) {
-                        if (vars.get(i).equals(codigo.get(j))) {
+                        if (vars.get(i).equals(C3D.get(j))) {
                             primerEncuentro = true;
                         }
                     } else {
-                        if (vars.get(i).equals(codigo.get(j))) {
+                        if (vars.get(i).equals(C3D.get(j))) {
                             vars.remove(i);
-                            j = codigo.size();
+                            j = C3D.size();
                         }
                     }
                 }
