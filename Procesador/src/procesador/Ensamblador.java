@@ -29,6 +29,8 @@ public class Ensamblador {
             Process enlazado = Runtime.getRuntime().exec(
                     "link /out:" + directorio + ".exe /subsystem:console " + directorio + ".obj");
             enlazado.waitFor();
+            System.out.println(ConsoleColors.YELLOW_BOLD_BRIGHT + "Proceso de ensamblado ("
+                    + directorio + ") completado con éxito" + ConsoleColors.RESET);
         } catch (Exception e) {
             e.printStackTrace();
         }
