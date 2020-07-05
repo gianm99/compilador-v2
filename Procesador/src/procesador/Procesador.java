@@ -20,7 +20,7 @@ public class Procesador {
      */
     public static void main(String[] args) throws Exception {
         String filename = FilenameUtils.getBaseName(args[0]);
-        String buildPath = "pruebas/build/" + filename + "/";
+        String buildPath = "pruebas\\build\\" + filename + "\\";
         File buildDir = new File(buildPath);
         if (!buildDir.mkdirs()) {
             // Si ya existe la carpeta, se vacía
