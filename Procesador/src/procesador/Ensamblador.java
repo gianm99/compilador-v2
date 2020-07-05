@@ -58,11 +58,10 @@ public class Ensamblador {
         asm.add("include \\masm32\\include\\masm32.inc");
         asm.add("includelib \\masm32\\lib\\kernel32.lib");
         asm.add("includelib \\masm32\\lib\\masm32.lib");
-        asm.add(".data"); // Datos inicializados
-        asm.add(".data?"); // Datos no inicializados
+        asm.add(".data"); // Variables globales
+        // asm.add(".data?"); // Datos no inicializados
         asm.add(".const"); // Todas las constantes
-        asm.add(".code");
-        // TODO Declarar aquí todas las subrutinas
+        asm.add(".code"); // Todas las subrutinas y el programa principal
         asm.add("start:");
         for (Instruccion instruccion : c3d) {
             switch (instruccion.getCodigo()) {
@@ -120,9 +119,6 @@ public class Ensamblador {
                 break;
             case sub:
                 break;
-            default:
-                break;
-
             }
         }
         asm.add("end start");
