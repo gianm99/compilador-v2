@@ -41,6 +41,14 @@ public ArrayList<Instruccion> getC3D() {
 	return c3d;
 }
 
+public TablaVariables getTv() {
+	return tv;
+}
+
+public TablaProcedimientos getTp() {
+	return tp;
+}
+
 public void imprimirC3D(){
 	Writer buffer;
 	File interFile = new File(directorio+"C3D.txt");
