@@ -15,6 +15,10 @@ public class Etiqueta {
         ne = ce; // Asigna el número de etiqueta
     }
 
+    public static int get(String etiqueta) {
+        return Integer.parseInt(etiqueta.substring(1));
+    }
+
     public int getNe() {
         return ne;
     }
