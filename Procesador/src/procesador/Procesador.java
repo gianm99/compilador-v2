@@ -15,9 +15,6 @@ import org.apache.commons.io.*;
  */
 public class Procesador {
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) throws Exception {
         String filename = FilenameUtils.getBaseName(args[0]);
         String buildPath = "pruebas\\build\\" + filename + "\\";
@@ -68,13 +65,18 @@ public class Procesador {
         } catch (RuntimeException e) {
             System.out.println(ConsoleColors.RED_BOLD + "Error al generar código: " + e.getMessage()
                     + ConsoleColors.RESET);
-            return;
+            throw e;
         }
         // Ensamblado de código sin optimizar
-        Ensamblador normal = new Ensamblador(buildPath+filename, parserC3D.getC3D());
+        Ensamblador normal = new Ensamblador(buildPath + filename, parserC3D.getC3D());
         normal.ensamblar();
         // Optimización de código
+        Optimizador optimizador = new Optimizador(buildPath + filename + "_OPT", parserC3D.getC3D(),
+                parserC3D.getTv());
+        optimizador.optimizar();
         // Ensamblado de código optimizado
-        // Ensamblador optimizado = new Ensamblador(buildPath+, );
+        Ensamblador optimizado = new Ensamblador(buildPath + filename + "_OPT",
+                optimizador.getC3D());
+        optimizado.ensamblar();
     }
 }
