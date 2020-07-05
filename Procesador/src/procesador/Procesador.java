@@ -6,8 +6,9 @@ import java.io.*;
 import org.apache.commons.io.*;
 
 /**
- * Procesador. Programa que procesa un archivo de texto escrito en el lenguaje inventado "vaja" y
- * genera código intermedio, código ensamblador sin optimizar y código ensamblador optimizado.
+ * Procesador. Programa que procesa un archivo de texto escrito en el lenguaje
+ * inventado "vaja" y genera código intermedio, código ensamblador sin optimizar
+ * y código ensamblador optimizado.
  *
  * @author Gian Lucas Martín Chamorro
  * @author Jordi Antoni Sastre Moll
@@ -69,9 +70,11 @@ public class Procesador {
                     + ConsoleColors.RESET);
             return;
         }
-        // Ensamblado de código
-        Ensamblador.ensamblar(buildPath+filename,parserC3D.getC3D());
+        // Ensamblado de código sin optimizar
+        Ensamblador normal = new Ensamblador(buildPath+filename, parserC3D.getC3D());
+        normal.ensamblar();
         // Optimización de código
         // Ensamblado de código optimizado
+        // Ensamblador optimizado = new Ensamblador(buildPath+, );
     }
 }
