@@ -3,36 +3,48 @@ package procesador;
 import java.util.ArrayList;
 
 /**
- * TablaVariable. Clase que sirve para almacenar las variables que aparecen en el código.
+ * TablaVariable. Clase que sirve para almacenar las variables que aparecen en
+ * el código.
  * 
  * @author Gian Lucas Martín Chamorro
  */
 public class TablaVariables {
 
     private ArrayList<Variable> tv;
-    private Variable ant = null;
+    private int nv;
 
     public TablaVariables(String directorio) {
         tv = new ArrayList<Variable>();
+        nv = 0;
     }
 
-    public Variable nuevaVar(Procedimiento sub, Simbolo.Tipo tipo, Simbolo.TSub tsub) {
-        Variable var = new Variable(sub, tipo, tsub);
+    public int nuevaVar(boolean temporal, Integer proc, Simbolo.Tipo tipo, Simbolo.TSub tsub) {
+        Variable var;
+        nv++;
+        if (proc==null) {
+            var = new Variable(nv, temporal, 0, tipo, tsub);            
+        } else {
+            var = new Variable(nv, temporal, proc, tipo, tsub);            
+        }
         tv.add(var);
-        if(tv.size()>2) ant = tv.get(tv.size()-1);
-        return var;
+        return nv;
     }
 
-    // Getters y setters
-    public ArrayList<Variable> getTV() {
-        return tv;
+    public void quitarVar(String var) {
+        String segmentos[] = var.split("\\$");
+        tv.remove(Integer.parseInt(segmentos[1]));
     }
 
-    public void setTV(ArrayList<Variable> tv) {
-        this.tv = tv;
+    public Variable get(int nv) {
+        return tv.get(nv-1);
     }
 
-    public Variable getAnt() {
-        return ant;
+    public Variable get(String var) {
+        String segmentos[] = var.split("\\$");
+        if (segmentos.length > 1) {
+            return tv.get(Integer.parseInt(segmentos[1]));
+        } else {
+            return null;
+        }
     }
 }
