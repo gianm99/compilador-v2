@@ -13,10 +13,7 @@ public class Simbolo {
 	private Tipo t;
 	private TSub tsub;
 	private boolean returnEncontrado;
-	// TODO #35 Crear herencias para Simbolo en las que guardar información específica
-	private boolean vCB;
-	private int vCI;
-	private String vCS;
+	private String valor;
 	private Variable nv;
 	private Procedimiento np;
 
@@ -110,27 +107,11 @@ public class Simbolo {
 		this.returnEncontrado = returnEncontrado;
 	}
 
-	public boolean isvCB() {
-		return vCB;
+	public String getValor() {
+		return valor;
 	}
 
-	public void setvCB(boolean vCB) {
-		this.vCB = vCB;
-	}
-
-	public int getvCI() {
-		return vCI;
-	}
-
-	public void setvCI(int vCI) {
-		this.vCI = vCI;
-	}
-
-	public String getvCS() {
-		return vCS;
-	}
-
-	public void setvCS(String vCS) {
-		this.vCS = vCS;
+	public void setValor(String valor) {
+		this.valor = valor;
 	}
 }
