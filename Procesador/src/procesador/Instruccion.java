@@ -2,20 +2,19 @@ package procesador;
 
 public class Instruccion {
 
-    private OP codigo;
+    private OP opCode;
     private String[] instruccion = new String[4];
 
     public enum OP {
-        copy, add, sub, mult, div, neg, and, or, not, et, ifLT, ifLE, ifEQ, ifNE, ifGE, ifGT, jump, 
-        LT, LE, EQ, NEQ, GE, GT, init, call, ret, params
+        copy, add, sub, mult, div, neg, and, or, not, skip, ifLT, ifLE, ifEQ, ifNE, ifGE, ifGT, jump, LT, LE, EQ, NEQ, GE, GT, pmb, call, ret, params
     }
 
-    public Instruccion(OP codigo, String op1, String op2, String op3) {
-        this.codigo = codigo;
+    public Instruccion(OP opCode, String op1, String op2, String op3) {
+        this.opCode = opCode;
         this.instruccion[1] = op1;
         this.instruccion[2] = op2;
         this.instruccion[3] = op3;
-        switch (codigo) {
+        switch (opCode) {
         case add:
             instruccion[0] = "+";
             break;
@@ -59,7 +58,7 @@ public class Instruccion {
         case not:
             instruccion[0] = "!";
             break;
-        case et:
+        case skip:
             instruccion[0] = "skip";
             break;
         case ifLT:
@@ -83,7 +82,7 @@ public class Instruccion {
         case jump:
             instruccion[0] = "goto";
             break;
-        case init:
+        case pmb:
             instruccion[0] = "pmb";
             break;
         case call:
@@ -101,7 +100,7 @@ public class Instruccion {
     @Override
     public String toString() {
         String s = "";
-        switch (codigo) {
+        switch (opCode) {
         case add:
         case sub:
         case mult:
@@ -128,7 +127,7 @@ public class Instruccion {
         case not:
             s = instruccion[3] + " = " + instruccion[0] + " " + instruccion[1];
             break;
-        case et:
+        case skip:
             s = instruccion[3] + ": " + instruccion[0];
             break;
         case ifLT:
@@ -141,25 +140,14 @@ public class Instruccion {
                     + instruccion[3];
             break;
         case jump:
-        case init:
+        case pmb:
         case call:
         case ret:
         case params:
             s = instruccion[0] + " " + instruccion[3];
             break;
-        default:
-            s = "Error instrucción";
-            break;
         }
         return s;
-    }
-
-    public OP getCodigo() {
-        return codigo;
-    }
-
-    public void setCodigo(OP codigo) {
-        this.codigo = codigo;
     }
 
     public String[] getInstruccion() {
@@ -170,11 +158,23 @@ public class Instruccion {
         this.instruccion = instruccion;
     }
 
-    public String getInstruccion3(){
+    public String getOperando(int n) {
+        return instruccion[n];
+    }
+
+    public void setOperando(int n, String operando) {
+        this.instruccion[n] = operando;
+    }
+
+    public String destino() {
         return instruccion[3];
     }
 
-    public void setInstruccion3(String instruccion) {
-        this.instruccion[3] = instruccion;
+    public void setEtiqueta(String etiqueta) {
+        this.instruccion[3] = etiqueta;
+    }
+
+    public OP getOpCode() {
+        return opCode;
     }
 }

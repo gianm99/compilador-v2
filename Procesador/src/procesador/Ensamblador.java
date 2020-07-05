@@ -64,7 +64,7 @@ public class Ensamblador {
         asm.add(".code"); // Todas las subrutinas y el programa principal
         asm.add("start:");
         for (Instruccion instruccion : c3d) {
-            switch (instruccion.getCodigo()) {
+            switch (instruccion.getOpCode()) {
             case EQ:
                 break;
             case GE:
@@ -87,7 +87,7 @@ public class Ensamblador {
                 break;
             case div:
                 break;
-            case et:
+            case skip:
                 break;
             case ifEQ:
                 break;
@@ -101,7 +101,7 @@ public class Ensamblador {
                 break;
             case ifNE:
                 break;
-            case init:
+            case pmb:
                 break;
             case jump:
                 break;
