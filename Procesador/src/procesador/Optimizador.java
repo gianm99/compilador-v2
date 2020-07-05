@@ -24,16 +24,23 @@ public class Optimizador {
         return C3D;
     }
 
+    public void optimizar() {
+        eliminaCodigoInaccesible();
+        eliminaEtiquetasInecesarias();
+        imprimirC3D();
+    }
 
-    public void imprimirC3D_Opt(String directorio) {
+    private void imprimirC3D() {
         Writer buffer;
-        File interFile = new File(directorio + "/intermedioOptimo.txt");
+        File interFile = new File(directorio + ".txt");
         try {
             buffer = new BufferedWriter(new FileWriter(interFile));
             for (int i = 0; i < C3D.size(); i++) {
                 buffer.write(C3D.get(i).toString() + "\n");
             }
             buffer.close();
+            System.out.println(ConsoleColors.PURPLE_BOLD_BRIGHT
+                    + "Proceso de optimización completado con éxito" + ConsoleColors.RESET);
         } catch (IOException e) {
         }
     }
@@ -128,144 +135,171 @@ public class Optimizador {
                 j++;
             }
         }
-        //Seguir aquí
+        i = 0;
+        int k;
+        while(i<vars.size()){
+            k = devolverLineaVariableUsada(vars.get(i).destino());
+            if(C3D.get(k).getOperando(1).equals(vars.get(i).destino())){
+                C3D.get(k).setOperando(1, vars.get(i).destino());
+            } else {
+                C3D.get(k).setOperando(2, vars.get(i).destino());
+            }
+            C3D.remove(vars.get(i));
+            i++;
+        }
     }
 
     /*
-     * 
-     * 
-     * 
-     * 
+     *
+     *
+     *
+     *
      * Código para optimizaciones
-     * 
-     * 
-     * 
-     * 
+     *
+     *
+     *
+     *
      */
 
-    private ArrayList<Instruccion> recogerCodigo(int empieza, int lineaEtiqueta) {
-        boolean codigoRecogido = false;
-        int lineas = empieza;
-        ArrayList<Instruccion> lista = new ArrayList<Instruccion>();
-        Instruccion insAux = codigo.get(lineas);
-        // Recoger valor etiqueta
-        int intAux = Integer.parseInt(codigo.get(lineaEtiqueta).getInstruccion()[3].substring(1));
-        lista.add(insAux);
-        while (!codigoRecogido) {
-            lineas++;
-            insAux = codigo.get(lineas);
-            lista.add(insAux);
-            // Comprobar si se ha encontrado el skip con la etiqueta
-            if (insAux.getCodigo() == Instruccion.OP.et
-                    && intAux == Integer.parseInt(insAux.getInstruccion()[3].substring(1)))
-                codigoRecogido = true;
+    private int devolverLineaVariableUsada(String var){
+        String[] str = new String[4];
+        for(int i = 0; i<C3D.size();i++){
+            str = C3D.get(i).getInstruccion();
+            if(str[1].equals(var) || str[2].equals(var)){
+                return i;
+            } 
         }
+        return 0;
+    }
 
+    /**
+     * Devuelve las líneas de código intermedio que comprenden desde la posición
+     * inicial pos hasta la etiqueta skip igual a la misma etiqueta para un goto
+     * indicado por posGoto
+     *
+     * @param pos
+     * @param posEtiqueta
+     * @return
+     */
+    private ArrayList<Instruccion> recogerCodigo(int pos, int posEtiqueta) {
+        boolean terminado = false;
+        ArrayList<Instruccion> lista = new ArrayList<Instruccion>();
+        Instruccion ins = C3D.get(pos);
+        // Recoger valor etiqueta
+        int nEtiqueta = Etiqueta.get(C3D.get(posEtiqueta).destino());
+        lista.add(ins);
+        while (!terminado) {
+            pos++;
+            ins = C3D.get(pos);
+            lista.add(ins);
+            // Comprobar si se ha encontrado el skip con la etiqueta
+            if (ins.getOpCode() == Instruccion.OP.skip && nEtiqueta == Etiqueta.get(ins.destino()))
+                terminado = true;
+        }
         return lista;
     }
 
     private void reemplazaCodigo(ArrayList<Instruccion> codigoR, int empieza, int acaba) {
-        List<Instruccion> sublistacodigo = this.codigo.subList(empieza, acaba);
+        List<Instruccion> sublistacodigo = this.C3D.subList(empieza, acaba);
         sublistacodigo.clear();
-        this.codigo.addAll(empieza, codigoR);
+        this.C3D.addAll(empieza, codigoR);
     }
 
     private boolean esIf(Instruccion ins) {
-        return (ins.getCodigo() == Instruccion.OP.ifLT || ins.getCodigo() == Instruccion.OP.ifLE
-                || ins.getCodigo() == Instruccion.OP.ifEQ || ins.getCodigo() == Instruccion.OP.ifNE
-                || ins.getCodigo() == Instruccion.OP.ifGE
-                || ins.getCodigo() == Instruccion.OP.ifGT);
+        return (ins.getOpCode() == Instruccion.OP.ifLT || ins.getOpCode() == Instruccion.OP.ifLE
+                || ins.getOpCode() == Instruccion.OP.ifEQ || ins.getOpCode() == Instruccion.OP.ifNE
+                || ins.getOpCode() == Instruccion.OP.ifGE
+                || ins.getOpCode() == Instruccion.OP.ifGT);
     }
 
-    private Boolean esValorConstante(Instruccion ins, int linea) {
+    private Boolean operandosConstantes(Instruccion ins, int linea) {
         boolean esConst1 = false, esConst2 = false;
-        boolean b = false;
-
-        if (ins.getInstruccion()[1].charAt(0) == 'v') {
-            if (tv.getTV().get(Integer.parseInt(ins.getInstruccion()[1].substring(1)))
-                    .getTipo() == Simbolo.Tipo.CONST) {
-                esConst1 = true;
-            }
-        } else {
+        Variable operando1 = tv.get(ins.getOperando(1));
+        if (operando1 == null || operando1.tipo() == Simbolo.Tipo.CONST) {
             esConst1 = true;
         }
 
-        if (ins.getInstruccion()[2].charAt(0) == 'v') {
-            if (tv.getTV().get(Integer.parseInt(ins.getInstruccion()[2].substring(1)))
-                    .getTipo() == Simbolo.Tipo.CONST) {
-                esConst2 = true;
-            }
-        } else {
+        Variable operando2 = tv.get(ins.getOperando(2));
+        if (operando2 == null || operando2.tipo() == Simbolo.Tipo.CONST) {
             esConst2 = true;
         }
 
-        if (esConst1 && esConst2)
-            b = true;
-
-        return b;
+        return esConst1 && esConst2;
     }
 
     private int ejecutaIf(Instruccion ins, int empieza) {
         int lineasReemplazo = 0;
-        int parseInt1 = Integer.parseInt(ins.getInstruccion()[1].substring(1)) - 1;
-        int parseInt2 = Integer.parseInt(ins.getInstruccion()[2].substring(1)) - 1;
-        int c1 = tv.getTV().get(parseInt1).getR();
-        int c2 = tv.getTV().get(parseInt2).getR();
-        switch (ins.getCodigo()) {
-            case ifLT:
-                if (c1 < c2) {
-                    lineasReemplazo = optimizarIfCierto(empieza);
-                } else {
-                    lineasReemplazo = optimizarIfFalso(empieza);
-                }
-                break;
-            case ifLE:
-                if (c1 <= c2) {
-                    lineasReemplazo = optimizarIfCierto(empieza);
-                } else {
-                    lineasReemplazo = optimizarIfFalso(empieza);
-                }
-                break;
-            case ifEQ:
-                if (c1 == c2) {
-                    lineasReemplazo = optimizarIfCierto(empieza);
-                } else {
-                    lineasReemplazo = optimizarIfFalso(empieza);
-                }
-                break;
-            case ifNE:
-                if (c1 != c2) {
-                    lineasReemplazo = optimizarIfCierto(empieza);;
-                } else {
-                    lineasReemplazo = optimizarIfFalso(empieza);
-                }
-                break;
-            case ifGE:
-                if (c1 >= c2) {
-                    lineasReemplazo = optimizarIfCierto(empieza);
-                } else {
-                    lineasReemplazo = optimizarIfFalso(empieza);
-                }
-                break;
-            case ifGT:
-                if (c1 > c2) {
-                    lineasReemplazo = optimizarIfCierto(empieza);
-                } else {
-                    lineasReemplazo = optimizarIfFalso(empieza);
-                }
-                break;
-            default:
-                break;
+        int c1, c2;
+        Variable v1, v2;
+        v1 = tv.get(ins.getOperando(1));
+        if (v1 != null) {
+            c1 = Integer.parseInt(v1.getValor()); // Constante
+        } else {
+            c1 = Integer.parseInt(ins.getOperando(1)); // Literal
+        }
+        v2 = tv.get(ins.getOperando(2));
+        if (v2 != null) {
+            c2 = Integer.parseInt(v2.getValor()); // Constante
+        } else {
+            c2 = Integer.parseInt(ins.getOperando(2)); // Literal
+        }
+        switch (ins.getOpCode()) {
+        case ifLT:
+            if (c1 < c2) {
+                lineasReemplazo = optimizarIfCierto(empieza);
+            } else {
+                lineasReemplazo = optimizarIfFalso(empieza);
+            }
+            break;
+        case ifLE:
+            if (c1 <= c2) {
+                lineasReemplazo = optimizarIfCierto(empieza);
+            } else {
+                lineasReemplazo = optimizarIfFalso(empieza);
+            }
+            break;
+        case ifEQ:
+            if (c1 == c2) {
+                lineasReemplazo = optimizarIfCierto(empieza);
+            } else {
+                lineasReemplazo = optimizarIfFalso(empieza);
+            }
+            break;
+        case ifNE:
+            if (c1 != c2) {
+                lineasReemplazo = optimizarIfCierto(empieza);
+                ;
+            } else {
+                lineasReemplazo = optimizarIfFalso(empieza);
+            }
+            break;
+        case ifGE:
+            if (c1 >= c2) {
+                lineasReemplazo = optimizarIfCierto(empieza);
+            } else {
+                lineasReemplazo = optimizarIfFalso(empieza);
+            }
+            break;
+        case ifGT:
+            if (c1 > c2) {
+                lineasReemplazo = optimizarIfCierto(empieza);
+            } else {
+                lineasReemplazo = optimizarIfFalso(empieza);
+            }
+            break;
+        default:
+            break;
         }
         return lineasReemplazo;
     }
 
-
     private int optimizarIfCierto(int empieza) {
         int lineasReemplazo = 0;
         ArrayList<Instruccion> lista = recogerCodigo(empieza, empieza + 1);
+        // Se cambia la instrucción if (valor) goto e por goto e
         lista.add(0,
-                new Instruccion(Instruccion.OP.jump, "", "", lista.get(0).getInstruccion()[3]));
+                new Instruccion(Instruccion.OP.jump, "", "", lista.get(0).destino()));
+        // Se borran las dos instrucciones que vienen a continuación del goto e
         lista.remove(1);
         lista.remove(1);
         reemplazaCodigo(lista, empieza, empieza + lista.size() + 1);
@@ -277,6 +311,7 @@ public class Optimizador {
         int lineasReemplazo = 0;
         ArrayList<Instruccion> lista = recogerCodigo(empieza, empieza + 1);
         ArrayList<Instruccion> aux = new ArrayList<Instruccion>();
+        //Se sustituye todo el código por la segunda y última instruccion
         aux.add(lista.get(1));
         aux.add(lista.get(lista.size() - 1));
         reemplazaCodigo(aux, empieza, empieza + lista.size());
