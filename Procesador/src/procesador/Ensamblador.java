@@ -23,15 +23,12 @@ public class Ensamblador {
 
     public void generarEXE() {
         try {
-            Process compilado = Runtime.getRuntime().exec("ml /c /Zd /coff " + directorio + ".asm");
+            Process compilado = Runtime.getRuntime()
+                    .exec("ml /Fo" + directorio + ".obj" + " /c /Zd /coff  " + directorio + ".asm");
             compilado.waitFor();
-            Process enlazado = Runtime.getRuntime()
-                    .exec("link /subsystem:console " + directorio + ".obj");
+            Process enlazado = Runtime.getRuntime().exec(
+                    "link /out:" + directorio + ".exe /subsystem:console " + directorio + ".obj");
             enlazado.waitFor();
-            System.out.println(ConsoleColors.YELLOW_BOLD_BRIGHT
-                    + "Proceso de ensamblado completado con éxito\n"
-                    + "Se han generado los archivos: " + directorio + ".asm, " + directorio
-                    + ".obj y " + directorio + ".exe" + ConsoleColors.RESET);
         } catch (Exception e) {
             e.printStackTrace();
         }
