@@ -49,18 +49,6 @@ public void imprimirC3D(){
 	} catch(IOException e) {}
 }
 
-public void imprimirC3D_Opt(){
-	Writer buffer;
-	File interFile = new File(directorio + "/intermedioOptimo.txt");
-	try {
-		buffer = new BufferedWriter(new FileWriter(interFile));
-		for(int i=0;i<opt.getCodigo().size();i++) {
-			buffer.write(opt.getCodigo().get(i).toString() + "\n");
-		}
-		buffer.close();
-	} catch(IOException e) {}
-}
-
 public void backpatch(Deque<Integer> lista, Etiqueta e){
 	if(lista!=null) {
 		while(lista.size()>0) {
@@ -128,10 +116,10 @@ programa:
 	genera(Instruccion.OP.et, "", "", e.toString());
 	e.setNl(pc);
 	backpatch($sents.sents_seg,e);
-	opt = new Optimizador(c3d, tv);
 	imprimirC3D();
+	opt = new Optimizador(c3d, tv);
 	opt.optimizarCodigo();
-	imprimirC3D_Opt();
+	opt.imprimirC3D_Opt(directorio);
 };
 
 decl:
