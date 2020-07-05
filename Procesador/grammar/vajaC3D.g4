@@ -193,17 +193,7 @@ decl:
 		Simbolo s;
 		try {
 			s = ts.consulta($ID.getText());
-			switch(s.getTsub()) {
-				case BOOLEAN:
-					s.setvCB(Boolean.parseBoolean($literal.text));
-					break;
-				case INT:
-					s.setvCI(Integer.parseInt($literal.text));
-					break;
-				case STRING:
-					s.setvCS($literal.text);
-					break;
-			}
+			s.setValor($literal.text);
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
@@ -433,19 +423,19 @@ referencia
 				t.setTemporal(true);
 				switch(s.getTsub()) {
 					case BOOLEAN:
-						genera(Instruccion.OP.copy, String.valueOf(s.isvCB()), "", t.toString());
-						if(s.isvCB()){
+						genera(Instruccion.OP.copy, s.getValor(), "", t.toString());
+						if(Boolean.parseBoolean(s.getValor())){
 							t.setR(-1);
 						} else {
 							t.setR(0);
 						}
 						break;
 					case INT:
-						genera(Instruccion.OP.copy, String.valueOf(s.getvCI()), "", t.toString());
-						t.setR(s.getvCI());
+						genera(Instruccion.OP.copy, s.getValor(), "", t.toString());
+						t.setR(Integer.parseInteger(s.getValor()));
 						break;
 					case STRING:
-						genera(Instruccion.OP.copy, s.getvCS(), "", t.toString());
+						genera(Instruccion.OP.copy, s.getValor(), "", t.toString());
 						break;
 				}
 				$r = t;
