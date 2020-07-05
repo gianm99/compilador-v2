@@ -170,6 +170,10 @@ public class Instruccion {
         this.instruccion = instruccion;
     }
 
+    public String getInstruccion3(){
+        return instruccion[3];
+    }
+
     public void setInstruccion3(String instruccion) {
         this.instruccion[3] = instruccion;
     }

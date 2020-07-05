@@ -26,7 +26,7 @@ public class Procesador {
             // Si ya existe la carpeta, se vacía
             FileUtils.cleanDirectory(buildDir);
         }
-        // Stream del archivo pasado como argumento
+        // Stream del archivo paso como argumento
         CharStream stream = CharStreams.fromFileName(args[0]);
         // Se crea el lexer y el CommonTokenStream
         vajaLexer lexer = new vajaLexer(stream);
