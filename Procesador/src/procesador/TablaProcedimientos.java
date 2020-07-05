@@ -14,8 +14,8 @@ public class TablaProcedimientos {
         tp = new ArrayList<Procedimiento>();
     }
 
-    public Procedimiento nuevoProc(int nivelDecl, Simbolo.Tipo tipo){
-        Procedimiento met=new Procedimiento(nivelDecl,tipo);
+    public Procedimiento nuevoProc(int prof, Simbolo.Tipo tipo){
+        Procedimiento met=new Procedimiento(prof,tipo);
         tp.add(met);
         return met;
     }

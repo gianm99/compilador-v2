@@ -8,22 +8,22 @@ package procesador;
 public class Variable {
     private int r;
     private int nv; // Número de variable
-    private Procedimiento sub; // Subprograma que la ha declarado
+    private Procedimiento proc; // Procedimiento que la ha declarado
     private Simbolo.Tipo tipo; // Tipo: variable, constante o argumento
     private boolean temporal;
     private static int cv = 0; // Cantidad de variables creadas
 
-    public Variable(Procedimiento sub, Simbolo.Tipo tipo) {
+    public Variable(Procedimiento proc, Simbolo.Tipo tipo) {
         cv++; // Aumenta la cantidad de variables
         this.nv = cv;
         this.tipo = tipo;
-        this.sub = sub;
+        this.proc = proc;
     }
 
     public Variable(Variable v) {
         this.r=v.r;
         this.nv=v.nv;
-        this.sub=v.sub;
+        this.proc=v.proc;
         this.tipo=v.tipo;
         this.temporal=v.temporal;
     }
@@ -52,14 +52,6 @@ public class Variable {
         this.nv = nv;
     }
 
-    public Procedimiento getSub() {
-        return sub;
-    }
-
-    public void setSub(Procedimiento sub) {
-        this.sub = sub;
-    }
-
     public Simbolo.Tipo getTipo() {
         return tipo;
     }
@@ -83,5 +75,13 @@ public class Variable {
         } else {
             return "v"+nv;
         }
+    }
+
+    public Procedimiento getProc() {
+        return proc;
+    }
+
+    public void setProc(Procedimiento proc) {
+        this.proc = proc;
     }
 }
