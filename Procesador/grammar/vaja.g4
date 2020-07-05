@@ -616,7 +616,7 @@ LiteralBoolean: 'true' | 'false';
 // Cadenas
 LiteralString: '"' LetrasString? '"';
 fragment LetrasString: LetraString+;
-fragment LetraString: ~["\\\r\n];
+fragment LetraString: ~[$"\\\r\n];
 // Separadores
 LPAREN: '(';
 RPAREN: ')';
