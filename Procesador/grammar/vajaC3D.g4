@@ -177,14 +177,15 @@ decl:
 		}
 		pproc.push($encabezado.met);
 		// Crear variables para los parámetros
-		Simbolo aux=$encabezado.s.getNext();
+		Simbolo aux=new Simbolo();
 		try {
-			while(aux!=null) {
-				ts.consulta(aux.getId()).setNv(tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR));
-				aux=aux.getNext();
-			}
+			aux=ts.consulta($encabezado.s.getId()).getNext();
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
+		}
+		while(aux!=null) {
+			aux.setNv(tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR, aux.getTsub()));
+			aux=aux.getNext();
 		}
 		Etiqueta e=new Etiqueta();
 		$encabezado.met.setInicio(e);
@@ -206,9 +207,14 @@ decl:
 		}
 		pproc.push($encabezado.met);
 		// Crear variables para los parámetros
-		Simbolo aux=$encabezado.s.getNext();
+		Simbolo aux = new Simbolo();
+		try {
+			aux=ts.consulta($encabezado.s.getId()).getNext();
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
+		}
 		while(aux!=null) {
-			aux.setNv(tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR));
+			aux.setNv(tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR, aux.getTsub()));
 			aux=aux.getNext();
 		}
 		Etiqueta e=new Etiqueta();
@@ -388,7 +394,7 @@ referencia
 		try {
 			s = ts.consulta($ID.getText());
 			if (s.getT() == Simbolo.Tipo.CONST){
-				t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.CONST);
+				t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.CONST,s.getTsub());
 				t.setTemporal(true);
 				switch(s.getTsub()) {
 					case BOOLEAN:
@@ -401,7 +407,7 @@ referencia
 						break;
 					case INT:
 						genera(Instruccion.OP.copy, s.getValor(), "", t.toString());
-						t.setR(Integer.parseInteger(s.getValor()));
+						t.setR(Integer.parseInt(s.getValor()));
 						break;
 					case STRING:
 						genera(Instruccion.OP.copy, s.getValor(), "", t.toString());
@@ -626,7 +632,7 @@ exprAdit
 exprAdit_[Variable t1]
 	returns[Variable r, Deque<Integer> cierto, Deque<Integer falso>]:
 	ADD exprMult {
-		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
+		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR,Simbolo.TSub.INT);
 		t.setTemporal(true);
 		genera(Instruccion.OP.add, $t1.toString(), $exprMult.r.toString(), t.toString());
 		$r=t;
@@ -640,7 +646,7 @@ exprAdit_[Variable t1]
 		}
 	}
 	| SUB exprMult {
-		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
+		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR,Simbolo.TSub.INT);
 		t.setTemporal(true);
 		genera(Instruccion.OP.sub, $t1.toString(), $exprMult.r.toString(), t.toString());
 		$r=t;
@@ -673,7 +679,7 @@ exprMult
 exprMult_[Variable t1]
 	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
 	MULT exprNeg {
-		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
+		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR,Simbolo.TSub.INT);
 		t.setTemporal(true);
 		genera(Instruccion.OP.mult, $t1.toString(), $exprNeg.r.toString(), t.toString());
 		$r=t;
@@ -687,7 +693,7 @@ exprMult_[Variable t1]
 		}
 	}
 	| DIV exprNeg {
-		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
+		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR,Simbolo.TSub.INT);
 		t.setTemporal(true);
 		genera(Instruccion.OP.div, $t1.toString(), $exprNeg.r.toString(), t.toString());
 		$r=t;
@@ -706,7 +712,7 @@ exprMult_[Variable t1]
 exprNeg
 	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
 	SUB primario {
-		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR);
+		Variable t = tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR,Simbolo.TSub.INT);
 		t.setTemporal(true);
 		genera(Instruccion.OP.neg, $primario.r.toString(), "", t.toString());
 		$r = t;
@@ -738,7 +744,7 @@ primario
 		}
 	}
 	| literal {
-		Variable t = tv.nuevaVar(pproc.peek(), Simbolo.Tipo.VAR);
+		Variable t = tv.nuevaVar(pproc.peek(), Simbolo.Tipo.VAR,$literal.tsub);
 		t.setTemporal(true);
 		$r = t;
 		if($literal.tsub == Simbolo.TSub.BOOLEAN){
@@ -771,16 +777,26 @@ primario
 		}
 	};
 
-tipo: INTEGER | BOOLEAN | STRING;
+tipo
+	returns[Simbolo.TSub tsub]:
+	INTEGER {
+	$tsub=Simbolo.TSub.INT;
+	}
+	| BOOLEAN {
+		$tsub=Simbolo.TSub.BOOLEAN;
+	}
+	| STRING {
+		$tsub=Simbolo.TSub.STRING;
+	};
 
 literal
 	returns[Simbolo.TSub tsub]:
 	LiteralInteger {
-			$tsub=Simbolo.TSub.INT;
-		}
+		$tsub=Simbolo.TSub.INT;
+	}
 	| LiteralBoolean {
-			$tsub=Simbolo.TSub.BOOLEAN;
-		}
+		$tsub=Simbolo.TSub.BOOLEAN;
+	}
 	| LiteralString {
-			$tsub=Simbolo.TSub.STRING;
+		$tsub=Simbolo.TSub.STRING;
 	};
