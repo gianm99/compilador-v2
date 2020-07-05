@@ -129,17 +129,15 @@ programa:
 decl:
 	VARIABLE tipo ID {
 		Simbolo s=new Simbolo();
-		boolean inicializada=false;
 		try {
 			s=ts.consulta($ID.getText());
-			s.setNv(tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR));
+			s.setNv(tv.nuevaVar(pproc.peek(),Simbolo.Tipo.VAR, s.getTsub()));
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
 	} (
 		'=' expr {
-			// TODO Quitar esto y no generar código para inicializaciones
-			inicializada=true;
+			// TODO Quitar esto y no generar código para inicializaciones de variables globales
 			if(s.getTsub()==Simbolo.TSub.BOOLEAN) {
 				Etiqueta ec=new Etiqueta();
 				Etiqueta ef=new Etiqueta();
@@ -163,21 +161,7 @@ decl:
 					s.getNv().setR($expr.r.getR());
 			}
 	}
-	)? {
-		// Asignación de valor por defecto
-		if(!inicializada) {
-			switch(s.getTsub()) {
-				case BOOLEAN:
-				case INT:
-					genera(Instruccion.OP.copy, "0", "", s.getNv().toString());
-					s.getNv().setR(0);
-					break;
-				case STRING:
-					genera(Instruccion.OP.copy, "\"\"", "", s.getNv().toString());
-					break;
-			}
-		}
-	} ';'
+	)? ';'
 	| CONSTANT tipo ID '=' literal ';' {
 		Simbolo s;
 		try {
