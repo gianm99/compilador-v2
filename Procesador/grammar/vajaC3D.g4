@@ -145,7 +145,7 @@ decl:
 		}
 	} (
 		'=' expr {
-			// TODO Quitar esto y no generar código para inicializaciones de variables globales
+			tv.get(nv).setInicializada(true);
 			if(s.getTsub()==Simbolo.TSub.BOOLEAN) {
 				Etiqueta ec=new Etiqueta();
 				Etiqueta ef=new Etiqueta();

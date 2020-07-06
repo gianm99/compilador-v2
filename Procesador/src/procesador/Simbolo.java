@@ -14,6 +14,7 @@ public class Simbolo {
 	private TSub tsub;
 	private boolean returnEncontrado;
 	private String valor;
+	private boolean inicializada;
 	private int nv;
 	private Procedimiento np;
 
@@ -41,6 +42,14 @@ public class Simbolo {
 
 	public Simbolo() {
 	};
+
+	public boolean isInicializada() {
+		return inicializada;
+	}
+
+	public void setInicializada(boolean inicializada) {
+		this.inicializada = inicializada;
+	}
 
 	public Procedimiento getNp() {
 		return np;

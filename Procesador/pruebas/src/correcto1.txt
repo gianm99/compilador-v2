@@ -1,7 +1,7 @@
 var int a;
 const string s1 = "Hola mundo";
 var string s2 = s1;
-var int c;
+var int c=a;
 var boolean par = true;
 func boolean function1(string str, int i, boolean foo){
 	var int a = 2;
