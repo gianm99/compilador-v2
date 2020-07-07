@@ -12,18 +12,11 @@ public class Variable {
     private int proc; // Número del procedimiento que la ha declarado
     private Simbolo.Tipo tipo; // Tipo: variable, constante o argumento
     private Simbolo.TSub tsub; // Tipo subyacente
-    // TODO #48 Comprobar que las variables estén inicializadas
     private boolean inicializada; // Si ha sido inicializada
     private String id; // Identificador de la variable (t si es temporal)
-    private String valor;
-
-    public Variable(Variable v) {
-        this.valor = v.valor;
-        this.nv = v.nv;
-        this.proc = v.proc;
-        this.tipo = v.tipo;
-        this.temporal = v.temporal;
-    }
+    private String valor; // Valor para constantes
+    private int ocup; // Ocupación de la variable
+    private int desp; // Desplazamiento en el ámbito local
 
     public Variable(int nv, boolean temporal, int proc, Simbolo.Tipo tipo, Simbolo.TSub tsub) {
         this.nv = nv;
@@ -31,8 +24,20 @@ public class Variable {
         this.proc = proc;
         this.tipo = tipo;
         this.tsub = tsub;
+        this.inicializada = false;
         if (temporal) {
-            id="t";
+            id = "t";
+        }
+        switch (this.tsub) {
+        case INT:
+            this.ocup = 4; // 4 bytes
+            break;
+        case BOOLEAN:
+            this.ocup = 1; // 1 byte
+            break;
+        default:
+            // Para Strings se sabe cuando se inicializan
+            break;
         }
     }
 
@@ -82,7 +87,7 @@ public class Variable {
 
     @Override
     public String toString() {
-        return id+"$"+nv;
+        return id + "$" + nv;
     }
 
     public String getId() {
@@ -91,5 +96,21 @@ public class Variable {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public int getOcup() {
+        return ocup;
+    }
+
+    public void setOcup(int ocup) {
+        this.ocup = ocup;
+    }
+
+    public int getDesp() {
+        return desp;
+    }
+
+    public void setDesp(int desp) {
+        this.desp = desp;
     }
 }

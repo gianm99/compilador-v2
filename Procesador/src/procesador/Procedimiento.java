@@ -11,7 +11,8 @@ public class Procedimiento {
     private int np; // Número de procedimiento
     private int prof; // Nivel de la declaración
     private Etiqueta inicio; // Etiqueta de inicio
-    private int numDecl; // Número de declaraciones o variables
+    private int numParams; // Número de parámetros
+    private int ocupVL; // Ocupación de las variables locales
     private Simbolo.Tipo tipo; // Función o Procedimiento
     private static int cp = 0; // Cantidad de procedimientos creados
 
@@ -50,14 +51,6 @@ public class Procedimiento {
         this.inicio = inicio;
     }
 
-    public int getNumDecl() {
-        return numDecl;
-    }
-
-    public void setNumDecl(int numDecl) {
-        this.numDecl = numDecl;
-    }
-
     public static int getCp() {
         return cp;
     }
@@ -77,5 +70,21 @@ public class Procedimiento {
     @Override
     public String toString() {
         return String.valueOf(np);
+    }
+
+    public int getNumParams() {
+        return numParams;
+    }
+
+    public void setNumParams(int numParams) {
+        this.numParams = numParams;
+    }
+
+    public int getOcupVL() {
+        return ocupVL;
+    }
+
+    public void setOcupVL(int ocupVL) {
+        this.ocupVL = ocupVL;
     }
 }
