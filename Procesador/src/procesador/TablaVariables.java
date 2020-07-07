@@ -21,10 +21,10 @@ public class TablaVariables {
     public int nuevaVar(boolean temporal, Integer proc, Simbolo.Tipo tipo, Simbolo.TSub tsub) {
         Variable var;
         nv++;
-        if (proc==null) {
-            var = new Variable(nv, temporal, 0, tipo, tsub);            
+        if (proc == null) {
+            var = new Variable(nv, temporal, 0, tipo, tsub);
         } else {
-            var = new Variable(nv, temporal, proc, tipo, tsub);            
+            var = new Variable(nv, temporal, proc, tipo, tsub);
         }
         tv.add(var);
         return nv;
@@ -36,7 +36,7 @@ public class TablaVariables {
     }
 
     public Variable get(int nv) {
-        return tv.get(nv-1);
+        return tv.get(nv - 1);
     }
 
     public Variable get(String var) {

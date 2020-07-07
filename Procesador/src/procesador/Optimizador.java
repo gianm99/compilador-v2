@@ -141,9 +141,9 @@ public class Optimizador {
         }
         i = 0;
         int k;
-        while(i<vars.size()){
+        while (i < vars.size()) {
             k = devolverLineaVariableUsada(vars.get(i).destino());
-            if(C3D.get(k).getOperando(1).equals(vars.get(i).destino())){
+            if (C3D.get(k).getOperando(1).equals(vars.get(i).destino())) {
                 C3D.get(k).setOperando(1, vars.get(i).destino());
             } else {
                 C3D.get(k).setOperando(2, vars.get(i).destino());
@@ -165,13 +165,13 @@ public class Optimizador {
      *
      */
 
-    private int devolverLineaVariableUsada(String var){
+    private int devolverLineaVariableUsada(String var) {
         String[] str = new String[4];
-        for(int i = 0; i<C3D.size();i++){
+        for (int i = 0; i < C3D.size(); i++) {
             str = C3D.get(i).getInstruccion();
-            if(str[1].equals(var) || str[2].equals(var)){
+            if (str[1].equals(var) || str[2].equals(var)) {
                 return i;
-            } 
+            }
         }
         return 0;
     }
@@ -301,8 +301,7 @@ public class Optimizador {
         int lineasReemplazo = 0;
         ArrayList<Instruccion> lista = recogerCodigo(empieza, empieza + 1);
         // Se cambia la instrucción if (valor) goto e por goto e
-        lista.add(0,
-                new Instruccion(Instruccion.OP.jump, "", "", lista.get(0).destino()));
+        lista.add(0, new Instruccion(Instruccion.OP.jump, "", "", lista.get(0).destino()));
         // Se borran las dos instrucciones que vienen a continuación del goto e
         lista.remove(1);
         lista.remove(1);
@@ -315,7 +314,7 @@ public class Optimizador {
         int lineasReemplazo = 0;
         ArrayList<Instruccion> lista = recogerCodigo(empieza, empieza + 1);
         ArrayList<Instruccion> aux = new ArrayList<Instruccion>();
-        //Se sustituye todo el código por la segunda y última instruccion
+        // Se sustituye todo el código por la segunda y última instruccion
         aux.add(lista.get(1));
         aux.add(lista.get(lista.size() - 1));
         reemplazaCodigo(aux, empieza, empieza + lista.size());
