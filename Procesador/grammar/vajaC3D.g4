@@ -51,7 +51,7 @@ public TablaProcedimientos getTp() {
 
 public void imprimirC3D(){
 	Writer buffer;
-	File interFile = new File(directorio+".txt");
+	File interFile = new File(directorio+"_C3D.txt");
 	try {
 		buffer = new BufferedWriter(new FileWriter(interFile));
 		for(int i=0;i<C3D.size();i++) {
