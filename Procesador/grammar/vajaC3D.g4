@@ -770,7 +770,7 @@ primario
 		}
 	}
 	| literal {
-		int t = tv.nuevaVar(true,pproc.peek(), Simbolo.Tipo.VAR,$literal.tsub);
+		int t = tv.nuevaVar(true,pproc.peek(), Simbolo.Tipo.CONST,$literal.tsub);
 		tv.get(t).setTemporal(true);
 		$r = tv.get(t);
 		if($literal.tsub == Simbolo.TSub.BOOLEAN){

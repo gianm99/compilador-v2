@@ -322,4 +322,20 @@ public class Optimizador {
         lineasReemplazo = aux.size();
         return lineasReemplazo;
     }
+
+    public TablaVariables getTv() {
+        return tv;
+    }
+
+    public void setTv(TablaVariables tv) {
+        this.tv = tv;
+    }
+
+    public TablaProcedimientos getTp() {
+        return tp;
+    }
+
+    public void setTp(TablaProcedimientos tp) {
+        this.tp = tp;
+    }
 }

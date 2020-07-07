@@ -68,15 +68,16 @@ public class Procesador {
             throw e;
         }
         // Ensamblado de código sin optimizar
-        //Ensamblador normal = new Ensamblador(buildPath + filename, parserC3D.getC3D());
-        //normal.ensamblar();
+        // Ensamblador normal = new Ensamblador(buildPath + filename, parserC3D.getC3D(),
+        //         parserC3D.getTv(), parserC3D.getTp());
+        // normal.ensamblar();
         // Optimización de código
         Optimizador optimizador = new Optimizador(buildPath + filename + "_OPT", parserC3D.getC3D(),
                 parserC3D.getTv(), parserC3D.getTp());
         optimizador.optimizar();
         // Ensamblado de código optimizado
-        //Ensamblador optimizado = new Ensamblador(buildPath + filename + "_OPT",
-        //       optimizador.getC3D());
-        //optimizado.ensamblar();
+        // Ensamblador optimizado = new Ensamblador(buildPath + filename + "_OPT",
+        //         optimizador.getC3D(), optimizador.getTv(), optimizador.getTp());
+        // optimizado.ensamblar();
     }
 }
