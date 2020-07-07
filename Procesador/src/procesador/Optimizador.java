@@ -30,6 +30,7 @@ public class Optimizador {
     public void optimizar() {
         eliminaCodigoInaccesible();
         eliminaEtiquetasInecesarias();
+        //eliminaAsignacionesInecesarias();
         tv.calculoDespOcupVL(tp);
         imprimirC3D();
     }
