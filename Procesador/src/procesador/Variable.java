@@ -36,8 +36,10 @@ public class Variable {
         case BOOLEAN:
             this.ocup = 1; // 1 byte
             break;
+        case STRING:
+            this.ocup = 4; // 4 bytes (dirección)
+            break;
         default:
-            // Para Strings se sabe cuando se inicializan
             break;
         }
     }
