@@ -10,10 +10,15 @@ import java.util.ArrayList;
 public class Ensamblador {
     private String directorio;
     private ArrayList<Instruccion> c3d;
+    private TablaVariables tv;
+    private TablaProcedimientos tp;
 
-    public Ensamblador(String directorio, ArrayList<Instruccion> c3d) {
+    public Ensamblador(String directorio, ArrayList<Instruccion> c3d, TablaVariables tv,
+            TablaProcedimientos tp) {
         this.directorio = directorio;
         this.c3d = c3d;
+        this.tv = tv;
+        this.tp = tp;
     }
 
     public void ensamblar() {

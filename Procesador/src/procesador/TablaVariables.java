@@ -70,4 +70,12 @@ public class TablaVariables {
             }
         }
     }
+
+    public int getNv() {
+        return nv;
+    }
+
+    public void setNv(int nv) {
+        this.nv = nv;
+    }
 }
