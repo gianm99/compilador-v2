@@ -47,4 +47,27 @@ public class TablaVariables {
             return null;
         }
     }
+
+    /**
+     * Calcula el desp de todas las variables y el ocupVL de todos los
+     * procedimientos.
+     * 
+     * @param tp
+     *               La tabla de procedimientos que actualiza.
+     */
+    public void calculoDespOcupVL(TablaProcedimientos tp) {
+        for (int p = 1; p <= tp.getNp(); p++) {
+            tp.get(p).setOcupVL(0);
+        }
+        for (int x = 0; x < tv.size(); x++) {
+            Variable vx = tv.get(x);
+            int p = vx.proc();
+            if (vx.tipo() == Simbolo.Tipo.VAR && p != 0) {
+                int ocupx = vx.getOcup();
+                Procedimiento pp = tp.get(p);
+                pp.setOcupVL(pp.getOcupVL() + ocupx);
+                vx.setDesp(-pp.getOcupVL()); // TODO Preguntar a Pere Palmer esto
+            }
+        }
+    }
 }

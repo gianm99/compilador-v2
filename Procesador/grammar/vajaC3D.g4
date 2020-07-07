@@ -128,6 +128,7 @@ programa:
 	genera(Instruccion.OP.skip, "", "", e.toString());
 	e.setNl(pc);
 	backpatch($sents.sents_seg,e);
+	tv.calculoDespOcupVL(tp);
 	imprimirC3D();
 };
 
