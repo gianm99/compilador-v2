@@ -14,11 +14,9 @@ public class Procedimiento {
     private int numParams; // Número de parámetros
     private int ocupVL; // Ocupación de las variables locales
     private Simbolo.Tipo tipo; // Función o Procedimiento
-    private static int cp = 0; // Cantidad de procedimientos creados
 
-    public Procedimiento(int prof, Simbolo.Tipo tipo) {
-        cp++; // Aumenta la cantidad de procedimientos
-        this.np = cp;
+    public Procedimiento(int np, int prof, Simbolo.Tipo tipo) {
+        this.np = np;
         this.tipo = tipo;
         this.setProf(prof);
     }
@@ -35,10 +33,6 @@ public class Procedimiento {
         return np;
     }
 
-    public static int getNumProc() {
-        return cp;
-    }
-
     public void setNp(int np) {
         this.np = np;
     }
@@ -49,14 +43,6 @@ public class Procedimiento {
 
     public void setInicio(Etiqueta inicio) {
         this.inicio = inicio;
-    }
-
-    public static int getCp() {
-        return cp;
-    }
-
-    public static void setCp(int cp) {
-        Procedimiento.cp = cp;
     }
 
     public Simbolo.Tipo getTipo() {
