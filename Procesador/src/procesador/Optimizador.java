@@ -13,11 +13,14 @@ public class Optimizador {
     private String directorio;
     private ArrayList<Instruccion> C3D;
     private TablaVariables tv;
+    private TablaProcedimientos tp;
 
-    public Optimizador(String directorio, final ArrayList<Instruccion> C3D, TablaVariables tv) {
+    public Optimizador(String directorio, final ArrayList<Instruccion> C3D, TablaVariables tv,
+            TablaProcedimientos tp) {
         this.directorio = directorio;
         this.C3D = C3D;
         this.tv = tv;
+        this.tp = tp;
     }
 
     public ArrayList<Instruccion> getC3D() {
@@ -27,6 +30,7 @@ public class Optimizador {
     public void optimizar() {
         eliminaCodigoInaccesible();
         eliminaEtiquetasInecesarias();
+        tv.calculoDespOcupVL(tp);
         imprimirC3D();
     }
 
