@@ -17,6 +17,7 @@ public class Variable {
     private String valor; // Valor para constantes
     private int ocup; // Ocupación de la variable
     private int desp; // Desplazamiento en el ámbito local
+    private int nparam; // Número de parámetro
 
     public Variable(int nv, boolean temporal, int proc, Simbolo.Tipo tipo, Simbolo.TSub tsub) {
         this.nv = nv;
@@ -39,6 +40,14 @@ public class Variable {
             // Para Strings se sabe cuando se inicializan
             break;
         }
+    }
+
+    public int getNparam() {
+        return nparam;
+    }
+
+    public void setNparam(int nparam) {
+        this.nparam = nparam;
     }
 
     public String getValor() {

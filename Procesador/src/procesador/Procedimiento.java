@@ -19,6 +19,7 @@ public class Procedimiento {
         this.np = np;
         this.tipo = tipo;
         this.setProf(prof);
+        this.numParams = 0;
     }
 
     public int getProf() {

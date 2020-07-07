@@ -192,15 +192,18 @@ decl:
 		pproc.push($encabezado.met.getNp());
 		// Crear variables para los parámetros
 		Simbolo aux=$encabezado.s.getNext();
+		int nparam=1;
 		while(aux!=null) {
 			try {
 				int nv=tv.nuevaVar(false,pproc.peek(),Simbolo.Tipo.VAR, aux.getTsub());
+				tv.get(nv).setNparam(nparam);
 				tv.get(nv).setId(aux.getId());
 				ts.consulta(aux.getId()).setNv(nv);
 			} catch(TablaSimbolos.TablaSimbolosException e) {
 				System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 			}
 			aux=aux.getNext();
+			nparam++;
 		}
 		Etiqueta e=new Etiqueta();
 		$encabezado.met.setInicio(e);
@@ -223,15 +226,18 @@ decl:
 		pproc.push($encabezado.met.getNp());
 		// Crear variables para los parámetros
 		Simbolo aux=$encabezado.s.getNext();
+		int nparam=1;
 		while(aux!=null) {
 			try {
 				int nv=tv.nuevaVar(false,pproc.peek(),Simbolo.Tipo.VAR, aux.getTsub());
+				tv.get(nv).setNparam(nparam);
 				tv.get(nv).setId(aux.getId());
 				ts.consulta(aux.getId()).setNv(nv);
 			} catch(TablaSimbolos.TablaSimbolosException e) {
 				System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 			}
 			aux=aux.getNext();
+			nparam++;
 		}
 		Etiqueta e=new Etiqueta();
 		$encabezado.met.setInicio(e);
