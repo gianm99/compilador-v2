@@ -66,8 +66,17 @@ public class Ensamblador {
         asm.add("includelib \\masm32\\lib\\kernel32.lib");
         asm.add("includelib \\masm32\\lib\\masm32.lib");
         asm.add(".data"); // Variables globales
-        // asm.add(".data?"); // Datos no inicializados
-        asm.add(".const"); // Todas las constantes
+        // 
+        for (int x = 0; x < tv.getNv(); x++) {
+            Variable vx = tv.get(x);
+            if (vx.getTsub() == Simbolo.TSub.STRING && vx.tipo() == Simbolo.Tipo.CONST) {
+                asm.add(vx + "\tDB\t\"" + vx.getValor() + "\",0");
+            }
+        }
+        asm.add(".const"); // Constantes de integer y boolean
+        for (int x = 0; x < tv.getNv(); x++) {
+            
+        }
         asm.add(".code"); // Todas las subrutinas y el programa principal
         asm.add("start:");
         for (Instruccion instruccion : c3d) {
