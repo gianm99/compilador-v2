@@ -208,6 +208,7 @@ decl:
 		}
 		Etiqueta e=new Etiqueta();
 		$encabezado.met.setInicio(e);
+		$encabezado.met.setNumParams(nparam-1);
 		genera(Instruccion.OP.skip, "", "", e.toString());
 		e.setNl(pc);
 		genera(Instruccion.OP.pmb, "", "", String.valueOf($encabezado.met.getNp()));
@@ -242,6 +243,7 @@ decl:
 		}
 		Etiqueta e=new Etiqueta();
 		$encabezado.met.setInicio(e);
+		$encabezado.met.setNumParams(nparam-1);
 		genera(Instruccion.OP.skip, "", "", e.toString());
 		e.setNl(pc);
 		genera(Instruccion.OP.pmb, "", "", String.valueOf($encabezado.met.getNp()));;
