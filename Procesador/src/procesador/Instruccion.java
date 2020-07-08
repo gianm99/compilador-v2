@@ -143,6 +143,11 @@ public class Instruccion {
         case pmb:
         case call:
         case ret:
+            s = instruccion[0] + " " + instruccion[3];
+            if (instruccion[1]!=null) {
+                s = s + ", " + instruccion[1];
+            }
+            break;
         case params:
             s = instruccion[0] + " " + instruccion[3];
             break;
