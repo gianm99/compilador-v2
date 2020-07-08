@@ -11,6 +11,7 @@ func boolean function1(string str, int i, boolean foo){
 		printINT(5);
 	}
 	a = 5;
+	b=foo;
 	while(a>0){
 		b = par;
 		par=false;
@@ -19,11 +20,17 @@ func boolean function1(string str, int i, boolean foo){
 	foo = true;
 	return false;
 }
+
+func int funcion2() {
+	return 55;
+}
+
 proc main(){
 	printINT(c);
 }
 var int z = 2+10;
-
+var int y = 0;
+# y=funcion2();
 if(3>5){
 	var boolean b;
 	a=78;
@@ -31,4 +38,4 @@ if(3>5){
 }
 printINT(z);
 main();
-function1("HOLA",89,true);
+par = function1("HOLA",89,true);
