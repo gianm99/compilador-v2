@@ -215,7 +215,6 @@ decl:
 		e.setNl(pc);
 		genera(Instruccion.OP.pmb, null, null, String.valueOf($encabezado.met.getNp()));
 	} decl* sents {
-		genera(Instruccion.OP.ret, null, null, String.valueOf($encabezado.met.getNp()));
 		pproc.pop();
 		profundidad--;
 		ts=ts.subeBloque();
