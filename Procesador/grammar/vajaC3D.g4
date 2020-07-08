@@ -179,6 +179,7 @@ decl:
 			s.setValor($literal.text);
 			int nv=tv.nuevaVar(false,pproc.peek(),Simbolo.Tipo.CONST, s.getTsub());
 			tv.get(nv).setId(s.getId());
+			tv.get(nv).setValor(s.getValor());
 			s.setNv(nv);
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
