@@ -85,11 +85,10 @@ public class Ensamblador {
         asm.add("includelib \\masm32\\lib\\kernel32.lib");
         asm.add("includelib \\masm32\\lib\\masm32.lib");
         asm.add(".data"); // Variables globales
-        // 
-        for (int x = 0; x < tv.getNv(); x++) {
+        for (int x = 1; x <= tv.getNv(); x++) {
             Variable vx = tv.get(x);
-            if (vx.getTsub() == Simbolo.TSub.STRING && vx.tipo() == Simbolo.Tipo.CONST) {
-                asm.add(vx + "\tDB\t\"" + vx.getValor() + "\",0");
+            if (vx.tipo() == Simbolo.Tipo.CONST && vx.getTsub() == Simbolo.TSub.STRING) {
+                asm.add(vx + "  DB  " + vx.getValor() + ",0");
             }
         }
         asm.add(".const"); // Constantes de integer y boolean
