@@ -154,21 +154,16 @@ decl:
 				genera(Instruccion.OP.skip, null, null, ec.toString());
 				ec.setNl(pc);
 				genera(Instruccion.OP.copy, "-1", null, tv.get(nv).toString());
-				tv.get(s.getNv()).setValor("-1");
 				genera(Instruccion.OP.jump, null, null, efin.toString());
 				genera(Instruccion.OP.skip, null, null, ef.toString());
 				ef.setNl(pc);
 				genera(Instruccion.OP.copy, "0", null, tv.get(nv).toString());
-				tv.get(s.getNv()).setValor("0");
 				genera(Instruccion.OP.skip, null, null, efin.toString());
 				efin.setNl(pc);
 				backpatch($expr.cierto,ec);
 				backpatch($expr.falso,ef);
 			} else {
 				genera(Instruccion.OP.copy, $expr.r.toString(), null, tv.get(nv).toString());
-				// TODO Comprobar si esto es correcto
-				if(s.getTsub()==Simbolo.TSub.INT)
-					tv.get(s.getNv()).setValor($expr.r.getValor());
 			}
 	}
 	)? ';'
