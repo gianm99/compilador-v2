@@ -119,6 +119,7 @@ decl:
 		Simbolo param=$encabezado.met.getNext();
 		while(param!=null) {
 			Simbolo aux=new Simbolo(param);
+			aux.setInicializada(true);
 			aux.setNext(null);
 			try {
 				ts.inserta(aux.getId(),aux);
@@ -150,6 +151,7 @@ decl:
 		Simbolo param=$encabezado.met.getNext();
 		while(param!=null) {
 			Simbolo aux=new Simbolo(param);
+			aux.setInicializada(true);
 			aux.setNext(null);
 			try {
 				ts.inserta(aux.getId(),aux);
