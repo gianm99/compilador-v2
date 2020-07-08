@@ -63,8 +63,8 @@ public class Procesador {
             System.out.println(ConsoleColors.BLUE_BOLD_BRIGHT
                     + "Proceso de generación de código completado con éxito" + ConsoleColors.RESET);
         } catch (RuntimeException e) {
-            System.out.println(ConsoleColors.RED_BOLD + "Error al generar código: " + e.getMessage()
-                    + ConsoleColors.RESET);
+            System.out.println(
+                    ConsoleColors.RED_BOLD + "Error al generar código:" + ConsoleColors.RESET);
             throw e;
         }
         // Ensamblado de código sin optimizar
