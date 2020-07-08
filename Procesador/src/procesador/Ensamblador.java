@@ -84,88 +84,31 @@ public class Ensamblador {
         asm.add("include \\masm32\\include\\masm32.inc");
         asm.add("includelib \\masm32\\lib\\kernel32.lib");
         asm.add("includelib \\masm32\\lib\\masm32.lib");
-        asm.add(".data"); // Variables globales
+        asm.add(".data");
+        // Strings constantes
         for (int x = 1; x <= tv.getNv(); x++) {
             Variable vx = tv.get(x);
             if (vx.tipo() == Simbolo.Tipo.CONST && vx.getTsub() == Simbolo.TSub.STRING) {
                 asm.add(vx + "  DB  " + vx.getValor() + ",0");
             }
         }
-        asm.add(".const"); // Constantes de integer y boolean
+        // TODO Añadir las variables globales
+        asm.add(".const");
+        // Integers y booleans constantes
         for (int x = 1; x <= tv.getNv(); x++) {
             Variable vx = tv.get(x);
             if (vx.tipo() == Simbolo.Tipo.CONST && vx.getTsub() != Simbolo.TSub.STRING) {
                 asm.add(vx + "  EQU  " + vx.getValor());
             }
         }
-        asm.add(".code"); // Todas las subrutinas y el programa principal
+        asm.add(".code");
+        // TODO Añadir las subrutinas de manera independiente
         asm.add("start:");
-        for (Instruccion instruccion : c3d) {
-            switch (instruccion.getOpCode()) {
-            case EQ:
-                break;
-            case GE:
-                break;
-            case GT:
-                break;
-            case LE:
-                break;
-            case LT:
-                break;
-            case NEQ:
-                break;
-            case add:
-                break;
-            case and:
-                break;
-            case call:
-                break;
-            case copy:
-                break;
-            case div:
-                break;
-            case skip:
-                break;
-            case ifEQ:
-                break;
-            case ifGE:
-                break;
-            case ifGT:
-                break;
-            case ifLE:
-                break;
-            case ifLT:
-                break;
-            case ifNE:
-                break;
-            case pmb:
-                break;
-            case jump:
-                break;
-            case mult:
-                break;
-            case neg:
-                break;
-            case not:
-                break;
-            case or:
-                break;
-            case params:
-                break;
-            case ret:
-                break;
-            case sub:
-                break;
-            }
-        }
+        // TODO Añadir el programa principal
         asm.add("end start");
         return asm;
     }
 
-    /**
-     * Lectura de memoria a registro. Implementa la lectura de una posición de
-     * memoria a un registro.
-     */
     private void lecturaMemReg(Variable x, String R) {
         if (x.tipo() == Simbolo.Tipo.CONST) {
 
