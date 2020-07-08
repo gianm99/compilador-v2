@@ -762,7 +762,7 @@ primario
 	| referencia {
 		$r = $referencia.r;
 		if($referencia.tsub==Simbolo.TSub.BOOLEAN) {
-			genera(Instruccion.OP.ifEQ, $r.toString(), "0", null);
+			genera(Instruccion.OP.ifEQ, $r.toString(), "-1", null);
 			$cierto=new ArrayDeque<Integer>();
 			$cierto.add(pc);
 			genera(Instruccion.OP.jump, null, null, null);
