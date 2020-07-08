@@ -1,9 +1,11 @@
 package procesador;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.ArrayList;
 
@@ -30,9 +32,26 @@ public class Ensamblador {
         try {
             Process compilado = Runtime.getRuntime()
                     .exec("ml /Fo" + directorio + ".obj" + " /c /Zd /coff  " + directorio + ".asm");
+            BufferedReader stdInput = new BufferedReader(
+                    new InputStreamReader(compilado.getInputStream()));
+            // Leer el output del comando
+            // System.out.println("Output:\n");
+            // String s = null;
+            // while ((s = stdInput.readLine()) != null) {
+            //     System.out.println(s);
+            // }
             compilado.waitFor();
+
             Process enlazado = Runtime.getRuntime().exec(
                     "link /out:" + directorio + ".exe /subsystem:console " + directorio + ".obj");
+
+            stdInput = new BufferedReader(new InputStreamReader(enlazado.getInputStream()));
+            // Leer el output del comando
+            // System.out.println("Output:\n");
+            // s = null;
+            // while ((s = stdInput.readLine()) != null) {
+            //     System.out.println(s);
+            // }
             enlazado.waitFor();
             System.out.println(ConsoleColors.YELLOW_BOLD_BRIGHT + "Proceso de ensamblado ("
                     + directorio + ") completado con éxito" + ConsoleColors.RESET);
