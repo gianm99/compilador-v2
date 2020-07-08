@@ -92,8 +92,11 @@ public class Ensamblador {
             }
         }
         asm.add(".const"); // Constantes de integer y boolean
-        for (int x = 0; x < tv.getNv(); x++) {
-            
+        for (int x = 1; x <= tv.getNv(); x++) {
+            Variable vx = tv.get(x);
+            if (vx.tipo() == Simbolo.Tipo.CONST && vx.getTsub() != Simbolo.TSub.STRING) {
+                asm.add(vx + "  EQU  " + vx.getValor());
+            }
         }
         asm.add(".code"); // Todas las subrutinas y el programa principal
         asm.add("start:");
