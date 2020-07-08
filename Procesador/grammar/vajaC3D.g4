@@ -771,37 +771,41 @@ primario
 		}
 	}
 	| literal {
-		int t = tv.nuevaVar(true,pproc.peek(), Simbolo.Tipo.CONST,$literal.tsub);
+		int t=0;
+		switch($literal.tsub) {
+			case BOOLEAN:
+				t = tv.nuevaVar(true,pproc.peek(), Simbolo.Tipo.VAR,$literal.tsub);
+				if($literal.text.equals("true")) {
+					genera(Instruccion.OP.copy, "-1", null, tv.get(t).toString());
+					tv.get(t).setValor("-1");
+					genera(Instruccion.OP.jump, null, null, null);
+					$cierto=new ArrayDeque<Integer>();
+					$cierto.add(pc);
+					$falso = null;
+				} else {
+					genera(Instruccion.OP.copy, "0", null, tv.get(t).toString());
+					tv.get(t).setValor("0");
+					genera(Instruccion.OP.jump, null, null, null);
+					$falso=new ArrayDeque<Integer>();
+					$falso.add(pc);
+					$cierto = null;
+				}
+				break;
+			case STRING:
+				t = tv.nuevaVar(true,pproc.peek(), Simbolo.Tipo.CONST,$literal.tsub);
+				genera(Instruccion.OP.copy, $literal.text, null, tv.get(t).toString());
+				tv.get(t).setValor($literal.text);
+				break;
+			case INT:
+				t = tv.nuevaVar(true,pproc.peek(), Simbolo.Tipo.VAR,$literal.tsub);
+				genera(Instruccion.OP.copy, $literal.text, null, tv.get(t).toString());
+				tv.get(t).setValor($literal.text);
+				break;
+			default:
+				break;
+		}
 		tv.get(t).setTemporal(true);
 		$r = tv.get(t);
-		if($literal.tsub == Simbolo.TSub.BOOLEAN){
-			if($literal.text.equals("true")) {
-				genera(Instruccion.OP.copy, "-1", "", tv.get(t).toString());
-				tv.get(t).setValor("-1");
-				genera(Instruccion.OP.jump, "", "", "");
-				$cierto=new ArrayDeque<Integer>();
-				$cierto.add(pc);
-				$falso = null;
-			} else {
-				genera(Instruccion.OP.copy, "0", "", tv.get(t).toString());
-				tv.get(t).setValor("0");
-				genera(Instruccion.OP.jump, "", "", "");
-				$falso=new ArrayDeque<Integer>();
-				$falso.add(pc);
-				$cierto = null;
-			}
-		} else {
-			genera(Instruccion.OP.copy, $literal.text, "", tv.get(t).toString());
-			if($literal.tsub==Simbolo.TSub.BOOLEAN){
-				if($literal.text.equals("-1")){
-					tv.get(t).setValor("-1");
-				} else {
-					tv.get(t).setValor("0");
-				}
-			} else if($literal.tsub==Simbolo.TSub.INT){
-				tv.get(t).setValor($literal.text);
-			}	
-		}
 	};
 
 tipo
