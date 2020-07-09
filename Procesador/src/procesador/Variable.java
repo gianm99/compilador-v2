@@ -17,6 +17,7 @@ public class Variable {
     private int ocup; // Ocupación de la variable
     private int desp; // Desplazamiento en el ámbito local
     private int nparam; // Número de parámetro
+    private boolean resultado; // Si la variable es resultado de una función
 
     public Variable(int nv, boolean temporal, int proc, Simbolo.Tipo tipo, Simbolo.TSub tsub) {
         this.nv = nv;
@@ -27,7 +28,15 @@ public class Variable {
         if (temporal) {
             id = "t";
         }
-        this.ocup=4; // 32 bits
+        this.ocup = 4; // 32 bits
+    }
+
+    public boolean isResultado() {
+        return resultado;
+    }
+
+    public void setResultado(boolean resultado) {
+        this.resultado = resultado;
     }
 
     public int getNparam() {

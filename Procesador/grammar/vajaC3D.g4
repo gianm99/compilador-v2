@@ -441,28 +441,40 @@ referencia
 		}
 	}
 	| ID '(' ')' {
-		// TODO Gestionar el return value
 		Simbolo s;
+		int t;
 		try {
 			s = ts.consulta($ID.getText());
 			genera(Instruccion.OP.call, null, null, s.getNp().toString());
+			if(s.getT()==Simbolo.Tipo.FUNC) {
+				t = tv.nuevaVar(true, pproc.peek(),Simbolo.Tipo.VAR,s.getTsub());
+				tv.get(t).setResultado(true);
+				$r = tv.get(t);
+			}
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
 	}
 	| contIdx ')' {
+		int t;
 		while($contIdx.pparams.size()>0)
 		genera(Instruccion.OP.params, null, null, $contIdx.pparams.pop().toString());
 		genera(Instruccion.OP.call, null, null, String.valueOf($contIdx.met.getNp()));
+		if($contIdx.s.getT()==Simbolo.Tipo.FUNC) {
+			t = tv.nuevaVar(true, pproc.peek(),Simbolo.Tipo.VAR,$contIdx.s.getTsub());
+			tv.get(t).setResultado(true);
+			$r = tv.get(t);
+		}
 	};
 
 contIdx
-	returns[Deque<Variable> pparams, Procedimiento met]:
+	returns[Deque<Variable> pparams, Procedimiento met, Simbolo s]:
 	ID '(' expr {
 		Simbolo s=new Simbolo();
 		$pparams = new ArrayDeque<Variable>();
 		try {
 			s = ts.consulta($ID.getText());
+			$s = s;
 			$met = s.getNp();
 			// TODO Comprobar si esto funciona con booleans
 			$pparams.push($expr.r);
