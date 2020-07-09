@@ -209,6 +209,7 @@ decl:
 		e.setNl(pc);
 		genera(Instruccion.OP.pmb, null, null, String.valueOf($encabezado.met.getNp()));
 	} decl* sents {
+		C3D.get(pc-1).setInstFinal(true);
 		pproc.pop();
 		profundidad--;
 		ts=ts.subeBloque();
@@ -243,6 +244,7 @@ decl:
 		e.setNl(pc);
 		genera(Instruccion.OP.pmb, null, null, String.valueOf($encabezado.met.getNp()));;
 	} decl* sents {
+		C3D.get(pc-1).setInstFinal(true);
 		genera(Instruccion.OP.ret, null, null, String.valueOf($encabezado.met.getNp()));
 		pproc.pop();
 		profundidad--;
