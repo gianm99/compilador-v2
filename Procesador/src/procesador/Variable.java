@@ -27,19 +27,7 @@ public class Variable {
         if (temporal) {
             id = "t";
         }
-        switch (this.tsub) {
-        case INT:
-            this.ocup = 4; // 4 bytes
-            break;
-        case BOOLEAN:
-            this.ocup = 1; // 1 byte
-            break;
-        case STRING:
-            this.ocup = 4; // 4 bytes (dirección)
-            break;
-        default:
-            break;
-        }
+        this.ocup=4; // 32 bits
     }
 
     public int getNparam() {

@@ -38,7 +38,7 @@ public class Ensamblador {
             // System.out.println("Output:\n");
             // String s = null;
             // while ((s = stdInput.readLine()) != null) {
-            //     System.out.println(s);
+            // System.out.println(s);
             // }
             compilado.waitFor();
 
@@ -50,7 +50,7 @@ public class Ensamblador {
             // System.out.println("Output:\n");
             // s = null;
             // while ((s = stdInput.readLine()) != null) {
-            //     System.out.println(s);
+            // System.out.println(s);
             // }
             enlazado.waitFor();
             System.out.println(ConsoleColors.YELLOW_BOLD_BRIGHT + "Proceso de ensamblado ("
@@ -85,6 +85,22 @@ public class Ensamblador {
         asm.add("includelib \\masm32\\lib\\kernel32.lib");
         asm.add("includelib \\masm32\\lib\\masm32.lib");
         asm.add(".data");
+        // TODO Añadir las variables globales
+        for (int x = 1; x < tv.getNv(); x++) {
+            Variable vx = tv.get(x);
+            if (vx.tipo() == Simbolo.Tipo.VAR && vx.proc() == 0) {
+                switch (vx.getTsub()) {
+                case INT:
+                    break;
+                case BOOLEAN:
+                    break;
+                case STRING:
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
         // Strings constantes
         for (int x = 1; x <= tv.getNv(); x++) {
             Variable vx = tv.get(x);
@@ -92,7 +108,6 @@ public class Ensamblador {
                 asm.add(vx + "  DB  " + vx.getValor() + ",0");
             }
         }
-        // TODO Añadir las variables globales
         asm.add(".const");
         // Integers y booleans constantes
         for (int x = 1; x <= tv.getNv(); x++) {
@@ -102,7 +117,8 @@ public class Ensamblador {
             }
         }
         asm.add(".code");
-        // TODO Añadir las subrutinas de manera independiente
+        // TODO Añadir las subrutinas propias del lenguaje (Input y Output)
+        // TODO Añadir las subrutinas de usuario de manera independiente
         asm.add("start:");
         // TODO Añadir el programa principal
         asm.add("end start");

@@ -444,6 +444,7 @@ referencia
 		}
 	}
 	| ID '(' ')' {
+		// TODO Gestionar el return value
 		Simbolo s;
 		try {
 			s = ts.consulta($ID.getText());
