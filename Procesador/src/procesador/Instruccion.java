@@ -4,6 +4,7 @@ public class Instruccion {
 
     private OP opCode;
     private String[] instruccion = new String[4];
+    private boolean instFinal;
 
     public enum OP {
         copy, add, sub, mult, div, neg, and, or, not, skip, ifLT, ifLE, ifEQ, ifNE, ifGE, ifGT, jump, LT, LE, EQ, NEQ, GE, GT, pmb, call, ret, params
@@ -97,6 +98,14 @@ public class Instruccion {
         }
     }
 
+    public boolean isInstFinal() {
+        return instFinal;
+    }
+
+    public void setInstFinal(boolean instFinal) {
+        this.instFinal = instFinal;
+    }
+
     @Override
     public String toString() {
         String s = "";
@@ -144,7 +153,7 @@ public class Instruccion {
         case call:
         case ret:
             s = instruccion[0] + " " + instruccion[3];
-            if (instruccion[1]!=null) {
+            if (instruccion[1] != null) {
                 s = s + ", " + instruccion[1];
             }
             break;
