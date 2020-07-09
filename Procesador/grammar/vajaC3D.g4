@@ -112,12 +112,12 @@ programa:
 		try{
 			// Operación de entrada
 			s=ts.consulta("read");
-			s.setNp(tp.nuevoProc(profundidad,s.getT()));
+			s.setNp(tp.nuevoProc(profundidad,s.getT(),"read"));
 			// Operaciones de salida
 			for(Simbolo.TSub tsub : Simbolo.TSub.values()) {
 				if(tsub!=Simbolo.TSub.NULL) {
 					s=ts.consulta("print"+tsub);
-					s.setNp(tp.nuevoProc(profundidad,s.getT()));
+					s.setNp(tp.nuevoProc(profundidad,s.getT(),"print"+tsub));
 				}
 			}
 		} catch(TablaSimbolos.TablaSimbolosException e) {
@@ -256,7 +256,7 @@ encabezado
 		Procedimiento met;
 		try {
 			s=ts.consulta($ID.getText());
-			met=tp.nuevoProc(profundidad,s.getT());
+			met=tp.nuevoProc(profundidad,s.getT(),$ID.getText());
 			s.setNp(met);
 			$met = met;
 			$s=s;
