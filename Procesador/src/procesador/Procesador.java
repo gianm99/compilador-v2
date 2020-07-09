@@ -63,21 +63,21 @@ public class Procesador {
             System.out.println(ConsoleColors.BLUE_BOLD_BRIGHT
                     + "Proceso de generación de código completado con éxito" + ConsoleColors.RESET);
         } catch (RuntimeException e) {
-            System.out.println(ConsoleColors.RED_BOLD + "Error al generar código: " + e.getMessage()
-                    + ConsoleColors.RESET);
+            System.out.println(
+                    ConsoleColors.RED_BOLD + "Error al generar código:" + ConsoleColors.RESET);
             throw e;
         }
         // Ensamblado de código sin optimizar
-        // Ensamblador normal = new Ensamblador(buildPath + filename, parserC3D.getC3D(),
-        //         parserC3D.getTv(), parserC3D.getTp());
-        // normal.ensamblar();
+        Ensamblador normal = new Ensamblador(buildPath + filename, parserC3D.getC3D(),
+                parserC3D.getTv(), parserC3D.getTp());
+        normal.ensamblar();
         // Optimización de código
         Optimizador optimizador = new Optimizador(buildPath + filename + "_OPT", parserC3D.getC3D(),
                 parserC3D.getTv(), parserC3D.getTp());
         optimizador.optimizar();
         // Ensamblado de código optimizado
-        // Ensamblador optimizado = new Ensamblador(buildPath + filename + "_OPT",
-        //         optimizador.getC3D(), optimizador.getTv(), optimizador.getTp());
-        // optimizado.ensamblar();
+        Ensamblador optimizado = new Ensamblador(buildPath + filename + "_OPT",
+                optimizador.getC3D(), optimizador.getTv(), optimizador.getTp());
+        optimizado.ensamblar();
     }
 }

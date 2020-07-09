@@ -119,6 +119,7 @@ decl:
 		Simbolo param=$encabezado.met.getNext();
 		while(param!=null) {
 			Simbolo aux=new Simbolo(param);
+			aux.setInicializada(true);
 			aux.setNext(null);
 			try {
 				ts.inserta(aux.getId(),aux);
@@ -150,6 +151,7 @@ decl:
 		Simbolo param=$encabezado.met.getNext();
 		while(param!=null) {
 			Simbolo aux=new Simbolo(param);
+			aux.setInicializada(true);
 			aux.setNext(null);
 			try {
 				ts.inserta(aux.getId(),aux);
@@ -284,6 +286,9 @@ sent:
 			if($referencia.s.getT()==Simbolo.Tipo.CONST) {
 				errores+="Error semántico - Línea "+$ASSIGN.getLine()+": "+$referencia.s.getId()+
 				"es una constante\n";
+			} else if($referencia.s.getT()==Simbolo.Tipo.FUNC || $referencia.s.getT()==Simbolo.Tipo.PROC) {
+				errores+="Error semántico - Línea "+$ASSIGN.getLine()+
+				": no se esperaba una función o un procedimiento\n";
 			} else if($referencia.s.getTsub()!=$expr.tsub) {
 				errores+="Error semántico - Línea "+$ASSIGN.getLine()+
 				": asignación de tipo incorrecto (esperado '"+$referencia.s.getTsub()+

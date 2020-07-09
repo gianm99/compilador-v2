@@ -12,12 +12,13 @@ public class Variable {
     private int proc; // Número del procedimiento que la ha declarado
     private Simbolo.Tipo tipo; // Tipo: variable, constante o argumento
     private Simbolo.TSub tsub; // Tipo subyacente
-    private boolean inicializada; // Si ha sido inicializada
     private String id; // Identificador de la variable (t si es temporal)
     private String valor; // Valor para constantes
     private int ocup; // Ocupación de la variable
     private int desp; // Desplazamiento en el ámbito local
     private int nparam; // Número de parámetro
+    private boolean resultado; // Si la variable es resultado de una función
+    private boolean borrada; // Si la variable ha sido borrada
 
     public Variable(int nv, boolean temporal, int proc, Simbolo.Tipo tipo, Simbolo.TSub tsub) {
         this.nv = nv;
@@ -25,23 +26,27 @@ public class Variable {
         this.proc = proc;
         this.tipo = tipo;
         this.tsub = tsub;
-        this.inicializada = false;
         if (temporal) {
             id = "t";
         }
-        switch (this.tsub) {
-        case INT:
-            this.ocup = 4; // 4 bytes
-            break;
-        case BOOLEAN:
-            this.ocup = 1; // 1 byte
-            break;
-        case STRING:
-            this.ocup = 4; // 4 bytes (dirección)
-            break;
-        default:
-            break;
-        }
+        this.ocup = 4; // 32 bits
+        this.borrada = false;
+    }
+
+    public boolean isBorrada() {
+        return borrada;
+    }
+
+    public void setBorrada(boolean borrada) {
+        this.borrada = borrada;
+    }
+
+    public boolean isResultado() {
+        return resultado;
+    }
+
+    public void setResultado(boolean resultado) {
+        this.resultado = resultado;
     }
 
     public int getNparam() {
@@ -62,14 +67,6 @@ public class Variable {
 
     public Simbolo.TSub getTsub() {
         return tsub;
-    }
-
-    public boolean isInicializada() {
-        return inicializada;
-    }
-
-    public void setInicializada(boolean inicializada) {
-        this.inicializada = inicializada;
     }
 
     public boolean isTemporal() {

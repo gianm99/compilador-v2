@@ -31,7 +31,7 @@ public class TablaVariables {
 
     public void quitarVar(String var) {
         String segmentos[] = var.split("\\$");
-        tv.remove(Integer.parseInt(segmentos[1]));
+        tv.get(Integer.parseInt(segmentos[1]) - 1).setBorrada(true);
     }
 
     public void quitarVar(ArrayList<Instruccion> var) {

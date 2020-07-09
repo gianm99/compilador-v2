@@ -8,6 +8,7 @@ package procesador;
  */
 public class Procedimiento {
 
+    private String id;
     private int np; // Número de procedimiento
     private int prof; // Nivel de la declaración
     private Etiqueta inicio; // Etiqueta de inicio
@@ -15,11 +16,12 @@ public class Procedimiento {
     private int ocupVL; // Ocupación de las variables locales
     private Simbolo.Tipo tipo; // Función o Procedimiento
 
-    public Procedimiento(int np, int prof, Simbolo.Tipo tipo) {
+    public Procedimiento(int np, int prof, Simbolo.Tipo tipo, String id) {
         this.np = np;
         this.tipo = tipo;
         this.setProf(prof);
         this.numParams = 0;
+        this.id = id;
     }
 
     public int getProf() {
@@ -56,7 +58,7 @@ public class Procedimiento {
 
     @Override
     public String toString() {
-        return String.valueOf(np);
+        return id + "$" + np;
     }
 
     public int getNumParams() {

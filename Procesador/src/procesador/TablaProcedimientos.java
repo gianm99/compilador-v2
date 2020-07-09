@@ -17,10 +17,9 @@ public class TablaProcedimientos {
         np = 0;
     }
 
-    // TODO Cambiar el tipo a int
-    public Procedimiento nuevoProc(int prof, Simbolo.Tipo tipo) {
+    public Procedimiento nuevoProc(int prof, Simbolo.Tipo tipo, String id) {
         np++;
-        tp.add(new Procedimiento(np, prof, tipo));
+        tp.add(new Procedimiento(np, prof, tipo, id));
         return tp.get(tp.size() - 1);
     }
 

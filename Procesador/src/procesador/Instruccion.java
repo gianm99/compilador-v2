@@ -6,6 +6,7 @@ public class Instruccion {
 
     private OP opCode;
     private String[] instruccion = new String[4];
+    private boolean instFinal;
 
     public enum OP {
         copy, add, sub, mult, div, neg, and, or, not, skip, ifLT, ifLE, ifEQ, ifNE, ifGE, ifGT, jump, LT, LE, EQ, NEQ, GE, GT, pmb, call, ret, params
@@ -99,55 +100,68 @@ public class Instruccion {
         }
     }
 
+    public boolean isInstFinal() {
+        return instFinal;
+    }
+
+    public void setInstFinal(boolean instFinal) {
+        this.instFinal = instFinal;
+    }
+
     @Override
     public String toString() {
         String s = "";
         switch (opCode) {
-            case add:
-            case sub:
-            case mult:
-            case div:
-            case and:
-            case or:
-                s = instruccion[3] + " = " + instruccion[1] + " " + instruccion[0] + " "
-                        + instruccion[2];
-                break;
-            case copy:
-                s = instruccion[3] + " " + instruccion[0] + " " + instruccion[1];
-                break;
-            case LT:
-            case LE:
-            case EQ:
-            case NEQ:
-            case GE:
-            case GT:
-                s = instruccion[1] + " " + instruccion[0] + " " + instruccion[2];
-                break;
-            case neg:
-                s = instruccion[3] + " = " + instruccion[0] + instruccion[1];
-                break;
-            case not:
-                s = instruccion[3] + " = " + instruccion[0] + " " + instruccion[1];
-                break;
-            case skip:
-                s = instruccion[3] + ": " + instruccion[0];
-                break;
-            case ifLT:
-            case ifLE:
-            case ifEQ:
-            case ifNE:
-            case ifGE:
-            case ifGT:
-                s = "if " + instruccion[1] + " " + instruccion[0] + " " + instruccion[2] + " goto "
-                        + instruccion[3];
-                break;
-            case jump:
-            case pmb:
-            case call:
-            case ret:
-            case params:
-                s = instruccion[0] + " " + instruccion[3];
-                break;
+        case add:
+        case sub:
+        case mult:
+        case div:
+        case and:
+        case or:
+            s = instruccion[3] + " = " + instruccion[1] + " " + instruccion[0] + " "
+                    + instruccion[2];
+            break;
+        case copy:
+            s = instruccion[3] + " " + instruccion[0] + " " + instruccion[1];
+            break;
+        case LT:
+        case LE:
+        case EQ:
+        case NEQ:
+        case GE:
+        case GT:
+            s = instruccion[1] + " " + instruccion[0] + " " + instruccion[2];
+            break;
+        case neg:
+            s = instruccion[3] + " = " + instruccion[0] + instruccion[1];
+            break;
+        case not:
+            s = instruccion[3] + " = " + instruccion[0] + " " + instruccion[1];
+            break;
+        case skip:
+            s = instruccion[3] + ": " + instruccion[0];
+            break;
+        case ifLT:
+        case ifLE:
+        case ifEQ:
+        case ifNE:
+        case ifGE:
+        case ifGT:
+            s = "if " + instruccion[1] + " " + instruccion[0] + " " + instruccion[2] + " goto "
+                    + instruccion[3];
+            break;
+        case jump:
+        case pmb:
+        case call:
+        case ret:
+            s = instruccion[0] + " " + instruccion[3];
+            if (instruccion[1] != null) {
+                s = s + ", " + instruccion[1];
+            }
+            break;
+        case params:
+            s = instruccion[0] + " " + instruccion[3];
+            break;
         }
         return s;
     }
