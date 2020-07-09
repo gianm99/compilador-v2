@@ -12,7 +12,6 @@ public class Variable {
     private int proc; // Número del procedimiento que la ha declarado
     private Simbolo.Tipo tipo; // Tipo: variable, constante o argumento
     private Simbolo.TSub tsub; // Tipo subyacente
-    private boolean inicializada; // Si ha sido inicializada
     private String id; // Identificador de la variable (t si es temporal)
     private String valor; // Valor para constantes
     private int ocup; // Ocupación de la variable
@@ -25,7 +24,6 @@ public class Variable {
         this.proc = proc;
         this.tipo = tipo;
         this.tsub = tsub;
-        this.inicializada = false;
         if (temporal) {
             id = "t";
         }
@@ -62,14 +60,6 @@ public class Variable {
 
     public Simbolo.TSub getTsub() {
         return tsub;
-    }
-
-    public boolean isInicializada() {
-        return inicializada;
-    }
-
-    public void setInicializada(boolean inicializada) {
-        this.inicializada = inicializada;
     }
 
     public boolean isTemporal() {

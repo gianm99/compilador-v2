@@ -146,7 +146,6 @@ decl:
 		}
 	} (
 		'=' expr {
-			tv.get(nv).setInicializada(true);
 			if(s.getTsub()==Simbolo.TSub.BOOLEAN) {
 				Etiqueta ec=new Etiqueta();
 				Etiqueta ef=new Etiqueta();
