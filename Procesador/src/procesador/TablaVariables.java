@@ -32,7 +32,7 @@ public class TablaVariables {
 
     public void quitarVar(String var) {
         String segmentos[] = var.split("\\$");
-        tv.remove(Integer.parseInt(segmentos[1]));
+        tv.remove(Integer.parseInt(segmentos[1]) - 1);
     }
 
     public Variable get(int nv) {
@@ -42,7 +42,7 @@ public class TablaVariables {
     public Variable get(String var) {
         String segmentos[] = var.split("\\$");
         if (segmentos.length > 1) {
-            return tv.get(Integer.parseInt(segmentos[1])-1);
+            return tv.get(Integer.parseInt(segmentos[1]) - 1);
         } else {
             return null;
         }
