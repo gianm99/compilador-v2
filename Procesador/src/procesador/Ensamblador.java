@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.ArrayList;
+import procesador.Instruccion.OP;
 
 public class Ensamblador {
     private String directorio;
@@ -157,8 +158,71 @@ public class Ensamblador {
         return asm;
     }
 
-    private void lecturaMemReg(Variable x, String R) {
-        if (x.tipo() == Simbolo.Tipo.CONST) {
+    private void conversion(int i) {
+        switch (c3d.get(i).getOpCode()) {
+        case EQ:
+            break;
+        case GE:
+            break;
+        case GT:
+            break;
+        case LE:
+            break;
+        case LT:
+            break;
+        case NEQ:
+            break;
+        case add:
+            break;
+        case and:
+            break;
+        case call:
+            break;
+        case copy:
+            break;
+        case div:
+            break;
+        case ifEQ:
+            break;
+        case ifGE:
+            break;
+        case ifGT:
+            break;
+        case ifLE:
+            break;
+        case ifLT:
+            break;
+        case ifNE:
+            break;
+        case jump:
+            break;
+        case mult:
+            break;
+        case neg:
+            break;
+        case not:
+            break;
+        case or:
+            break;
+        case params:
+            break;
+        case ret:
+            break;
+        case skip:
+            break;
+        case sub:
+            break;
+        default:
+            break;
+
+        }
+    }
+
+    // private void lecturaMemReg(Variable x, String R) {
+    // if (x.tipo() == Simbolo.Tipo.CONST) {
+
+    // }
+    // }
 
     private int saltarSubprograma(int i) {
         int prof = 1;
