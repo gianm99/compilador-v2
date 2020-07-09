@@ -125,7 +125,32 @@ public class Ensamblador {
         }
         asm.add(".code");
         // TODO Añadir las subrutinas propias del lenguaje (Input y Output)
-        // TODO Añadir las subrutinas de usuario de manera independiente
+        for (int p = 5; p < tp.getNp(); p++) {
+            Procedimiento pp = tp.get(p);
+            int i = pp.getInicio().getNl();
+            asm.add(pp + "  PROC");
+            int prof4x = tp.get(p).getProf() * 4;
+            asm.add("lea  esi, DISP  ; esi = @DISP");
+            asm.add("push [esi+" + prof4x + "]");
+            asm.add("push ebp");
+            asm.add("mov ebp, esp  ; BP = SP");
+            asm.add("mov [esi+" + prof4x + "], ebp  ; DISP(prof) = BP");
+            asm.add("sub esp, " + pp.getOcupVL()
+                    + "  ; reserva memoria para las variables locales");
+            i++;
+            do {
+                switch (c3d.get(i).getOpCode()) {
+                case pmb:
+                    i = saltarSubprograma(i);
+                    break;
+                default:
+                    conversion(i);
+                    i++;
+                    break;
+                }
+            } while (!c3d.get(i).isInstFinal());
+            asm.add(pp + "  ENDP");
+        }
         asm.add("start:");
         // TODO Añadir el programa principal
         asm.add("end start");
@@ -135,6 +160,17 @@ public class Ensamblador {
     private void lecturaMemReg(Variable x, String R) {
         if (x.tipo() == Simbolo.Tipo.CONST) {
 
+    private int saltarSubprograma(int i) {
+        int prof = 1;
+        i++;
+        while (prof != 0) {
+            if (c3d.get(i).isInstFinal()) {
+                prof--;
+            } else if (c3d.get(i).getOpCode() == OP.pmb) {
+                prof++;
+            }
+            i++;
         }
+        return i;
     }
 }
