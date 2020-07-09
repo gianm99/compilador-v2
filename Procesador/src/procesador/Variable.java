@@ -18,6 +18,7 @@ public class Variable {
     private int desp; // Desplazamiento en el ámbito local
     private int nparam; // Número de parámetro
     private boolean resultado; // Si la variable es resultado de una función
+    private boolean borrada; // Si la variable ha sido borrada
 
     public Variable(int nv, boolean temporal, int proc, Simbolo.Tipo tipo, Simbolo.TSub tsub) {
         this.nv = nv;
@@ -29,6 +30,15 @@ public class Variable {
             id = "t";
         }
         this.ocup = 4; // 32 bits
+        this.borrada = false;
+    }
+
+    public boolean isBorrada() {
+        return borrada;
+    }
+
+    public void setBorrada(boolean borrada) {
+        this.borrada = borrada;
     }
 
     public boolean isResultado() {
