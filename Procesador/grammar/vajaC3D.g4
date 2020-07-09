@@ -179,7 +179,7 @@ decl:
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
 	}
-	| FUNCTION tipo encabezado BEGIN { // TODO Ocupación de variables locales y número de parámetros
+	| FUNCTION tipo encabezado BEGIN {
 		profundidad++;
 		try{
 			ts=ts.bajaBloque();
@@ -214,7 +214,7 @@ decl:
 		profundidad--;
 		ts=ts.subeBloque();
 	} END
-	| PROCEDURE encabezado BEGIN { // TODO Ocupación de variables locales y número de parámetros
+	| PROCEDURE encabezado BEGIN {
 		profundidad++;
 		try{
 			ts=ts.bajaBloque();
