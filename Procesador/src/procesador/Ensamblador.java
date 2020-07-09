@@ -84,23 +84,28 @@ public class Ensamblador {
         asm.add("include \\masm32\\include\\masm32.inc");
         asm.add("includelib \\masm32\\lib\\kernel32.lib");
         asm.add("includelib \\masm32\\lib\\masm32.lib");
-        asm.add(".data");
-        // TODO Añadir las variables globales
-        for (int x = 1; x < tv.getNv(); x++) {
+        asm.add(".const");
+        // Integers y booleans constantes
+        for (int x = 1; x <= tv.getNv(); x++) {
             Variable vx = tv.get(x);
-            if (vx.tipo() == Simbolo.Tipo.VAR && vx.proc() == 0) {
+            if (vx.tipo() == Simbolo.Tipo.CONST && vx.getTsub() != Simbolo.TSub.STRING) {
                 switch (vx.getTsub()) {
                 case INT:
+                    asm.add(vx + "  EQU  " + vx.getValor());
                     break;
                 case BOOLEAN:
-                    break;
-                case STRING:
+                    if (vx.getValor().equals("true")) {
+                        asm.add(vx + "  EQU  -1");
+                    } else {
+                        asm.add(vx + "  EQU  0");
+                    }
                     break;
                 default:
                     break;
                 }
             }
         }
+        asm.add(".data");
         // Strings constantes
         for (int x = 1; x <= tv.getNv(); x++) {
             Variable vx = tv.get(x);
@@ -108,12 +113,14 @@ public class Ensamblador {
                 asm.add(vx + "  DB  " + vx.getValor() + ",0");
             }
         }
-        asm.add(".const");
-        // Integers y booleans constantes
-        for (int x = 1; x <= tv.getNv(); x++) {
+        asm.add(".data?");
+        // DISP
+        asm.add("DISP  DW  1000 DUP (?)");
+        // Variables globales
+        for (int x = 1; x < tv.getNv(); x++) {
             Variable vx = tv.get(x);
-            if (vx.tipo() == Simbolo.Tipo.CONST && vx.getTsub() != Simbolo.TSub.STRING) {
-                asm.add(vx + "  EQU  " + vx.getValor());
+            if (vx.tipo() == Simbolo.Tipo.VAR && !vx.isBorrada() && vx.proc() == 0) {
+                asm.add(vx + "  DD  ?");
             }
         }
         asm.add(".code");
