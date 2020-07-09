@@ -389,19 +389,16 @@ sent[Deque<Integer> sents_seg]
 			genera(Instruccion.OP.skip, null, null, ec.toString());
 			ec.setNl(pc);
 			genera(Instruccion.OP.copy, "-1", null, $referencia.r.toString());
-			$referencia.r.setValor("-1");
 			genera(Instruccion.OP.jump, null, null, efin.toString());
 			genera(Instruccion.OP.skip, null, null, ef.toString());
 			ef.setNl(pc);
 			genera(Instruccion.OP.copy, "0", null, $referencia.r.toString());
-			$referencia.r.setValor("0");
 			genera(Instruccion.OP.skip, null, null, efin.toString());
 			efin.setNl(pc);
 			backpatch($expr.cierto,ec);
 			backpatch($expr.falso,ef);
 		} else {
 			genera(Instruccion.OP.copy, $expr.r.toString(), null, $referencia.r.toString());
-			$referencia.r.setValor($expr.r.getValor());
 		}
 	}
 	| referencia ';';
@@ -477,12 +474,10 @@ contIdx
 				genera(Instruccion.OP.skip, null, null, ec.toString());
 				ec.setNl(pc);
 				genera(Instruccion.OP.copy, "-1", null, $expr.r.toString());
-				$expr.r.setValor("-1");
 				genera(Instruccion.OP.jump, null, null, efin.toString());
 				genera(Instruccion.OP.skip, null, null, ef.toString());
 				ef.setNl(pc);
 				genera(Instruccion.OP.copy, "0", null, $expr.r.toString());
-				$expr.r.setValor("0");
 				genera(Instruccion.OP.skip, null, null, efin.toString());
 				efin.setNl(pc);
 				backpatch($expr.cierto,ec);
@@ -504,12 +499,10 @@ contIdx_[Deque<Variable> pparams]:
 			genera(Instruccion.OP.skip, null, null, ec.toString());
 			ec.setNl(pc);
 			genera(Instruccion.OP.copy, "-1", null, $expr.r.toString());
-			$expr.r.setValor("-1");
 			genera(Instruccion.OP.jump, null, null, efin.toString());
 			genera(Instruccion.OP.skip, null, null, ef.toString());
 			ef.setNl(pc);
 			genera(Instruccion.OP.copy, "0", null, $expr.r.toString());
-			$expr.r.setValor("0");
 			genera(Instruccion.OP.skip, null, null, efin.toString());
 			efin.setNl(pc);
 			backpatch($expr.cierto,ec);
