@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+import org.antlr.v4.codegen.SourceGenTriggers;
 import procesador.Simbolo.TSub;
 
 public class Optimizador {
@@ -34,6 +35,8 @@ public class Optimizador {
         eliminaCodigoInaccesibleEntreEtiquetas();
         eliminaAsignacionesInecesarias();
         // TODO hacer una función que reasinge los números de las líneas a las etiquetas al final.
+        // TODO revisar optimizaciones para que se asigne la instrucción final de un subprograma si
+        // se cambia el códgio de esta
         tv.calculoDespOcupVL(tp);
         imprimirC3D();
     }
@@ -149,7 +152,9 @@ public class Optimizador {
         eliminaEtiquetasInecesarias();
     }
 
-    // TODO comprobar que funciona correctamente
+    // TODO comprobar que funciona correctamen
+    // Encontrado error donde se elimina una variable temporal usada en el condicional del IF y no
+    // se sustiye por el valor correspondiente
     /**
      * Reduce el número de variables temporales para las asignaciones, siempre y cuando no sean de
      * tipo String o necesitados para pasar por parámetro para una función.
@@ -159,14 +164,15 @@ public class Optimizador {
         ArrayList<Instruccion> InstrucParams = new ArrayList<Instruccion>();
         int i = 0;
         while (i < C3D.size()) {
-            if ((C3D.get(i).getOpCode() == Instruccion.OP.copy)
-                    && C3D.get(i).destino().charAt(0) == 't') {
-                if (!InstrucVars.contains(C3D.get(i))
-                        && !(tv.get(C3D.get(i).destino()).getTsub() == Simbolo.TSub.STRING)) {
-                    InstrucVars.add(C3D.get(i));
+            if (C3D.get(i).destino().charAt(0) == 't' && C3D.get(i).destino().charAt(1) == '$') {
+                if ((C3D.get(i).getOpCode() == Instruccion.OP.copy)) {
+                    if (!InstrucVars.contains(C3D.get(i))
+                            && !(tv.get(C3D.get(i).destino()).getTsub() == Simbolo.TSub.STRING)) {
+                        InstrucVars.add(C3D.get(i));
+                    }
+                } else if (C3D.get(i).getOpCode() == Instruccion.OP.params) {
+                    InstrucParams.add(C3D.get(i));
                 }
-            } else if (C3D.get(i).getOpCode() == Instruccion.OP.params) {
-                InstrucParams.add(C3D.get(i));
             }
             i++;
         }
@@ -204,19 +210,25 @@ public class Optimizador {
         int k;
         while (i < InstrucVars.size()) {
             k = devolverLineaVariableUsada(InstrucVars.get(i).destino());
-            if (C3D.get(k).getOperando(1).equals(InstrucVars.get(i).destino())) {
-                C3D.get(k).setOperando(1, InstrucVars.get(i).getOperando(1));
+            if (k == -1) {
+                tv.quitarVar(InstrucVars.get(i).destino());
             } else {
-                C3D.get(k).setOperando(2, InstrucVars.get(i).getOperando(1));
+                if (C3D.get(k).getOperando(1).equals(InstrucVars.get(i).destino())) {
+                    C3D.get(k).setOperando(1, InstrucVars.get(i).getOperando(1));
+                }
+                if (C3D.get(k).getOperando(2) != null) {
+                    if (C3D.get(k).getOperando(2).equals(InstrucVars.get(i).destino())) {
+                        C3D.get(k).setOperando(2, InstrucVars.get(i).getOperando(1));
+                    }
+                }
+                C3D.remove(InstrucVars.get(i));
             }
-            C3D.remove(InstrucVars.get(i));
-
             i++;
         }
         i = 0;
-        while (i<C3D.size() - 1){
-            if(C3D.get(i).equals(C3D.get(i+1))){
-                C3D.remove(i+1);
+        while (i < C3D.size() - 1) {
+            if (C3D.get(i).equals(C3D.get(i + 1))) {
+                C3D.remove(i + 1);
             } else {
                 i++;
             }
@@ -246,18 +258,23 @@ public class Optimizador {
         String[] str = new String[4];
         for (int i = 0; i < C3D.size(); i++) {
             str = C3D.get(i).getInstruccion();
-            if (str[1].equals(var) || str[2].equals(var)) {
-                return i;
+            if (str[1] != null) {
+                if (str[1].equals(var))
+                    return i;
+            }
+            if (str[2] != null) {
+                if (str[2].equals(var))
+                    return i;
             }
         }
-        return 0;
+        return -1;
     }
 
     /**
      * Devuelve las líneas de código C3D que comprenden desde la posición inicial "pos" hasta la
      * posición final "posEtiqueta"
      *
-     * @param pos         Posición inicual
+     * @param pos         Posición inicial
      * @param posEtiqueta Posición final marcado por una etiqueta
      * @return Devuelve el código entre las dos posiciones
      */
