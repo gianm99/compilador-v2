@@ -251,8 +251,54 @@ public class Ensamblador {
         }
     }
 
-    // private void lecturaMemReg(Variable x, String R) {
-    // if (x.tipo() == Simbolo.Tipo.CONST) {
+    private void loadMemReg(Variable x, String R) {
+        int profp, profx;
+        if (npActual != 0) {
+            profp = tp.get(npActual).getProf();
+        } else {
+            profp = 0;
+        }
+        if (x.proc() != 0) {
+            profx = tp.get(x.proc()).getProf();
+        } else {
+            profx = 0;
+        }
+        if (x.tipo() == Simbolo.Tipo.CONST) {
+            // x es un valor constante
+            if (x.getTsub() == TSub.STRING) {
+                asm.add("mov " + R + ", OFFSET " + x + "  ; " + R + " = @" + x);
+            } else {
+                asm.add("mov " + R + ", " + x);
+            }
+        } else if (profx == 0) {
+            // x es una variable global
+            asm.add("mov " + R + ", " + x + "  ; " + R + " = " + x);
+        } else if (profp == profx && x.getDesp() < 0) {
+            // x es una variable local
+            int dx = x.getDesp();
+            asm.add("mov " + R + ", [ebp" + dx + "]");
+        } else if (profp == profx) {
+            // x es un parámetro local
+            int dx = 8 + 4 * x.getNparam();
+            asm.add("mov esi, [ebp+" + dx + "]");
+            asm.add("mov " + R + ", [esi]"); // TODO Preguntar esto
+        } else if (profp < profx && x.getDesp() < 0) {
+            // x es una variable definida en otro ámbito
+            int dx = x.getDesp();
+            int prof4x = profx * 4;
+            asm.add("mov esi, OFFSET DISP  ; ESI = @ DISP");
+            asm.add("mov esi, [esi+" + prof4x + "]  ; ESI = DISP[profx] = BPx");
+            asm.add("mov " + R + ", [esi" + dx + "]");
+        } else if (profx < profp) {
+            int dx = 8 + 4 * x.getNparam();
+            int prof4x = profx * 4;
+            asm.add("mov esi, OFFSET DISP  ; ESI = @ DISP");
+            asm.add("mov esi, [esi+" + prof4x + "]  ; ESI = DISP[profx] = BPx");
+            asm.add("mov esi, [esi+" + dx + "]"); // TODO Preguntar esto otro
+            asm.add("mov " + R + ", [esi]");
+        }
+    }
+
 
     // }
     // }
