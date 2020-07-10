@@ -776,7 +776,7 @@ primario
 		int t=0;
 		switch($literal.tsub) {
 			case BOOLEAN:
-				t = tv.nuevaVar(true,pproc.peek(), Simbolo.Tipo.VAR,$literal.tsub);
+				t = tv.nuevaVar(true,pproc.peek(), Simbolo.Tipo.CONST,$literal.tsub);
 				if($literal.text.equals("true")) {
 					genera(Instruccion.OP.copy, "-1", null, tv.get(t).toString());
 					tv.get(t).setValor("-1");
@@ -799,7 +799,7 @@ primario
 				tv.get(t).setValor($literal.text);
 				break;
 			case INT:
-				t = tv.nuevaVar(true,pproc.peek(), Simbolo.Tipo.VAR,$literal.tsub);
+				t = tv.nuevaVar(true,pproc.peek(), Simbolo.Tipo.CONST,$literal.tsub);
 				genera(Instruccion.OP.copy, $literal.text, null, tv.get(t).toString());
 				tv.get(t).setValor($literal.text);
 				break;
