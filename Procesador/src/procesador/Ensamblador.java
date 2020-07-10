@@ -238,7 +238,15 @@ public class Ensamblador {
         }
     }
 
-    private void loadMemReg(Variable x, String R) {
+    /**
+     * Genera el código para la lectura de un valor de memoria a un registro.
+     * 
+     * @param R
+     *              El valor de memoria que se quiere guardar en el registro.
+     * @param x
+     *              El registro en el que se quiere guardar el valor de memoria.
+     */
+    private void loadMemReg(String R, Variable x) {
         int profp, profx;
         if (npActual != 0) {
             profp = tp.get(npActual).getProf();
@@ -277,15 +285,24 @@ public class Ensamblador {
             asm.add("mov esi, [esi+" + prof4x + "]  ; ESI = DISP[profx] = BPx");
             asm.add("mov " + R + ", [esi" + dx + "]");
         } else if (profx < profp) {
+            // x es un parámetro definido en otro ámbito
             int dx = 8 + 4 * x.getNparam();
             int prof4x = profx * 4;
             asm.add("mov esi, OFFSET DISP  ; ESI = @ DISP");
             asm.add("mov esi, [esi+" + prof4x + "]  ; ESI = DISP[profx] = BPx");
-            asm.add("mov esi, [esi+" + dx + "]"); // TODO Preguntar esto otro
+            asm.add("mov esi, [esi+" + dx + "]  ; ESI = @ param"); // TODO Preguntar esto otro
             asm.add("mov " + R + ", [esi]");
         }
     }
 
+    /**
+     * Genera el código para escritura de un valor de un registro a memoria.
+     * 
+     * @param x
+     *              La posición de memoria en la que se quiere guardar el valor.
+     * @param R
+     *              El registro que contiene el valor a escribir.
+     */
     private void storeRegMem(Variable x, String R) {
         int profp, profx;
         if (npActual != 0) {
@@ -328,6 +345,14 @@ public class Ensamblador {
         }
     }
 
+    /**
+     * Salta las declaraciones de subrutinas que se encuentra.
+     * 
+     * @param i
+     *              La instrucción en la que empieza.
+     * @return la primera instrucción que no es parte de una declaración de
+     *         subrutina.
+     */
     private int saltarSubprograma(int i) {
         int prof = 1;
         i++;
