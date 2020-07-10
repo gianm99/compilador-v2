@@ -27,6 +27,11 @@ public class TablaProcedimientos {
         return tp.get(np - 1);
     }
 
+    public Procedimiento get(String proc) {
+        String segmentos[] = proc.split("\\$");
+        return tp.get(Integer.parseInt(segmentos[1]) - 1);
+    }
+
     // Getters y setters
     public ArrayList<Procedimiento> getTP() {
         return tp;
