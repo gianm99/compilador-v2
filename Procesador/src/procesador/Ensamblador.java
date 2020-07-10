@@ -126,12 +126,14 @@ public class Ensamblador {
         }
         asm.add(".code");
         // TODO Añadir las subrutinas propias del lenguaje (Input y Output)
+        // Subrutinas definidas por el usuario
         for (int p = 5; p < tp.getNp(); p++) {
             Procedimiento pp = tp.get(p);
             int i = pp.getInicio().getNl();
             asm.add(pp + "  PROC");
+            // pmb
             int prof4x = tp.get(p).getProf() * 4;
-            asm.add("lea  esi, DISP  ; esi = @DISP");
+            asm.add("lea  esi, DISP  ; ESI = @DISP");
             asm.add("push [esi+" + prof4x + "]");
             asm.add("push ebp");
             asm.add("mov ebp, esp  ; BP = SP");
@@ -139,17 +141,36 @@ public class Ensamblador {
             asm.add("sub esp, " + pp.getOcupVL()
                     + "  ; reserva memoria para las variables locales");
             i++;
-            do {
-                switch (c3d.get(i).getOpCode()) {
-                case pmb:
+            while (true) {
+                Instruccion ins = c3d.get(i);
+                if (ins.getOpCode() == OP.pmb) {
+                    // Saltar las declaraciones de subrutinas locales
                     i = saltarSubprograma(i);
-                    break;
-                default:
-                    conversion(i);
-                    i++;
-                    break;
+                } else {
+                    if (ins.getOpCode() == OP.ret) {
+                        // Caso del return
+                        asm.add("mov esp, ebp  ; SP = BP");
+                        asm.add("pop ebp  ; BP = antiguo BP");
+                        asm.add("lea edi, DISP  ; EDI = @DISP");
+                        asm.add("pop [edi+" + prof4x + "]  ; DISP[prof] = antiguo valor");
+                        if (ins.getOperando(1) != null) {
+                            // Guardar el valor de retorno en %eax
+                            loadMemReg(tv.get(ins.getOperando(1)), "eax");
+                        }
+                        asm.add("ret");
+                    } else {
+                        // El resto de instrucciones
+                        conversion(i);
+                    }
+                    if (ins.isInstFinal()) {
+                        // Si es la última instrucción, sale del bucle
+                        break;
+                    } else {
+                        // Si no, continua
+                        i++;
+                    }
                 }
-            } while (!c3d.get(i).isInstFinal());
+            }
             asm.add(pp + "  ENDP");
         }
         asm.add("start:");
@@ -205,8 +226,6 @@ public class Ensamblador {
         case or:
             break;
         case params:
-            break;
-        case ret:
             break;
         case skip:
             break;
