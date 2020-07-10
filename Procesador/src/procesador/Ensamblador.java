@@ -286,9 +286,47 @@ public class Ensamblador {
         }
     }
 
-
-    // }
-    // }
+    private void storeRegMem(Variable x, String R) {
+        int profp, profx;
+        if (npActual != 0) {
+            profp = tp.get(npActual).getProf();
+        } else {
+            profp = 0;
+        }
+        if (x.proc() != 0) {
+            profx = tp.get(x.proc()).getProf();
+        } else {
+            profx = 0;
+        }
+        if (profx == 0) {
+            // x es una variable global
+            asm.add("mov " + x + ", " + R);
+        } else if (profp == profx && x.getDesp() < 0) {
+            // x es una variable local
+            int dx = x.getDesp();
+            asm.add("mov [ebp" + dx + "], " + R);
+        } else if (profp == profx) {
+            // x es un parámetro local
+            int dx = 8 + 4 * x.getNparam();
+            asm.add("mov edi, [ebp+" + dx + "]");
+            asm.add("mov [edi], " + R);
+        } else if (profp < profx && x.getDesp() < 0) {
+            // x es una variable definida en otro ámbito
+            int dx = x.getDesp();
+            int prof4x = profx * 4;
+            asm.add("mov esi, OFFSET DISP  ; ESI = @ DISP");
+            asm.add("mov edi, [esi+" + prof4x + "]  ; EDI = DISP[profx] = BPx");
+            asm.add("mov [edi" + dx + "], R");
+        } else if (profx < profp) {
+            // x es un parámetro definido en otro ámbito
+            int dx = 8 + 4 * x.getNparam();
+            int prof4x = profx * 4;
+            asm.add("mov esi, OFFSET DISP  ; ESI = @ DISP");
+            asm.add("mov esi, [esi+" + prof4x + "]  ; ESI = BPx");
+            asm.add("mov edi, [esi+" + dx + "]  ; EDI = @ param");
+            asm.add("mov [edi], " + R);
+        }
+    }
 
     private int saltarSubprograma(int i) {
         int prof = 1;
