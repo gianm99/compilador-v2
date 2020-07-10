@@ -207,7 +207,7 @@ decl:
 		$encabezado.met.setNumParams(nparam-1);
 		genera(Instruccion.OP.skip, null, null, e.toString());
 		e.setNl(pc);
-		genera(Instruccion.OP.pmb, null, null, String.valueOf($encabezado.met.getNp()));
+		genera(Instruccion.OP.pmb, null, null, $encabezado.met.toString());
 	} decl* sents {
 		C3D.get(pc-1).setInstFinal(true);
 		pproc.pop();
@@ -242,7 +242,7 @@ decl:
 		$encabezado.met.setNumParams(nparam-1);
 		genera(Instruccion.OP.skip, null, null, e.toString());
 		e.setNl(pc);
-		genera(Instruccion.OP.pmb, null, null, String.valueOf($encabezado.met.getNp()));;
+		genera(Instruccion.OP.pmb, null, null, $encabezado.met.toString());;
 	} decl* sents {
 		C3D.get(pc-1).setInstFinal(true);
 		genera(Instruccion.OP.ret, null, null, String.valueOf($encabezado.met.getNp()));
@@ -461,7 +461,7 @@ referencia
 		int t;
 		while($contIdx.pparams.size()>0)
 		genera(Instruccion.OP.params, null, null, $contIdx.pparams.pop().toString());
-		genera(Instruccion.OP.call, null, null, String.valueOf($contIdx.met.getNp()));
+		genera(Instruccion.OP.call, null, null, $contIdx.met.toString());
 		if($contIdx.s.getT()==Simbolo.Tipo.FUNC) {
 			t = tv.nuevaVar(true, pproc.peek(),Simbolo.Tipo.VAR,$contIdx.s.getTsub());
 			tv.get(t).setResultado(true);
