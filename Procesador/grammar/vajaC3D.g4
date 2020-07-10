@@ -179,7 +179,7 @@ decl:
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
 	}
-	| FUNCTION tipo encabezado BEGIN { // TODO Ocupación de variables locales y número de parámetros
+	| FUNCTION tipo encabezado BEGIN {
 		profundidad++;
 		try{
 			ts=ts.bajaBloque();
@@ -207,14 +207,14 @@ decl:
 		$encabezado.met.setNumParams(nparam-1);
 		genera(Instruccion.OP.skip, null, null, e.toString());
 		e.setNl(pc);
-		genera(Instruccion.OP.pmb, null, null, String.valueOf($encabezado.met.getNp()));
+		genera(Instruccion.OP.pmb, null, null, $encabezado.met.toString());
 	} decl* sents {
 		C3D.get(pc-1).setInstFinal(true);
 		pproc.pop();
 		profundidad--;
 		ts=ts.subeBloque();
 	} END
-	| PROCEDURE encabezado BEGIN { // TODO Ocupación de variables locales y número de parámetros
+	| PROCEDURE encabezado BEGIN {
 		profundidad++;
 		try{
 			ts=ts.bajaBloque();
@@ -242,7 +242,7 @@ decl:
 		$encabezado.met.setNumParams(nparam-1);
 		genera(Instruccion.OP.skip, null, null, e.toString());
 		e.setNl(pc);
-		genera(Instruccion.OP.pmb, null, null, String.valueOf($encabezado.met.getNp()));;
+		genera(Instruccion.OP.pmb, null, null, $encabezado.met.toString());;
 	} decl* sents {
 		C3D.get(pc-1).setInstFinal(true);
 		genera(Instruccion.OP.ret, null, null, String.valueOf($encabezado.met.getNp()));
@@ -461,7 +461,7 @@ referencia
 		int t;
 		while($contIdx.pparams.size()>0)
 		genera(Instruccion.OP.params, null, null, $contIdx.pparams.pop().toString());
-		genera(Instruccion.OP.call, null, null, String.valueOf($contIdx.met.getNp()));
+		genera(Instruccion.OP.call, null, null, $contIdx.met.toString());
 		if($contIdx.s.getT()==Simbolo.Tipo.FUNC) {
 			t = tv.nuevaVar(true, pproc.peek(),Simbolo.Tipo.VAR,$contIdx.s.getTsub());
 			tv.get(t).setResultado(true);
@@ -776,7 +776,7 @@ primario
 		int t=0;
 		switch($literal.tsub) {
 			case BOOLEAN:
-				t = tv.nuevaVar(true,pproc.peek(), Simbolo.Tipo.VAR,$literal.tsub);
+				t = tv.nuevaVar(true,pproc.peek(), Simbolo.Tipo.CONST,$literal.tsub);
 				if($literal.text.equals("true")) {
 					genera(Instruccion.OP.copy, "-1", null, tv.get(t).toString());
 					tv.get(t).setValor("-1");
@@ -799,7 +799,7 @@ primario
 				tv.get(t).setValor($literal.text);
 				break;
 			case INT:
-				t = tv.nuevaVar(true,pproc.peek(), Simbolo.Tipo.VAR,$literal.tsub);
+				t = tv.nuevaVar(true,pproc.peek(), Simbolo.Tipo.CONST,$literal.tsub);
 				genera(Instruccion.OP.copy, $literal.text, null, tv.get(t).toString());
 				tv.get(t).setValor($literal.text);
 				break;
