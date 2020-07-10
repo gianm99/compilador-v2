@@ -9,19 +9,24 @@ import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.ArrayList;
 import procesador.Instruccion.OP;
+import procesador.Simbolo.TSub;
 
 public class Ensamblador {
     private String directorio;
     private ArrayList<Instruccion> c3d;
+    private ArrayList<String> asm;
     private TablaVariables tv;
     private TablaProcedimientos tp;
+    private int npActual; // El número de procedimiento actual
 
     public Ensamblador(String directorio, ArrayList<Instruccion> c3d, TablaVariables tv,
             TablaProcedimientos tp) {
         this.directorio = directorio;
         this.c3d = c3d;
+        this.asm = new ArrayList<>();
         this.tv = tv;
         this.tp = tp;
+        this.npActual = 0;
     }
 
     public void ensamblar() {
@@ -64,7 +69,7 @@ public class Ensamblador {
     public void generarASM() {
         Writer buffer;
         File asmFile = new File(directorio + ".asm");
-        ArrayList<String> asm = traducir();
+        asm = traducir();
         try {
             buffer = new BufferedWriter(new FileWriter(asmFile));
             for (int i = 0; i < asm.size(); i++) {
@@ -128,6 +133,7 @@ public class Ensamblador {
         // TODO Añadir las subrutinas propias del lenguaje (Input y Output)
         // Subrutinas definidas por el usuario
         for (int p = 5; p < tp.getNp(); p++) {
+            npActual = p; // La subrutina actual
             Procedimiento pp = tp.get(p);
             int i = pp.getInicio().getNl();
             asm.add(pp + "  PROC");
@@ -155,7 +161,14 @@ public class Ensamblador {
                         asm.add("pop [edi+" + prof4x + "]  ; DISP[prof] = antiguo valor");
                         if (ins.getOperando(1) != null) {
                             // Guardar el valor de retorno en %eax
-                            loadMemReg(tv.get(ins.getOperando(1)), "eax");
+                            Variable var = tv.get(ins.getOperando(1));
+                            if (var != null) {
+                                // Si no es un literal
+                                loadMemReg(var, "eax");
+                            } else {
+                                // Solo puede ser un int o un boolean
+                                asm.add("mov eax, " + ins.getOperando(1));
+                            }
                         }
                         asm.add("ret");
                     } else {
@@ -174,6 +187,7 @@ public class Ensamblador {
             asm.add(pp + "  ENDP");
         }
         asm.add("start:");
+        npActual = 0; // Ya no se está en una subrutina
         // TODO Añadir el programa principal
         asm.add("end start");
         return asm;
