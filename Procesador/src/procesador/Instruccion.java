@@ -196,6 +196,10 @@ public class Instruccion {
         return opCode;
     }
 
+    public void setOpCode(OP op){
+        this.opCode = op;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)

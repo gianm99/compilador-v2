@@ -8,6 +8,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import org.antlr.v4.codegen.SourceGenTriggers;
+import procesador.Instruccion.OP;
 import procesador.Simbolo.TSub;
 
 public class Optimizador {
@@ -16,13 +17,15 @@ public class Optimizador {
     private ArrayList<Instruccion> C3D;
     private TablaVariables tv;
     private TablaProcedimientos tp;
+    private TablaEtiquetas te;
 
     public Optimizador(String directorio, final ArrayList<Instruccion> C3D, TablaVariables tv,
-            TablaProcedimientos tp) {
+            TablaProcedimientos tp, TablaEtiquetas te) {
         this.directorio = directorio;
         this.C3D = C3D;
         this.tv = tv;
         this.tp = tp;
+        this.te = te;
     }
 
     public ArrayList<Instruccion> getC3D() {
@@ -34,9 +37,9 @@ public class Optimizador {
         eliminaEtiquetasInecesarias();
         eliminaCodigoInaccesibleEntreEtiquetas();
         eliminaAsignacionesInecesarias();
-        // TODO hacer una función que reasinge los números de las líneas a las etiquetas al final.
+        reasignarLineaEtiqueta();
         // TODO revisar optimizaciones para que se asigne la instrucción final de un subprograma si
-        // se cambia el códgio de esta
+        // se cambia el código de esta
         tv.calculoDespOcupVL(tp);
         imprimirC3D();
     }
@@ -77,7 +80,7 @@ public class Optimizador {
      * Comprueba y elimina todas las etiquetas de salto (skip) las cuales no tengan una instrucción
      * de salto (goto) asignadas
      */
-    public void eliminaEtiquetasInecesarias() {
+    private void eliminaEtiquetasInecesarias() {
         ArrayList<String> skips = new ArrayList<String>();
         ArrayList<String> gotos = new ArrayList<String>();
         for (int i = 0; i < C3D.size(); i++) {
@@ -130,7 +133,7 @@ public class Optimizador {
      * llama a la función "eliminaEtiquetasInecesarias()" para borrar todos los skips que no tengan
      * un gotos asocioados después de aplicar esta optimización
      */
-    public void eliminaCodigoInaccesibleEntreEtiquetas() {
+    private void eliminaCodigoInaccesibleEntreEtiquetas() {
         ArrayList<Instruccion> aux = new ArrayList<Instruccion>();
         int j;
         for (int i = 0; i < C3D.size(); i++) {
@@ -152,16 +155,14 @@ public class Optimizador {
         eliminaEtiquetasInecesarias();
     }
 
-    // TODO comprobar que funciona correctamen
-    // Encontrado error donde se elimina una variable temporal usada en el condicional del IF y no
-    // se sustiye por el valor correspondiente
     /**
      * Reduce el número de variables temporales para las asignaciones, siempre y cuando no sean de
      * tipo String o necesitados para pasar por parámetro para una función.
      */
-    public void eliminaAsignacionesInecesarias() {
+    private void eliminaAsignacionesInecesarias() {
         ArrayList<Instruccion> InstrucVars = new ArrayList<Instruccion>();
         ArrayList<Instruccion> InstrucParams = new ArrayList<Instruccion>();
+        ArrayList<Instruccion> InstrucArit = new ArrayList<Instruccion>();
         int i = 0;
         while (i < C3D.size()) {
             if (C3D.get(i).destino().charAt(0) == 't' && C3D.get(i).destino().charAt(1) == '$') {
@@ -172,6 +173,8 @@ public class Optimizador {
                     }
                 } else if (C3D.get(i).getOpCode() == Instruccion.OP.params) {
                     InstrucParams.add(C3D.get(i));
+                } else if (esArit(C3D.get(i))) {
+                    InstrucArit.add(C3D.get(i));
                 }
             }
             i++;
@@ -210,9 +213,7 @@ public class Optimizador {
         int k;
         while (i < InstrucVars.size()) {
             k = devolverLineaVariableUsada(InstrucVars.get(i).destino());
-            if (k == -1) {
-                tv.quitarVar(InstrucVars.get(i).destino());
-            } else {
+            if (k > 0) {
                 if (C3D.get(k).getOperando(1).equals(InstrucVars.get(i).destino())) {
                     C3D.get(k).setOperando(1, InstrucVars.get(i).getOperando(1));
                 }
@@ -221,8 +222,25 @@ public class Optimizador {
                         C3D.get(k).setOperando(2, InstrucVars.get(i).getOperando(1));
                     }
                 }
-                C3D.remove(InstrucVars.get(i));
             }
+            tv.quitarVar(InstrucVars.get(i).destino());
+            C3D.remove(InstrucVars.get(i));
+            i++;
+        }
+        i = 0;
+        while (i < InstrucArit.size()) {
+            k = devolverLineaVariableUsada(InstrucArit.get(i).destino());
+            if (k > 0) {
+                if (C3D.get(k).getOperando(1) != null)
+                    if (C3D.get(k).getOperando(1).equals(InstrucArit.get(i).destino())) {
+                        C3D.get(k).setOpCode(InstrucArit.get(i).getOpCode());
+                        C3D.get(k).setOperando(0, InstrucArit.get(i).getOperando(0));
+                        C3D.get(k).setOperando(1, InstrucArit.get(i).getOperando(1));
+                        C3D.get(k).setOperando(2, InstrucArit.get(i).getOperando(2));
+                    }
+            }
+            tv.quitarVar(InstrucArit.get(i).destino());
+            C3D.remove(InstrucArit.get(i));
             i++;
         }
         i = 0;
@@ -234,6 +252,20 @@ public class Optimizador {
             }
         }
     }
+
+    private void reasignarLineaEtiqueta() { // TODO mirar que funciona el reasignado
+        ArrayList<Etiqueta> teaux = new ArrayList<Etiqueta>();
+        Etiqueta e;
+        for (int i = 0; i < C3D.size(); i++) {
+            if (C3D.get(i).getOpCode() == Instruccion.OP.skip) {
+                e = te.get(C3D.get(i).destino().substring(1));
+                e.setNl(i + 1);
+                teaux.add(e);
+            }
+        }
+        te.getTe().clear();
+        te.getTe().addAll(teaux);
+;    }
 
     /*
      *
@@ -322,6 +354,17 @@ public class Optimizador {
                 || ins.getOpCode() == Instruccion.OP.ifEQ || ins.getOpCode() == Instruccion.OP.ifNE
                 || ins.getOpCode() == Instruccion.OP.ifGE
                 || ins.getOpCode() == Instruccion.OP.ifGT);
+    }
+
+    /**
+     * Comprueba si la instrucción "ins" es una instrucción de tipo aritmético
+     * 
+     * @param ins Instrucción a comprobar
+     * @return Valor de la comprobación
+     */
+    private boolean esArit(Instruccion ins) {
+        return (ins.getOpCode() == Instruccion.OP.add || ins.getOpCode() == Instruccion.OP.sub
+                || ins.getOpCode() == Instruccion.OP.mult || ins.getOpCode() == Instruccion.OP.div);
     }
 
     /**
