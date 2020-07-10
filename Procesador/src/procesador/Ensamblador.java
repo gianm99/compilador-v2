@@ -194,19 +194,6 @@ public class Ensamblador {
     }
 
     private void conversion(int i) {
-        switch (c3d.get(i).getOpCode()) {
-        case EQ:
-            break;
-        case GE:
-            break;
-        case GT:
-            break;
-        case LE:
-            break;
-        case LT:
-            break;
-        case NEQ:
-            break;
         case add:
             break;
         case and:

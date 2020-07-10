@@ -7,7 +7,7 @@ public class Instruccion {
     private boolean instFinal;
 
     public enum OP {
-        copy, add, sub, mult, div, neg, and, or, not, skip, ifLT, ifLE, ifEQ, ifNE, ifGE, ifGT, jump, LT, LE, EQ, NEQ, GE, GT, pmb, call, ret, params
+        copy, add, sub, mult, div, neg, and, or, not, skip, ifLT, ifLE, ifEQ, ifNE, ifGE, ifGT, jump, pmb, call, ret, params
     }
 
     public Instruccion(OP opCode, String op1, String op2, String op3) {
@@ -37,24 +37,6 @@ public class Instruccion {
             break;
         case copy:
             instruccion[0] = "=";
-            break;
-        case LT:
-            instruccion[0] = "<";
-            break;
-        case LE:
-            instruccion[0] = "<=";
-            break;
-        case EQ:
-            instruccion[0] = "==";
-            break;
-        case NEQ:
-            instruccion[0] = "!=";
-            break;
-        case GE:
-            instruccion[0] = ">=";
-            break;
-        case GT:
-            instruccion[0] = ">";
             break;
         case not:
             instruccion[0] = "!";
@@ -121,14 +103,6 @@ public class Instruccion {
             break;
         case copy:
             s = instruccion[3] + " " + instruccion[0] + " " + instruccion[1];
-            break;
-        case LT:
-        case LE:
-        case EQ:
-        case NEQ:
-        case GE:
-        case GT:
-            s = instruccion[1] + " " + instruccion[0] + " " + instruccion[2];
             break;
         case neg:
             s = instruccion[3] + " = " + instruccion[0] + instruccion[1];
