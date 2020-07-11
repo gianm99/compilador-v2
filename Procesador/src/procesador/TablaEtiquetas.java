@@ -23,9 +23,9 @@ public class TablaEtiquetas {
         this.te = te;
     }
 
-    public Etiqueta get(String var) {
-        if (var != null) {
-            return te.get(Integer.parseInt(var) - 1);
+    public Etiqueta get(String e) {
+        if (e != null) {
+            return te.get(Integer.parseInt(e) - 1);
         } else {
             return null;
         }
