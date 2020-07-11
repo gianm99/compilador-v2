@@ -188,7 +188,15 @@ public class Ensamblador {
         }
         asm.add("start:");
         npActual = 0; // Ya no se está en una subrutina
-        // TODO Añadir el programa principal
+        int i = 0;
+        while (i < c3d.size()) {
+            if (c3d.get(i).getOpCode() == OP.pmb) {
+                // Saltar los subprogramas
+                i = saltarSubprograma(i);
+            } else {
+                conversion(i);
+            }
+        }
         asm.add("end start");
         return asm;
     }
