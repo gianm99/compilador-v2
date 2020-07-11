@@ -173,6 +173,8 @@ public class Instruccion {
         this.opCode = op;
     }
 
+    
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)

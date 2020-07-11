@@ -28,20 +28,33 @@ public class Optimizador {
         this.te = te;
     }
 
-    public ArrayList<Instruccion> getC3D() {
-        return C3D;
+    private void C3DquitarInstruccion(int posicion){
+        if(C3D.get(posicion).isInstFinal()){
+            C3D.get(posicion - 1).setInstFinal(true);
+        } 
+        C3D.remove(posicion);  
+    }
+
+    private void C3DquitarInstruccion(Instruccion ins){
+        int posicion = C3D.indexOf(ins);
+        if (C3D.get(posicion).isInstFinal()){
+            C3D.get(posicion - 1).setInstFinal(true);
+        } else {
+            C3D.remove(posicion);
+        }   
     }
 
     public void optimizar() {
         eliminaCodigoInaccesibleIf();
-        eliminaEtiquetasInecesarias();
+        eliminaEtiquetasInnecesarias();
         eliminaCodigoInaccesibleEntreEtiquetas();
-        eliminaAsignacionesInecesarias();
+        eliminaAsignacionesInnecesarias();
         reasignarLineaEtiqueta();
         // TODO revisar optimizaciones para que se asigne la instrucción final de un subprograma si
         // se cambia el código de esta
         tv.calculoDespOcupVL(tp);
         imprimirC3D();
+        //int a = 0;
     }
 
     /**
@@ -80,7 +93,7 @@ public class Optimizador {
      * Comprueba y elimina todas las etiquetas de salto (skip) las cuales no tengan una instrucción
      * de salto (goto) asignadas
      */
-    private void eliminaEtiquetasInecesarias() {
+    private void eliminaEtiquetasInnecesarias() {
         ArrayList<String> skips = new ArrayList<String>();
         ArrayList<String> gotos = new ArrayList<String>();
         for (int i = 0; i < C3D.size(); i++) {
@@ -101,7 +114,7 @@ public class Optimizador {
             if (aux.getOpCode() == Instruccion.OP.skip) {
                 for (int j = 0; j < skips.size(); j++) {
                     if (skips.get(j).equals(aux.destino())) {
-                        C3D.remove(i);
+                        C3DquitarInstruccion(i);
                         j = skips.size();
                         borrado = true;
                     }
@@ -114,13 +127,13 @@ public class Optimizador {
         borrado = false;
         while (i < C3D.size() - 1) { // TODO Puede haber más gotos en este caso
             if (borrado)
-                C3D.remove(i - 1);
+                C3DquitarInstruccion(i - 1);
             borrado = false;
             if (C3D.get(i).getOpCode() == Instruccion.OP.jump) {
                 if (C3D.get(i + 1).getOpCode() == Instruccion.OP.skip
                         && C3D.get(i).destino().equals(C3D.get(i + 1).destino())) {
                     borrado = true;
-                    C3D.remove(i);
+                    C3DquitarInstruccion(i);
                 }
             }
             i++;
@@ -130,7 +143,7 @@ public class Optimizador {
     /**
      * Para cada conjunto de instrucciones entre un goto y su skip más cercano, si no se detecta un
      * skip de otra etiqueta, elimina el código entre goto y el skip, sin incluir el skip. Después
-     * llama a la función "eliminaEtiquetasInecesarias()" para borrar todos los skips que no tengan
+     * llama a la función "eliminaEtiquetasInnecesarias()" para borrar todos los skips que no tengan
      * un gotos asocioados después de aplicar esta optimización
      */
     private void eliminaCodigoInaccesibleEntreEtiquetas() {
@@ -152,14 +165,14 @@ public class Optimizador {
                 aux.clear();
             }
         }
-        eliminaEtiquetasInecesarias();
+        eliminaEtiquetasInnecesarias();
     }
 
     /**
      * Reduce el número de variables temporales para las asignaciones, siempre y cuando no sean de
      * tipo String o necesitados para pasar por parámetro para una función.
      */
-    private void eliminaAsignacionesInecesarias() {
+    private void eliminaAsignacionesInnecesarias() {
         ArrayList<Instruccion> InstrucVars = new ArrayList<Instruccion>();
         ArrayList<Instruccion> InstrucParams = new ArrayList<Instruccion>();
         ArrayList<Instruccion> InstrucArit = new ArrayList<Instruccion>();
@@ -224,7 +237,7 @@ public class Optimizador {
                 }
             }
             tv.quitarVar(InstrucVars.get(i).destino());
-            C3D.remove(InstrucVars.get(i));
+            C3DquitarInstruccion(InstrucVars.get(i));
             i++;
         }
         i = 0;
@@ -240,13 +253,13 @@ public class Optimizador {
                     }
             }
             tv.quitarVar(InstrucArit.get(i).destino());
-            C3D.remove(InstrucArit.get(i));
+            C3DquitarInstruccion(InstrucArit.get(i));
             i++;
         }
         i = 0;
         while (i < C3D.size() - 1) {
             if (C3D.get(i).equals(C3D.get(i + 1))) {
-                C3D.remove(i + 1);
+                C3DquitarInstruccion(i + 1);
             } else {
                 i++;
             }
@@ -338,6 +351,12 @@ public class Optimizador {
      */
     private void reemplazaCodigo(ArrayList<Instruccion> codigoR, int empieza, int acaba) {
         List<Instruccion> sublistacodigo = this.C3D.subList(empieza, acaba);
+        for(int i = 0; i< sublistacodigo.size();i++){
+            if(sublistacodigo.get(i).isInstFinal()){
+                codigoR.get(codigoR.size() - 1).setInstFinal(true);
+                break;
+            }       
+        }
         sublistacodigo.clear();
         if (codigoR != null)
             this.C3D.addAll(empieza, codigoR);
@@ -512,5 +531,9 @@ public class Optimizador {
 
     public void setTp(TablaProcedimientos tp) {
         this.tp = tp;
+    }
+
+    public ArrayList<Instruccion> getC3D() {
+        return C3D;
     }
 }
