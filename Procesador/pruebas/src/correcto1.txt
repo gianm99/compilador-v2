@@ -1,10 +1,11 @@
 var int a=3;
 const string s1 = "Hola mundo";
-const int asdf=32;
+const int asdf=-32;
 const boolean VERDAD=true;
 var string s2 = s1;
 var int c=a;
-var boolean par = VERDAD && (false || true);
+# var boolean par = VERDAD && (false || true);
+var boolean par = VERDAD;
 func boolean function1(string str, int i, boolean foo){
 	var int a = 2;
 	var boolean b;
