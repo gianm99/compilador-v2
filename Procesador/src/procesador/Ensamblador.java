@@ -187,6 +187,7 @@ public class Ensamblador {
             asm.add(pp + "  ENDP");
         }
         asm.add("start:");
+        // Programa principal
         npActual = 0; // Ya no se está en una subrutina
         int i = 0;
         while (i < c3d.size()) {
@@ -247,12 +248,12 @@ public class Ensamblador {
     }
 
     /**
-     * Genera el código para la lectura de un valor de memoria a un registro.
+     * Carga un valor de memoria a un registro.
      * 
      * @param R
-     *              El valor de memoria que se quiere guardar en el registro.
+     *              El registro en el que se quiere cargar el valor de memoria.
      * @param x
-     *              El registro en el que se quiere guardar el valor de memoria.
+     *              El valor de memoria que se quiere cargar en el registro.
      */
     private void loadMemReg(String R, Variable x) {
         int profp, profx;
@@ -284,7 +285,7 @@ public class Ensamblador {
             // x es un parámetro local
             int dx = 8 + 4 * x.getNparam();
             asm.add("mov esi, [ebp+" + dx + "]");
-            asm.add("mov " + R + ", [esi]"); // TODO Preguntar esto
+            asm.add("mov " + R + ", [esi]");
         } else if (profp < profx && x.getDesp() < 0) {
             // x es una variable definida en otro ámbito
             int dx = x.getDesp();
@@ -298,13 +299,13 @@ public class Ensamblador {
             int prof4x = profx * 4;
             asm.add("mov esi, OFFSET DISP  ; ESI = @ DISP");
             asm.add("mov esi, [esi+" + prof4x + "]  ; ESI = DISP[profx] = BPx");
-            asm.add("mov esi, [esi+" + dx + "]  ; ESI = @ param"); // TODO Preguntar esto otro
+            asm.add("mov esi, [esi+" + dx + "]  ; ESI = @ param");
             asm.add("mov " + R + ", [esi]");
         }
     }
 
     /**
-     * Genera el código para escritura de un valor de un registro a memoria.
+     * Guarda el valor de un registro en una posición de memoria.
      * 
      * @param x
      *              La posición de memoria en la que se quiere guardar el valor.
