@@ -349,8 +349,10 @@ public class Ensamblador {
             storeRegMem(a, "eax");
             break;
         case skip:
+            asm.add(ins.destino() + " :");
             break;
         case jump:
+            asm.add("jmp " + ins.destino());
             break;
         case ifEQ:
             break;
