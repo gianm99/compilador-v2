@@ -7,6 +7,8 @@ options
 @parser::header {
 package antlr;
 import procesador.*;
+import procesador.Simbolo.Tipo;
+import procesador.Simbolo.TSub;
 import java.io.*;
 import java.util.Deque;
 import java.util.ArrayDeque;
@@ -120,8 +122,8 @@ programa:
 			s=ts.consulta("read");
 			s.setNp(tp.nuevoProc(profundidad,s.getT(),"read"));
 			// Operaciones de salida
-			for(Simbolo.TSub tsub : Simbolo.TSub.values()) {
-				if(tsub!=Simbolo.TSub.NULL) {
+			for(TSub tsub : TSub.values()) {
+				if(tsub!=TSub.NULL) {
 					s=ts.consulta("print"+tsub);
 					s.setNp(tp.nuevoProc(profundidad,s.getT(),"print"+tsub));
 				}
@@ -144,7 +146,7 @@ decl:
 		int nv=0;
 		try {
 			s=ts.consulta($ID.getText());
-			nv=tv.nuevaVar(false,pproc.peek(),Simbolo.Tipo.VAR, s.getTsub());
+			nv=tv.nuevaVar(false,pproc.peek(),Tipo.VAR, s.getTsub());
 			tv.get(nv).setId(s.getId());
 			s.setNv(nv);
 		} catch(TablaSimbolos.TablaSimbolosException e) {
@@ -152,7 +154,7 @@ decl:
 		}
 	} (
 		'=' expr {
-			if(s.getTsub()==Simbolo.TSub.BOOLEAN) {
+			if(s.getTsub()==TSub.BOOLEAN) {
 				Etiqueta ec=new Etiqueta();
 				Etiqueta ef=new Etiqueta();
 				Etiqueta efin=new Etiqueta();
@@ -177,7 +179,7 @@ decl:
 		try {
 			s = ts.consulta($ID.getText());
 			s.setValor($expr.r.getValor());
-			int nv=tv.nuevaVar(false,pproc.peek(),Simbolo.Tipo.CONST, s.getTsub());
+			int nv=tv.nuevaVar(false,pproc.peek(),Tipo.CONST, s.getTsub());
 			tv.get(nv).setId(s.getId());
 			tv.get(nv).setValor(s.getValor());
 			s.setNv(nv);
@@ -198,7 +200,7 @@ decl:
 		int nparam=1;
 		while(aux!=null) {
 			try {
-				int nv=tv.nuevaVar(false,pproc.peek(),Simbolo.Tipo.VAR, aux.getTsub());
+				int nv=tv.nuevaVar(false,pproc.peek(),Tipo.VAR, aux.getTsub());
 				tv.get(nv).setNparam(nparam);
 				tv.get(nv).setId(aux.getId());
 				ts.consulta(aux.getId()).setNv(nv);
@@ -233,7 +235,7 @@ decl:
 		int nparam=1;
 		while(aux!=null) {
 			try {
-				int nv=tv.nuevaVar(false,pproc.peek(),Simbolo.Tipo.VAR, aux.getTsub());
+				int nv=tv.nuevaVar(false,pproc.peek(),Tipo.VAR, aux.getTsub());
 				tv.get(nv).setNparam(nparam);
 				tv.get(nv).setId(aux.getId());
 				ts.consulta(aux.getId()).setNv(nv);
@@ -390,7 +392,7 @@ sent[Deque<Integer> sents_seg]
 		genera(Instruccion.OP.ret, null, null, pproc.peek().toString());
 	}
 	| referencia '=' expr ';' {
-		if($referencia.tsub==Simbolo.TSub.BOOLEAN) {
+		if($referencia.tsub==TSub.BOOLEAN) {
 			Etiqueta ec=new Etiqueta();
 			Etiqueta ef=new Etiqueta();
 			Etiqueta efin=new Etiqueta();
@@ -412,14 +414,14 @@ sent[Deque<Integer> sents_seg]
 	| referencia ';';
 
 referencia
-	returns[Variable r, Simbolo.TSub tsub]:
+	returns[Variable r, TSub tsub]:
 	ID {
 		Simbolo s;
 		int t;
 		try {
 			s = ts.consulta($ID.getText());
-			if (s.getT() == Simbolo.Tipo.CONST){
-				t = tv.nuevaVar(true,pproc.peek(),Simbolo.Tipo.VAR,s.getTsub());
+			if (s.getT() == Tipo.CONST){
+				t = tv.nuevaVar(true,pproc.peek(),Tipo.VAR,s.getTsub());
 				tv.get(t).setTemporal(true);
 				switch(s.getTsub()) {
 					case BOOLEAN:
@@ -454,8 +456,8 @@ referencia
 		try {
 			s = ts.consulta($ID.getText());
 			genera(Instruccion.OP.call, null, null, s.getNp().toString());
-			if(s.getT()==Simbolo.Tipo.FUNC) {
-				t = tv.nuevaVar(true, pproc.peek(),Simbolo.Tipo.VAR,s.getTsub());
+			if(s.getT()==Tipo.FUNC) {
+				t = tv.nuevaVar(true, pproc.peek(),Tipo.VAR,s.getTsub());
 				tv.get(t).setResultado(true);
 				$r = tv.get(t);
 			}
@@ -468,8 +470,8 @@ referencia
 		while($contIdx.pparams.size()>0)
 		genera(Instruccion.OP.params, null, null, $contIdx.pparams.pop().toString());
 		genera(Instruccion.OP.call, null, null, $contIdx.met.toString());
-		if($contIdx.s.getT()==Simbolo.Tipo.FUNC) {
-			t = tv.nuevaVar(true, pproc.peek(),Simbolo.Tipo.VAR,$contIdx.s.getTsub());
+		if($contIdx.s.getT()==Tipo.FUNC) {
+			t = tv.nuevaVar(true, pproc.peek(),Tipo.VAR,$contIdx.s.getTsub());
 			tv.get(t).setResultado(true);
 			$r = tv.get(t);
 		}
@@ -667,7 +669,7 @@ exprAdit
 exprAdit_[Variable t1]
 	returns[Variable r, Deque<Integer> cierto, Deque<Integer falso>]:
 	ADD exprMult {
-		int t = tv.nuevaVar(true,pproc.peek(),Simbolo.Tipo.VAR,Simbolo.TSub.INT);
+		int t = tv.nuevaVar(true,pproc.peek(),Tipo.VAR,TSub.INT);
 		tv.get(t).setTemporal(true);
 		genera(Instruccion.OP.add, $t1.toString(), $exprMult.r.toString(), tv.get(t).toString());
 		$r=tv.get(t);
@@ -681,7 +683,7 @@ exprAdit_[Variable t1]
 		}
 	}
 	| SUB exprMult {
-		int t = tv.nuevaVar(true,pproc.peek(),Simbolo.Tipo.VAR,Simbolo.TSub.INT);
+		int t = tv.nuevaVar(true,pproc.peek(),Tipo.VAR,TSub.INT);
 		tv.get(t).setTemporal(true);
 		genera(Instruccion.OP.sub, $t1.toString(), $exprMult.r.toString(), tv.get(t).toString());
 		$r=tv.get(t);
@@ -714,7 +716,7 @@ exprMult
 exprMult_[Variable t1]
 	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
 	MULT exprNeg {
-		int t = tv.nuevaVar(true,pproc.peek(),Simbolo.Tipo.VAR,Simbolo.TSub.INT);
+		int t = tv.nuevaVar(true,pproc.peek(),Tipo.VAR,TSub.INT);
 		tv.get(t).setTemporal(true);
 		genera(Instruccion.OP.mult, $t1.toString(), $exprNeg.r.toString(), tv.get(t).toString());
 		$r=tv.get(t);
@@ -728,7 +730,7 @@ exprMult_[Variable t1]
 		}
 	}
 	| DIV exprNeg {
-		int t = tv.nuevaVar(true,pproc.peek(),Simbolo.Tipo.VAR,Simbolo.TSub.INT);
+		int t = tv.nuevaVar(true,pproc.peek(),Tipo.VAR,TSub.INT);
 		tv.get(t).setTemporal(true);
 		genera(Instruccion.OP.div, $t1.toString(), $exprNeg.r.toString(), tv.get(t).toString());
 		$r=tv.get(t);
@@ -747,7 +749,7 @@ exprMult_[Variable t1]
 exprNeg
 	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
 	SUB primario {
-		int t = tv.nuevaVar(true,pproc.peek(),Simbolo.Tipo.VAR,Simbolo.TSub.INT);
+		int t = tv.nuevaVar(true,pproc.peek(),Tipo.VAR,TSub.INT);
 		tv.get(t).setTemporal(true);
 		genera(Instruccion.OP.neg, $primario.r.toString(), null, tv.get(t).toString());
 		$r = tv.get(t);
@@ -769,7 +771,7 @@ primario
 	}
 	| referencia {
 		$r = $referencia.r;
-		if($referencia.tsub==Simbolo.TSub.BOOLEAN) {
+		if($referencia.tsub==TSub.BOOLEAN) {
 			genera(Instruccion.OP.ifEQ, $r.toString(), "-1", null);
 			$cierto=new ArrayDeque<Integer>();
 			$cierto.add(pc);
@@ -782,7 +784,7 @@ primario
 		int t=0;
 		switch($literal.tsub) {
 			case BOOLEAN:
-				t = tv.nuevaVar(true,pproc.peek(), Simbolo.Tipo.CONST,$literal.tsub);
+				t = tv.nuevaVar(true,pproc.peek(), Tipo.CONST,$literal.tsub);
 				if($literal.text.equals("true")) {
 					genera(Instruccion.OP.copy, "-1", null, tv.get(t).toString());
 					tv.get(t).setValor("-1");
@@ -800,12 +802,12 @@ primario
 				}
 				break;
 			case STRING:
-				t = tv.nuevaVar(true,pproc.peek(), Simbolo.Tipo.CONST,$literal.tsub);
+				t = tv.nuevaVar(true,pproc.peek(), Tipo.CONST,$literal.tsub);
 				genera(Instruccion.OP.copy, $literal.text, null, tv.get(t).toString());
 				tv.get(t).setValor($literal.text);
 				break;
 			case INT:
-				t = tv.nuevaVar(true,pproc.peek(), Simbolo.Tipo.CONST,$literal.tsub);
+				t = tv.nuevaVar(true,pproc.peek(), Tipo.CONST,$literal.tsub);
 				genera(Instruccion.OP.copy, $literal.text, null, tv.get(t).toString());
 				tv.get(t).setValor($literal.text);
 				break;
@@ -817,25 +819,25 @@ primario
 	};
 
 tipo
-	returns[Simbolo.TSub tsub]:
+	returns[TSub tsub]:
 	INTEGER {
-	$tsub=Simbolo.TSub.INT;
+	$tsub=TSub.INT;
 	}
 	| BOOLEAN {
-		$tsub=Simbolo.TSub.BOOLEAN;
+		$tsub=TSub.BOOLEAN;
 	}
 	| STRING {
-		$tsub=Simbolo.TSub.STRING;
+		$tsub=TSub.STRING;
 	};
 
 literal
-	returns[Simbolo.TSub tsub]:
+	returns[TSub tsub]:
 	LiteralInteger {
-		$tsub=Simbolo.TSub.INT;
+		$tsub=TSub.INT;
 	}
 	| LiteralBoolean {
-		$tsub=Simbolo.TSub.BOOLEAN;
+		$tsub=TSub.BOOLEAN;
 	}
 	| LiteralString {
-		$tsub=Simbolo.TSub.STRING;
+		$tsub=TSub.STRING;
 	};
