@@ -253,13 +253,86 @@ public class Ensamblador {
             storeRegMem(a, "eax");
             break;
         case add:
+            a = tv.get(ins.destino());
+            b = tv.get(ins.getOperando(1));
+            c = tv.get(ins.getOperando(2));
+            if (b != null) {
+                loadMemReg("eax", b);
+            } else {
+                asm.add("mov eax, " + ins.getOperando(1));
+            }
+            if (c != null) {
+                loadMemReg("ebx", c);
+            } else {
+                asm.add("mov ebx, " + ins.getOperando(2));
+            }
+            asm.add("add eax, ebx");
+            storeRegMem(a, "eax");
             break;
+        case sub:
+            a = tv.get(ins.destino());
+            b = tv.get(ins.getOperando(1));
+            if (ins.getOperando(2) != null) {
+                // a = b - c
+                c = tv.get(ins.getOperando(2));
+                if (b != null) {
+                    loadMemReg("eax", b);
+                } else {
+                    asm.add("mov eax, " + ins.getOperando(1));
+                }
+                if (c != null) {
+                    loadMemReg("ebx", c);
+                } else {
+                    asm.add("mov ebx, " + ins.getOperando(2));
+                }
+                asm.add("sub eax, ebx");
+            } else {
+                // a = -b
+                asm.add("xor eax, eax  ; EAX = 0");
+                loadMemReg("ebx", b);
+                asm.add("sub eax, ebx");
+            }
+            storeRegMem(a, "eax");
+            break;
+        case div:
+            a = tv.get(ins.destino());
+            b = tv.get(ins.getOperando(1));
+            c = tv.get(ins.getOperando(2));
+            if (b != null) {
+                loadMemReg("eax", b);
+            } else {
+                asm.add("mov eax, " + ins.getOperando(1));
+            }
+            asm.add("mov edx, eax");
+            asm.add("sar edx, 31");
+            if (c != null) {
+                loadMemReg("ebx", c);
+            } else {
+                asm.add("mov ebx, " + ins.getOperando(2));
+            }
+            asm.add("idiv ebx");
+            storeRegMem(a, "eax");
+            break;
+        case mult:
+            a = tv.get(ins.destino());
+            b = tv.get(ins.getOperando(1));
+            c = tv.get(ins.getOperando(2));
+            if (b != null) {
+                loadMemReg("eax", b);
+            } else {
+                asm.add("mov eax, " + ins.getOperando(1));
+            }
+            if (c != null) {
+                loadMemReg("ebx", c);
+            } else {
+                asm.add("mov ebx, " + ins.getOperando(2));
+            }
+            asm.add("imul eax, ebx");
+            storeRegMem(a, "eax");
             break;
         case call:
             break;
         case copy:
-            break;
-        case div:
             break;
         case ifEQ:
             break;
@@ -275,15 +348,11 @@ public class Ensamblador {
             break;
         case jump:
             break;
-        case mult:
-            break;
         case neg:
             break;
         case params:
             break;
         case skip:
-            break;
-        case sub:
             break;
         default:
             break;
