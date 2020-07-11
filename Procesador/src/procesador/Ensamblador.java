@@ -355,16 +355,100 @@ public class Ensamblador {
             asm.add("jmp " + ins.destino());
             break;
         case ifEQ:
-            break;
-        case ifGE:
-            break;
-        case ifGT:
-            break;
-        case ifLE:
-            break;
-        case ifLT:
+            a = tv.get(ins.getOperando(1));
+            b = tv.get(ins.getOperando(2));
+            if (a != null) {
+                loadMemReg("eax", a);
+            } else {
+                asm.add("mov eax, " + ins.getOperando(1));
+            }
+            if (b != null) {
+                loadMemReg("ebx", b);
+            } else {
+                asm.add("mov ebx, " + ins.getOperando(2));
+            }
+            asm.add("cmp ebx, eax");
+            asm.add("je " + ins.destino());
             break;
         case ifNE:
+            a = tv.get(ins.getOperando(1));
+            b = tv.get(ins.getOperando(2));
+            if (a != null) {
+                loadMemReg("eax", a);
+            } else {
+                asm.add("mov eax, " + ins.getOperando(1));
+            }
+            if (b != null) {
+                loadMemReg("ebx", b);
+            } else {
+                asm.add("mov ebx, " + ins.getOperando(2));
+            }
+            asm.add("cmp ebx, eax");
+            asm.add("jne " + ins.destino());
+            break;
+        case ifGE:
+            a = tv.get(ins.getOperando(1));
+            b = tv.get(ins.getOperando(2));
+            if (a != null) {
+                loadMemReg("eax", a);
+            } else {
+                asm.add("mov eax, " + ins.getOperando(1));
+            }
+            if (b != null) {
+                loadMemReg("ebx", b);
+            } else {
+                asm.add("mov ebx, " + ins.getOperando(2));
+            }
+            asm.add("cmp ebx, eax");
+            asm.add("jge " + ins.destino());
+            break;
+        case ifGT:
+            a = tv.get(ins.getOperando(1));
+            b = tv.get(ins.getOperando(2));
+            if (a != null) {
+                loadMemReg("eax", a);
+            } else {
+                asm.add("mov eax, " + ins.getOperando(1));
+            }
+            if (b != null) {
+                loadMemReg("ebx", b);
+            } else {
+                asm.add("mov ebx, " + ins.getOperando(2));
+            }
+            asm.add("cmp ebx, eax");
+            asm.add("jgt " + ins.destino());
+            break;
+        case ifLT:
+            a = tv.get(ins.getOperando(1));
+            b = tv.get(ins.getOperando(2));
+            if (a != null) {
+                loadMemReg("eax", a);
+            } else {
+                asm.add("mov eax, " + ins.getOperando(1));
+            }
+            if (b != null) {
+                loadMemReg("ebx", b);
+            } else {
+                asm.add("mov ebx, " + ins.getOperando(2));
+            }
+            asm.add("cmp ebx, eax");
+            asm.add("jl " + ins.destino());
+            break;
+        case ifLE:
+            a = tv.get(ins.getOperando(1));
+            b = tv.get(ins.getOperando(2));
+            if (a != null) {
+                loadMemReg("eax", a);
+            } else {
+                asm.add("mov eax, " + ins.getOperando(1));
+            }
+            if (b != null) {
+                loadMemReg("ebx", b);
+            } else {
+                asm.add("mov ebx, " + ins.getOperando(2));
+            }
+            asm.add("cmp ebx, eax");
+            asm.add("jle " + ins.destino());
             break;
         case call:
             break;
