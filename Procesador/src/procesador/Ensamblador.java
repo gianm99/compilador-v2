@@ -451,8 +451,13 @@ public class Ensamblador {
             asm.add("jle " + ins.destino());
             break;
         case call:
+            int numpar4 = tp.get(ins.destino()).getNumParams() * 4;
+            asm.add("call " + ins.destino());
+            asm.add("add esp, " + numpar4);
             break;
-        case params:
+        case params: // TODO Decidir el método de paso de parámetros
+            break;
+        case st:
             break;
         default:
             break;

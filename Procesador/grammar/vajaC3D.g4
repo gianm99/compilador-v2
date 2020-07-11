@@ -459,7 +459,7 @@ referencia
 			if(s.getT()==Tipo.FUNC) {
 				t = tv.nuevaVar(true, pproc.peek(),Tipo.VAR,s.getTsub());
 				tv.get(t).setResultado(true);
-				$r = tv.get(t);
+				$r = tv.get(t); // TODO Añadir código de 'store'
 			}
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());

@@ -10,7 +10,7 @@ public class Instruccion {
 
     // TODO Crear nueva operación 'store'
     public enum OP {
-        copy, add, sub, mult, div, neg, and, or, not, skip, ifLT, ifLE, ifEQ, ifNE, ifGE, ifGT, jump, pmb, call, ret, params
+        copy, add, sub, mult, div, neg, and, or, not, skip, ifLT, ifLE, ifEQ, ifNE, ifGE, ifGT, jump, pmb, call, ret, st, params
     }
 
     public Instruccion(OP opCode, String op1, String op2, String op3) {
@@ -80,6 +80,11 @@ public class Instruccion {
         case params:
             instruccion[0] = "param_s";
             break;
+        case st:
+            instruccion[0] = "store";
+            break;
+        default:
+            break;
         }
     }
 
@@ -137,6 +142,9 @@ public class Instruccion {
         case params:
             s = instruccion[0] + " " + instruccion[3];
             break;
+        case st:
+            s = instruccion[0] + " " + instruccion[3];
+            break;
         }
         return s;
     }
@@ -172,8 +180,6 @@ public class Instruccion {
     public void setOpCode(OP op) {
         this.opCode = op;
     }
-
-    
 
     @Override
     public boolean equals(Object obj) {
