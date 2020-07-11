@@ -10,6 +10,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import procesador.Instruccion.OP;
 import procesador.Simbolo.TSub;
+import procesador.Simbolo.Tipo;
 
 public class Ensamblador {
     private String directorio;
@@ -335,9 +336,21 @@ public class Ensamblador {
             asm.add("imul eax, ebx");
             storeRegMem(a, "eax");
             break;
-        case call:
-            break;
         case copy:
+            a = tv.get(ins.destino());
+            b = tv.get(ins.getOperando(1));
+            if (b == null) {
+                asm.add("mov eax, " + ins.getOperando(1));
+            } else if (b.tipo() == Tipo.CONST && b.getTsub() == TSub.STRING) {
+                loadAddrReg("eax", b);
+            } else {
+                loadMemReg("eax", b);
+            }
+            storeRegMem(a, "eax");
+            break;
+        case skip:
+            break;
+        case jump:
             break;
         case ifEQ:
             break;
@@ -351,13 +364,9 @@ public class Ensamblador {
             break;
         case ifNE:
             break;
-        case jump:
-            break;
-        case neg:
+        case call:
             break;
         case params:
-            break;
-        case skip:
             break;
         default:
             break;
