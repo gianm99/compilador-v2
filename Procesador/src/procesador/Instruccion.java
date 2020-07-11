@@ -1,5 +1,7 @@
 package procesador;
 
+import java.util.Arrays;
+
 public class Instruccion {
 
     private OP opCode;
@@ -138,6 +140,8 @@ public class Instruccion {
         return s;
     }
 
+
+
     public String[] getInstruccion() {
         return instruccion;
     }
@@ -164,5 +168,23 @@ public class Instruccion {
 
     public OP getOpCode() {
         return opCode;
+    }
+
+    public void setOpCode(OP op){
+        this.opCode = op;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Instruccion other = (Instruccion) obj;
+        if (!Arrays.equals(instruccion, other.instruccion))
+            return false;
+        return true;
     }
 }

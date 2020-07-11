@@ -3,8 +3,7 @@ package procesador;
 import java.util.ArrayList;
 
 /**
- * TablaVariable. Clase que sirve para almacenar las variables que aparecen en
- * el código.
+ * TablaVariable. Clase que sirve para almacenar las variables que aparecen en el código.
  * 
  * @author Gian Lucas Martín Chamorro
  */
@@ -35,6 +34,18 @@ public class TablaVariables {
         tv.get(Integer.parseInt(segmentos[1]) - 1).setBorrada(true);
     }
 
+    public void quitarVar(ArrayList<Instruccion> var) {
+        int i = 0;
+        while (i < var.size()) {
+            if (get(var.get(i).destino()).getTsub() != Simbolo.TSub.STRING){
+                quitarVar(var.get(i).destino());
+                var.remove(i);
+            } else {
+                i++; 
+            }
+        }
+    }
+
     public Variable get(int nv) {
         return tv.get(nv - 1);
     }
@@ -49,11 +60,9 @@ public class TablaVariables {
     }
 
     /**
-     * Calcula el desp de todas las variables y el ocupVL de todos los
-     * procedimientos.
+     * Calcula el desp de todas las variables y el ocupVL de todos los procedimientos.
      * 
-     * @param tp
-     *               La tabla de procedimientos que actualiza.
+     * @param tp La tabla de procedimientos que actualiza.
      */
     public void calculoDespOcupVL(TablaProcedimientos tp) {
         for (int p = 1; p <= tp.getNp(); p++) {
