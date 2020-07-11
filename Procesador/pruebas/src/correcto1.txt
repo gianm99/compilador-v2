@@ -4,7 +4,7 @@ const int asdf=32;
 const boolean VERDAD=true;
 var string s2 = s1;
 var int c=a;
-var boolean par = true;
+var boolean par = VERDAD && (false || true);
 func boolean function1(string str, int i, boolean foo){
 	var int a = 2;
 	var boolean b;
