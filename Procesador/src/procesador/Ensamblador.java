@@ -352,7 +352,7 @@ public class Ensamblador {
      * @param R
      *              El registro que contiene el valor a escribir.
      */
-    private void storeRegMem(Variable x, String R) {
+    private void storeRegMem(Variable x, String R) { // TODO Comprobar si hay instrucciones ambiguas
         int profp, profx;
         if (npActual != 0) {
             profp = tp.get(npActual).getProf();

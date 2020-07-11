@@ -8,6 +8,7 @@ public class Instruccion {
     private String[] instruccion = new String[4];
     private boolean instFinal;
 
+    // TODO Crear nueva operación 'store'
     public enum OP {
         copy, add, sub, mult, div, neg, and, or, not, skip, ifLT, ifLE, ifEQ, ifNE, ifGE, ifGT, jump, pmb, call, ret, params
     }
@@ -140,8 +141,6 @@ public class Instruccion {
         return s;
     }
 
-
-
     public String[] getInstruccion() {
         return instruccion;
     }
@@ -170,7 +169,7 @@ public class Instruccion {
         return opCode;
     }
 
-    public void setOpCode(OP op){
+    public void setOpCode(OP op) {
         this.opCode = op;
     }
 
