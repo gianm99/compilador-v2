@@ -164,7 +164,7 @@ public class Ensamblador {
                             Variable var = tv.get(ins.getOperando(1));
                             if (var != null) {
                                 // Si no es un literal
-                                loadMemReg(var, "eax");
+                                loadMemReg("eax", var);
                             } else {
                                 // Solo puede ser un int o un boolean
                                 asm.add("mov eax, " + ins.getOperando(1));
