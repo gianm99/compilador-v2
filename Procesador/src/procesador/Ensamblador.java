@@ -203,9 +203,57 @@ public class Ensamblador {
     }
 
     private void conversion(int i) {
+        Variable a, b, c;
+        Instruccion ins = c3d.get(i);
+        switch (ins.getOpCode()) {
+        case and:
+            a = tv.get(ins.destino());
+            b = tv.get(ins.getOperando(1));
+            c = tv.get(ins.getOperando(2));
+            if (b != null) {
+                loadMemReg("eax", b);
+            } else {
+                asm.add("mov eax, " + ins.getOperando(1));
+            }
+            if (c != null) {
+                loadMemReg("ebx", c);
+            } else {
+                asm.add("mov ebx, " + ins.getOperando(2));
+            }
+            asm.add("and eax, ebx");
+            storeRegMem(a, "eax");
+            break;
+        case or:
+            a = tv.get(ins.destino());
+            b = tv.get(ins.getOperando(1));
+            c = tv.get(ins.getOperando(2));
+            if (b != null) {
+                loadMemReg("eax", b);
+            } else {
+                asm.add("mov eax, " + ins.getOperando(1));
+            }
+            if (c != null) {
+                loadMemReg("ebx", c);
+            } else {
+                asm.add("mov ebx, " + ins.getOperando(2));
+            }
+            asm.add("or eax, ebx");
+            storeRegMem(a, "eax");
+            break;
+        case not:
+            a = tv.get(ins.destino());
+            b = tv.get(ins.getOperando(1));
+            asm.add("xor eax, eax  ; EAX = 0");
+            if (b != null) {
+                loadMemReg("ebx", b);
+            } else {
+                asm.add("mov ebx, " + ins.getOperando(1));
+            }
+            asm.add("not eax, ebx");
+            storeRegMem(a, "eax");
+            break;
         case add:
             break;
-        case and:
             break;
         case call:
             break;
@@ -230,10 +278,6 @@ public class Ensamblador {
         case mult:
             break;
         case neg:
-            break;
-        case not:
-            break;
-        case or:
             break;
         case params:
             break;
