@@ -172,11 +172,11 @@ decl:
 			}
 	}
 	)? ';'
-	| CONSTANT tipo ID '=' literal ';' {
+	| CONSTANT tipo ID '=' expr ';' {
 		Simbolo s;
 		try {
 			s = ts.consulta($ID.getText());
-			s.setValor($literal.text);
+			s.setValor($expr.r.getValor());
 			int nv=tv.nuevaVar(false,pproc.peek(),Simbolo.Tipo.CONST, s.getTsub());
 			tv.get(nv).setId(s.getId());
 			tv.get(nv).setValor(s.getValor());

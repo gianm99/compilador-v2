@@ -102,10 +102,13 @@ decl:
 		errores+="Error semántico - Línea "+$ID.getLine()+": constante '"+$ID.getText()+
 		"' redeclarada\n";
 	}
-} '=' literal ';' {
-	if($literal.tsub!=$tipo.tsub) {
+} '=' expr ';' {
+	if($expr.tsub!=$tipo.tsub) {
 		errores+="Error semántico - Línea "+$ID.getLine()+": tipos incompatibles (esperado '"+
 		$tipo.tsub+"')\n";
+	} else if(!$expr.constante) {
+		errores+="Error semántico - Línea "+$ID.getLine()+": se encontró una expresión que no es"+
+		" constante\n";
 	}
 }
 	| FUNCTION tipo encabezado[$tipo.tsub] BEGIN {
@@ -307,7 +310,7 @@ sent:
 	};
 
 referencia[boolean asignacion]
-	returns[Simbolo s]:
+	returns[Simbolo s, boolean constante]:
 	ID {
 		try {
 			$s=ts.consulta($ID.getText());
@@ -319,9 +322,11 @@ referencia[boolean asignacion]
 					"' no ha sido inicializada\n";
 				}
 			}
+			$constante=$s.getT()==Simbolo.Tipo.CONST;
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			errores+="Error semántico - Línea "+$ID.getLine()+": "+e.getMessage()+"\n";
 			$s=null;
+			$constante=false;
 		}
 	}
 	| ID '(' ')' {
@@ -335,9 +340,11 @@ referencia[boolean asignacion]
 			errores+="Error semántico - Línea "+$ID.getLine()+": "+e.getMessage()+"\n";
 			$s=null;
 		}
+		$constante=false;
 	}
 	| contIdx ')' {
 		$s=$contIdx.met;
+		$constante=false;
 	};
 
 contIdx
@@ -385,14 +392,15 @@ contIdx_[Deque<Simbolo.TSub> pparams]:
 
 // Expresiones
 expr
-	returns[Simbolo.TSub tsub]:
+	returns[Simbolo.TSub tsub, boolean constante]:
 	exprOr {
 		$tsub=$exprOr.tsub;
+		$constante=$exprOr.constante;
 	};
 
 // Expresión de OR
 exprOr
-	returns[Simbolo.TSub tsub]:
+	returns[Simbolo.TSub tsub, boolean constante]:
 	exprAnd exprOr_ {
 		if($exprOr_.tsub!=null) {
 			if($exprAnd.tsub!=$exprOr_.tsub) {
@@ -404,22 +412,26 @@ exprOr
 		} else {
 			$tsub=$exprAnd.tsub;
 		}
+		$constante=$exprAnd.constante && $exprOr_.constante;
 	};
 
 exprOr_
-	returns[Simbolo.TSub tsub]:
+	returns[Simbolo.TSub tsub, boolean constante]:
 	OR exprAnd exprOr_ {
 		if($exprAnd.tsub!=Simbolo.TSub.BOOLEAN){
 			errores+="Error semántico - Línea "+$exprAnd.start.getLine()+
 				": tipos incompatibles (esperado BOOLEAN, encontrado "+$exprAnd.tsub+")\n";
 		}
 		$tsub=Simbolo.TSub.BOOLEAN;
+		$constante=$exprAnd.constante && $exprOr_.constante;
 	}
-	|; //lambda
+	| {
+		$constante = true;
+	}; //lambda
 
 // Expresión de AND
 exprAnd
-	returns[Simbolo.TSub tsub]:
+	returns[Simbolo.TSub tsub, boolean constante]:
 	exprNot exprAnd_ {
 		if($exprAnd_.tsub!=null) {
 			if($exprNot.tsub!=$exprAnd_.tsub) {
@@ -431,37 +443,42 @@ exprAnd
 		} else {
 			$tsub=$exprNot.tsub;
 		}
+		$constante=$exprNot.constante && $exprAnd_.constante;
 	};
 
 exprAnd_
-	returns[Simbolo.TSub tsub]:
+	returns[Simbolo.TSub tsub, boolean constante]:
 	AND exprNot exprAnd_ {
 		if($exprNot.tsub!=Simbolo.TSub.BOOLEAN){
 			errores+="Error semántico - Línea "+$exprNot.start.getLine()+
 				": tipos incompatibles (esperado BOOLEAN, encontrado "+$exprNot.tsub+")\n";
 		}
 		$tsub=Simbolo.TSub.BOOLEAN;
+		$constante=$exprNot.constante && $exprAnd_.constante;
 	}
-	|; //lambda
+	| {
+		$constante=true;
+	}; //lambda
 
 // Expresión de NOT
 exprNot
-	returns[Simbolo.TSub tsub]:
+	returns[Simbolo.TSub tsub, boolean constante]:
 	NOT exprComp {
 		if($exprComp.tsub!=Simbolo.TSub.BOOLEAN) {
 			errores+="Error semántico - Línea "+$exprComp.start.getLine()+
 			": tipos incompatibles (esperado BOOLEAN, encontrado "+$exprComp.tsub+")\n";
 		} 		
 		$tsub=Simbolo.TSub.BOOLEAN;
-
+		$constante=$exprComp.constante;
 	}
 	| exprComp {
 		$tsub=$exprComp.tsub;
+		$constante=$exprComp.constante;
 	};
 
 // Expresión comparativa
 exprComp
-	returns[Simbolo.TSub tsub]:
+	returns[Simbolo.TSub tsub, boolean constante]:
 	exprAdit exprComp_ {
 		if($exprComp_.tsub!=null) {
 			if($exprAdit.tsub!=Simbolo.TSub.INT) {
@@ -474,10 +491,11 @@ exprComp
 		} else {
 			$tsub=$exprAdit.tsub;
 		}
+		$constante=$exprAdit.constante && $exprComp_.constante;
 	};
 
 exprComp_
-	returns[Simbolo.TSub tsub]:
+	returns[Simbolo.TSub tsub, boolean constante]:
 	// OPREL exprAdit exprComp_{
 	OPREL exprAdit {
 		if($exprAdit.tsub!=Simbolo.TSub.INT) {
@@ -485,12 +503,15 @@ exprComp_
 			": tipos incompatibles (esperado INT, encontrado "+$exprAdit.tsub+")\n";
 		}
 		$tsub=Simbolo.TSub.BOOLEAN;
+		$constante=$exprAdit.constante;
 	}
-	|; //lambda
+	| {
+		$constante=true;
+	}; //lambda
 
 // Expresión aditiva
 exprAdit
-	returns[Simbolo.TSub tsub]:
+	returns[Simbolo.TSub tsub, boolean constante]:
 	exprMult exprAdit_ {
 		if($exprAdit_.tsub!=null) {
 			if($exprMult.tsub!=$exprAdit_.tsub) {
@@ -502,16 +523,18 @@ exprAdit
 		} else {
 			$tsub=$exprMult.tsub;
 		}
+		$constante=$exprMult.constante && $exprAdit_.constante;
 	};
 
 exprAdit_
-	returns[Simbolo.TSub tsub]:
+	returns[Simbolo.TSub tsub, boolean constante]:
 	ADD exprMult exprAdit_ {
 		if($exprMult.tsub!=Simbolo.TSub.INT) {
 			errores+="Error semántico - Línea "+$exprMult.start.getLine()+
 			": tipos incompatibles (esperado INT, encontrado "+$exprMult.tsub+")\n";
 		}
 		$tsub=Simbolo.TSub.INT;
+		$constante=$exprMult.constante && $exprAdit_.constante;
 	}
 	| SUB exprMult exprAdit_ {
 		if($exprMult.tsub!=Simbolo.TSub.INT) {
@@ -519,12 +542,15 @@ exprAdit_
 			": tipos incompatibles (esperado INT, encontrado "+$exprMult.tsub+")\n";
 		}
 		$tsub=Simbolo.TSub.INT;
+		$constante=$exprMult.constante && $exprAdit_.constante;
 	}
-	|; //lambda
+	| {
+		$constante = true;
+	}; //lambda
 
 // Expresión multiplicativa
 exprMult
-	returns[Simbolo.TSub tsub]:
+	returns[Simbolo.TSub tsub, boolean constante]:
 	exprNeg exprMult_ {
 		if($exprMult_.tsub!=null) {
 			if($exprNeg.tsub!=$exprMult_.tsub) {
@@ -536,16 +562,18 @@ exprMult
 		} else {
 			$tsub=$exprNeg.tsub;
 		}
+		$constante=$exprNeg.constante && $exprMult_.constante;
 	};
 
 exprMult_
-	returns[Simbolo.TSub tsub]:
+	returns[Simbolo.TSub tsub, boolean constante]:
 	MULT exprNeg exprMult_ {
 		if($exprNeg.tsub!=Simbolo.TSub.INT) {
 			errores+="Error semántico - Línea "+$exprNeg.start.getLine()+
 			": tipos incompatibles (esperado INT, encontrado "+$exprNeg.tsub+")\n";
 		}
 		$tsub=Simbolo.TSub.INT;
+		$constante=$exprNeg.constante && $exprMult_.constante;
 	}
 	| DIV exprNeg exprMult_ {
 		if($exprNeg.tsub!=Simbolo.TSub.INT) {
@@ -553,27 +581,33 @@ exprMult_
 			": tipos incompatibles (esperado INT, encontrado "+$exprNeg.tsub+")\n";
 		}
 		$tsub=Simbolo.TSub.INT;
+		$constante=$exprNeg.constante && $exprMult_.constante;
 	}
-	|; //lambda
+	| {
+		$constante=true;
+	}; //lambda
 
 // Expresión de negación
 exprNeg
-	returns[Simbolo.TSub tsub]:
+	returns[Simbolo.TSub tsub, boolean constante]:
 	SUB primario {
 		if($primario.tsub!=Simbolo.TSub.INT) {
 			errores+="Error semántico - Línea "+$primario.start.getLine()+
 			": tipos incompatibles (esperado INT, encontrado "+$primario.tsub+")\n";
 		}
 		$tsub=Simbolo.TSub.INT;
+		$constante=$primario.constante;
 	}
 	| primario {
 		$tsub=$primario.tsub;
+		$constante=$primario.constante;
 	};
 
 primario
-	returns[Simbolo.TSub tsub]:
+	returns[Simbolo.TSub tsub, boolean constante]:
 	'(' expr ')' {
 		$tsub=$expr.tsub;
+		$constante=$expr.constante;
 	}
 	| referencia[false] {
 		if($referencia.s==null) {
@@ -583,9 +617,11 @@ primario
 		} else {
 			$tsub=$referencia.s.getTsub();
 		}
+		$constante=$referencia.constante;
 	}
 	| literal {
 		$tsub=$literal.tsub;
+		$constante=true;
 	};
 
 tipo
