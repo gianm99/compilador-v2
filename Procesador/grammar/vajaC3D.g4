@@ -252,8 +252,8 @@ decl:
 		te.nuevaEtiqueta(e, pc);
 		genera(Instruccion.OP.pmb, null, null, $encabezado.met.toString());;
 	} decl* sents {
-		C3D.get(pc-1).setInstFinal(true);
 		genera(Instruccion.OP.ret, null, null, String.valueOf($encabezado.met.getNp()));
+		C3D.get(pc-1).setInstFinal(true);
 		pproc.pop();
 		profundidad--;
 		ts=ts.subeBloque();
