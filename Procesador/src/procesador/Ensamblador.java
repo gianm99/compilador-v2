@@ -415,7 +415,7 @@ public class Ensamblador {
                 asm.add("mov ebx, " + ins.getOperando(2));
             }
             asm.add("cmp ebx, eax");
-            asm.add("jgt " + ins.destino());
+            asm.add("jg " + ins.destino());
             break;
         case ifLT:
             a = tv.get(ins.getOperando(1));
