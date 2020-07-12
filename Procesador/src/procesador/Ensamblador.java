@@ -42,11 +42,11 @@ public class Ensamblador {
             BufferedReader stdInput = new BufferedReader(
                     new InputStreamReader(compilado.getInputStream()));
             // Leer el output del comando
-            // System.out.println("Output:\n");
-            // String s = null;
-            // while ((s = stdInput.readLine()) != null) {
-            // System.out.println(s);
-            // }
+            System.out.println("Output:\n");
+            String s = null;
+            while ((s = stdInput.readLine()) != null) {
+            System.out.println(s);
+            }
             compilado.waitFor();
 
             Process enlazado = Runtime.getRuntime().exec(
@@ -54,11 +54,11 @@ public class Ensamblador {
 
             stdInput = new BufferedReader(new InputStreamReader(enlazado.getInputStream()));
             // Leer el output del comando
-            // System.out.println("Output:\n");
-            // s = null;
-            // while ((s = stdInput.readLine()) != null) {
-            // System.out.println(s);
-            // }
+            System.out.println("Output:\n");
+            s = null;
+            while ((s = stdInput.readLine()) != null) {
+            System.out.println(s);
+            }
             enlazado.waitFor();
             System.out.println(ConsoleColors.YELLOW_BOLD_BRIGHT + "Proceso de ensamblado ("
                     + directorio + ") completado con éxito" + ConsoleColors.RESET);
