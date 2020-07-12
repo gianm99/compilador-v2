@@ -456,12 +456,16 @@ public class Ensamblador {
             asm.add("add esp, " + numpar4);
             break;
         case params: // TODO Decidir el método de paso de parámetros
+            a = tv.get(ins.destino());
+            loadAddrReg("eax", a); // No puede ser un literal
+            asm.add("push eax");
             break;
         case st:
+            a = tv.get(ins.destino());
+            storeRegMem(a, "eax");
             break;
         default:
             break;
-
         }
     }
 
