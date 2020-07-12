@@ -1,7 +1,9 @@
-var int a;
+var int a=3;
 const string s1 = "Hola mundo";
+const int asdf=32;
+const boolean VERDAD=true;
 var string s2 = s1;
-var int c;
+var int c=a;
 var boolean par = true;
 func boolean function1(string str, int i, boolean foo){
 	var int a = 2;
@@ -11,6 +13,7 @@ func boolean function1(string str, int i, boolean foo){
 		printINT(5);
 	}
 	a = 5;
+	b=foo;
 	while(a>0){
 		b = par;
 		par=false;
@@ -19,16 +22,22 @@ func boolean function1(string str, int i, boolean foo){
 	foo = true;
 	return false;
 }
+
+func int funcion2() {
+	return 55;
+}
+
 proc main(){
 	printINT(c);
 }
-var int z =2+10;
-
-if(true){
+var int z = 2+10;
+var int y = 0;
+y=funcion2();
+if(3>5){
 	var boolean b;
 	a=78;
-z=z/8+z+89*58;
+	z=z/8+z+89*58;
 }
 printINT(z);
 main();
-function1("HOLA",89,true);
+par = function1("HOLA",89,true);

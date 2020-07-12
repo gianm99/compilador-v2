@@ -1,9 +1,11 @@
 grammar vaja;
 
 @header {
+package antlr;
 import procesador.*;
 import java.io.*;
-import java.util.*;
+import java.util.Deque;
+import java.util.ArrayDeque;
 }
 
 @parser::members {
@@ -39,9 +41,6 @@ public void notifyErrorListeners(Token offendingToken, String msg, RecognitionEx
 	notificacion = notificacion.replaceAll("OpBinSum","+, -");
 	throw new RuntimeException(notificacion);
 }
-// DOT
-Writer writer;
-int dot = 0;
 }
 
 @lexer::members {
@@ -83,6 +82,12 @@ decl:
 	}
 } (
 		'=' expr {
+	try{
+		ts.consulta($ID.getText()).setInicializada(true);
+	} catch(TablaSimbolos.TablaSimbolosException e) {
+		errores+="Error semántico - Línea "+$ID.getLine()+": variable '"+$ID.getText()+
+		"' no existe\n";
+	}
 	if($expr.tsub!=$tipo.tsub) {
 		errores+="Error semántico - Línea "+$ID.getLine()+": tipos incompatibles (esperado '"+
 		$tipo.tsub+"', encontrado '"+$expr.tsub+"')\n";
@@ -92,6 +97,7 @@ decl:
 	| CONSTANT tipo ID {
 	try {
 		ts.inserta($ID.getText(),new Simbolo($ID.getText(),null,Simbolo.Tipo.CONST,$tipo.tsub));
+		ts.consulta($ID.getText()).setInicializada(true);
 	} catch(TablaSimbolos.TablaSimbolosException e) {
 		errores+="Error semántico - Línea "+$ID.getLine()+": constante '"+$ID.getText()+
 		"' redeclarada\n";
@@ -113,6 +119,7 @@ decl:
 		Simbolo param=$encabezado.met.getNext();
 		while(param!=null) {
 			Simbolo aux=new Simbolo(param);
+			aux.setInicializada(true);
 			aux.setNext(null);
 			try {
 				ts.inserta(aux.getId(),aux);
@@ -144,6 +151,7 @@ decl:
 		Simbolo param=$encabezado.met.getNext();
 		while(param!=null) {
 			Simbolo aux=new Simbolo(param);
+			aux.setInicializada(true);
 			aux.setNext(null);
 			try {
 				ts.inserta(aux.getId(),aux);
@@ -273,12 +281,14 @@ sent:
 			}
 		}
 	}
-	
-	| referencia ASSIGN expr ';' {
+	| referencia[true] ASSIGN expr ';' {
 		if($referencia.s!=null) {
 			if($referencia.s.getT()==Simbolo.Tipo.CONST) {
 				errores+="Error semántico - Línea "+$ASSIGN.getLine()+": "+$referencia.s.getId()+
 				"es una constante\n";
+			} else if($referencia.s.getT()==Simbolo.Tipo.FUNC || $referencia.s.getT()==Simbolo.Tipo.PROC) {
+				errores+="Error semántico - Línea "+$ASSIGN.getLine()+
+				": no se esperaba una función o un procedimiento\n";
 			} else if($referencia.s.getTsub()!=$expr.tsub) {
 				errores+="Error semántico - Línea "+$ASSIGN.getLine()+
 				": asignación de tipo incorrecto (esperado '"+$referencia.s.getTsub()+
@@ -286,7 +296,7 @@ sent:
 			}
 		}
 	}
-	| referencia SEMI {
+	| referencia[false] SEMI {
 		if($referencia.s!=null) {
 			if($referencia.s.getT()!=Simbolo.Tipo.FUNC && $referencia.s.getT()!=Simbolo.Tipo.PROC) {
 				// Tiene que ser función o procedimiento
@@ -296,11 +306,19 @@ sent:
 		}
 	};
 
-referencia
+referencia[boolean asignacion]
 	returns[Simbolo s]:
 	ID {
 		try {
 			$s=ts.consulta($ID.getText());
+			if($asignacion) {
+				$s.setInicializada(true);
+			} else {
+				if(!$s.isInicializada()) {
+					errores+="Error semántico - Línea "+$ID.getLine()+": '"+$ID.getText()+
+					"' no ha sido inicializada\n";
+				}
+			}
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			errores+="Error semántico - Línea "+$ID.getLine()+": "+e.getMessage()+"\n";
 			$s=null;
@@ -557,7 +575,7 @@ primario
 	'(' expr ')' {
 		$tsub=$expr.tsub;
 	}
-	| referencia {
+	| referencia[false] {
 		if($referencia.s==null) {
 			errores+="Error semántico - Línea "+$referencia.start.getLine()+
 			": tipos incompatibles (encontrado NULL)\n";
@@ -617,7 +635,7 @@ LiteralBoolean: 'true' | 'false';
 // Cadenas
 LiteralString: '"' LetrasString? '"';
 fragment LetrasString: LetraString+;
-fragment LetraString: ~["\\\r\n];
+fragment LetraString: ~[$"\\\r\n];
 // Separadores
 LPAREN: '(';
 RPAREN: ')';

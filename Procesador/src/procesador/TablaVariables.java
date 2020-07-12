@@ -10,23 +10,81 @@ import java.util.ArrayList;
 public class TablaVariables {
 
     private ArrayList<Variable> tv;
+    private int nv;
 
     public TablaVariables(String directorio) {
         tv = new ArrayList<Variable>();
+        nv = 0;
     }
 
-    public Variable nuevaVar(Procedimiento sub, Simbolo.Tipo tipo) {
-        Variable var = new Variable(sub, tipo);
+    public int nuevaVar(boolean temporal, Integer proc, Simbolo.Tipo tipo, Simbolo.TSub tsub) {
+        Variable var;
+        nv++;
+        if (proc == null) {
+            var = new Variable(nv, temporal, 0, tipo, tsub);
+        } else {
+            var = new Variable(nv, temporal, proc, tipo, tsub);
+        }
         tv.add(var);
-        return var;
+        return nv;
     }
 
-    // Getters y setters
-    public ArrayList<Variable> getTV() {
-        return tv;
+    public void quitarVar(String var) {
+        String segmentos[] = var.split("\\$");
+        tv.get(Integer.parseInt(segmentos[1]) - 1).setBorrada(true);
     }
 
-    public void setTV(ArrayList<Variable> tv) {
-        this.tv = tv;
+    public void quitarVar(ArrayList<Instruccion> var) {
+        int i = 0;
+        while (i < var.size()) {
+            if (get(var.get(i).destino()).getTsub() != Simbolo.TSub.STRING){
+                quitarVar(var.get(i).destino());
+                var.remove(i);
+            } else {
+                i++; 
+            }
+        }
+    }
+
+    public Variable get(int nv) {
+        return tv.get(nv - 1);
+    }
+
+    public Variable get(String var) {
+        String segmentos[] = var.split("\\$");
+        if (segmentos.length > 1) {
+            return tv.get(Integer.parseInt(segmentos[1]) - 1);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Calcula el desp de todas las variables y el ocupVL de todos los procedimientos.
+     * 
+     * @param tp La tabla de procedimientos que actualiza.
+     */
+    public void calculoDespOcupVL(TablaProcedimientos tp) {
+        for (int p = 1; p <= tp.getNp(); p++) {
+            tp.get(p).setOcupVL(0);
+        }
+        for (int x = 0; x < tv.size(); x++) {
+            Variable vx = tv.get(x);
+            int p = vx.proc();
+            if (vx.tipo() == Simbolo.Tipo.VAR && p != 0) {
+                int ocupx = vx.getOcup();
+                Procedimiento pp = tp.get(p);
+                pp.setOcupVL(pp.getOcupVL() + ocupx);
+                vx.setDesp(-pp.getOcupVL()); // TODO Preguntar a Pere Palmer esto
+            }
+        }
+    }
+
+    public int getNv() {
+        return nv;
+    }
+
+    public void setNv(int nv) {
+        this.nv = nv;
     }
 }

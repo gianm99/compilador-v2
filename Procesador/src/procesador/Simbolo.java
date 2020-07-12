@@ -1,8 +1,8 @@
 package procesador;
 
 /**
- * Simbolo. Clase que sirve para gestionar la información relacionada con los símbolos que aparecen
- * en el código fuente.
+ * Simbolo. Clase que sirve para gestionar la información relacionada con los
+ * símbolos que aparecen en el código fuente.
  * 
  * @author Gian Lucas Martín Chamorro
  * @author Jordi Antoni Sastre Moll
@@ -13,12 +13,18 @@ public class Simbolo {
 	private Tipo t;
 	private TSub tsub;
 	private boolean returnEncontrado;
-	// TODO #35 Crear herencias para Simbolo en las que guardar información específica
-	private boolean vCB;
-	private int vCI;
-	private String vCS;
-	private Variable nv;
+	private String valor;
+	private boolean inicializada;
+	private int nv;
 	private Procedimiento np;
+
+	public enum Tipo {
+		CONST, VAR, PROC, FUNC, ARG, NULO;
+	}
+
+	public enum TSub {
+		BOOLEAN, INT, STRING, NULL;
+	}
 
 	public Simbolo(String id, Simbolo next, Tipo t, TSub tsub) {
 		this.id = id;
@@ -37,28 +43,20 @@ public class Simbolo {
 	public Simbolo() {
 	};
 
+	public boolean isInicializada() {
+		return inicializada;
+	}
+
+	public void setInicializada(boolean inicializada) {
+		this.inicializada = inicializada;
+	}
+
 	public Procedimiento getNp() {
 		return np;
 	}
 
 	public void setNp(Procedimiento np) {
 		this.np = np;
-	}
-
-	public Variable getNv() {
-		return nv;
-	}
-
-	public void setNv(Variable nv) {
-		this.nv = nv;
-	}
-
-	public enum Tipo {
-		CONST, VAR, PROC, FUNC, ARG, NULO;
-	}
-
-	public enum TSub {
-		BOOLEAN, INT, STRING, NULL;
 	}
 
 	public String getId() {
@@ -101,27 +99,19 @@ public class Simbolo {
 		this.returnEncontrado = returnEncontrado;
 	}
 
-	public boolean isvCB() {
-		return vCB;
+	public String getValor() {
+		return valor;
 	}
 
-	public void setvCB(boolean vCB) {
-		this.vCB = vCB;
+	public void setValor(String valor) {
+		this.valor = valor;
 	}
 
-	public int getvCI() {
-		return vCI;
+	public int getNv() {
+		return nv;
 	}
 
-	public void setvCI(int vCI) {
-		this.vCI = vCI;
-	}
-
-	public String getvCS() {
-		return vCS;
-	}
-
-	public void setvCS(String vCS) {
-		this.vCS = vCS;
+	public void setNv(int nv) {
+		this.nv = nv;
 	}
 }

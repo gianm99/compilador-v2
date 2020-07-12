@@ -53,15 +53,16 @@ Como detalles a destacar del lenguaje tenemos los siguientes:
   1. *Declaraciones*. Puede no haber ninguna declaración.
   2. *Sentencias*. Tiene que haber como mínimo una.
 - Se pueden hacer returns a mitad de función o a mitad de procedimiento. En el caso del procedimiento tiene que ser un return vacío que no devuelva ninguna expresión.
-
 ## Compilador
 
-### Detalles del compilador
+### Detalles del análisis
 
 - El compilador detecta los errores léxicos, sintácticos y semánticos. 
   - Si detecta un error sintáctico deja de ejecutarse.
   - Si detecta un error semántico sigue evaluando el restro del programa para encontrar el resto.
 - Al imprimir los mensajes se muestran con colores distintos dependiendo de si el proceso de compilación ha sido exitoso. Se muestra en verde si se ha compilado correctamente y en rojo si ha habido algún error.
-- Si cuando se declara una variable no se inicializa, se le asigna el valor por defecto para cada tipo subyacente. Para boolean es `false`, para integer es `0` y para string es `""` (el string vacío).
+
+### Detalles de la generación de código
+
 - El proceso de compilación de hace en dos pasadas. Primero se realiza la comprobación de que el programa está bien escrito con el análisis léxico, sintáctico y semántico, y después se genera el código intermedio utilizando la información obtenida en la primera pasada y también volviendo a analizar el código.
-- Solo genera el código si el programa que se analiza está escrito correctamente.
+- Los strings del programa funcionan de la siguiente manera: los literales de string siempre se guardan en memoria al principio del programa (en la sección .data). Las variables de tipo string contienen realmente direcciones de memoria que apuntan a las posiciones en las que están almacenados realmente los literales. Esto permite que la ocupación de las variables de tipo string siempre sea la misma: 4 bytes.
