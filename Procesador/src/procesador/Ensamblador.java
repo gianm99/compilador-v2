@@ -70,7 +70,7 @@ public class Ensamblador {
     public void generarASM() {
         Writer buffer;
         File asmFile = new File(directorio + ".asm");
-        asm = traducir();
+        traducir();
         try {
             buffer = new BufferedWriter(new FileWriter(asmFile));
             for (int i = 0; i < asm.size(); i++) {
@@ -81,8 +81,7 @@ public class Ensamblador {
         }
     }
 
-    public ArrayList<String> traducir() {
-        ArrayList<String> asm = new ArrayList<>();
+    public void traducir() {
         asm.add(".386");
         asm.add(".model flat, stdcall");
         asm.add("option casemap:none");
@@ -197,10 +196,10 @@ public class Ensamblador {
                 i = saltarSubprograma(i);
             } else {
                 conversion(i);
+                i++;
             }
         }
         asm.add("end start");
-        return asm;
     }
 
     private void conversion(int i) {
