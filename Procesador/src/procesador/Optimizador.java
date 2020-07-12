@@ -54,7 +54,6 @@ public class Optimizador {
         reasignarLineaEtiqueta();
         tv.calculoDespOcupVL(tp);
         imprimirC3D();
-        // int a = 0;
     }
 
     /**
