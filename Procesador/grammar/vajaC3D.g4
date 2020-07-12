@@ -460,6 +460,8 @@ referencia
 				t = tv.nuevaVar(true, pproc.peek(),Tipo.VAR,s.getTsub());
 				tv.get(t).setResultado(true);
 				$r = tv.get(t); // TODO Añadir código de 'store'
+				$tsub=s.getTsub();
+				genera(Instruccion.OP.st, null, null, tv.get(t).toString());
 			}
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
@@ -474,6 +476,8 @@ referencia
 			t = tv.nuevaVar(true, pproc.peek(),Tipo.VAR,$contIdx.s.getTsub());
 			tv.get(t).setResultado(true);
 			$r = tv.get(t);
+			$tsub = $contIdx.s.getTsub();
+			genera(Instruccion.OP.st, null, null, tv.get(t).toString());
 		}
 	};
 
