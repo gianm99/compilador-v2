@@ -122,12 +122,12 @@ programa:
 			s=ts.consulta("read");
 			s.setNp(tp.nuevoProc(profundidad,s.getT(),"read"));
 			// Operaciones de salida
-			for(TSub tsub : TSub.values()) {
-				if(tsub!=TSub.NULL) {
-					s=ts.consulta("print"+tsub);
-					s.setNp(tp.nuevoProc(profundidad,s.getT(),"print"+tsub));
-				}
-			}
+			s=ts.consulta("printb");
+			s.setNp(tp.nuevoProc(profundidad,s.getT(),"printb"));
+			s=ts.consulta("printi");
+			s.setNp(tp.nuevoProc(profundidad,s.getT(),"printi"));
+			s=ts.consulta("prints");
+			s.setNp(tp.nuevoProc(profundidad,s.getT(),"prints"));
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}

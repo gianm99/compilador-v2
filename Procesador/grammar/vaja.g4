@@ -57,13 +57,12 @@ programa:
 	// Insertar operaciones de input/output
 	try {
 		ts.inserta("read",new Simbolo("read",null,Simbolo.Tipo.FUNC,Simbolo.TSub.STRING));
-		for(Simbolo.TSub tsub : Simbolo.TSub.values()) {
-			if(tsub!=Simbolo.TSub.NULL) {
-				Simbolo arg = new Simbolo("arg"+tsub,null,Simbolo.Tipo.ARG,tsub);
-				ts.inserta("print"+tsub,new Simbolo("print"+tsub,arg,Simbolo.Tipo.PROC,
-				Simbolo.TSub.NULL));
-			}
-		}
+		Simbolo arg = new Simbolo("argBool",null,Simbolo.Tipo.ARG,Simbolo.TSub.BOOLEAN);
+		ts.inserta("printb", new Simbolo("printb",arg,Simbolo.Tipo.PROC, Simbolo.TSub.NULL));
+		arg = new Simbolo("argInt",null,Simbolo.Tipo.ARG,Simbolo.TSub.INT);
+		ts.inserta("printi", new Simbolo("printi",arg,Simbolo.Tipo.PROC, Simbolo.TSub.NULL));
+		arg = new Simbolo("argString",null,Simbolo.Tipo.ARG,Simbolo.TSub.STRING);
+		ts.inserta("prints", new Simbolo("prints",arg,Simbolo.Tipo.PROC, Simbolo.TSub.NULL));
 	} catch (TablaSimbolos.TablaSimbolosException e) {}
 } decl* sents EOF {
 	ts.saleBloque();
