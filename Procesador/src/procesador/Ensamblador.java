@@ -420,7 +420,7 @@ public class Ensamblador {
             } else {
                 asm.add("mov ebx, " + ins.getOperando(2));
             }
-            asm.add("cmp ebx, eax");
+            asm.add("cmp eax, ebx");
             asm.add("je " + ins.destino());
             break;
         case ifNE:
@@ -437,7 +437,7 @@ public class Ensamblador {
             } else {
                 asm.add("mov ebx, " + ins.getOperando(2));
             }
-            asm.add("cmp ebx, eax");
+            asm.add("cmp eax, ebx");
             asm.add("jne " + ins.destino());
             break;
         case ifGE:
@@ -454,7 +454,7 @@ public class Ensamblador {
             } else {
                 asm.add("mov ebx, " + ins.getOperando(2));
             }
-            asm.add("cmp ebx, eax");
+            asm.add("cmp eax, ebx");
             asm.add("jge " + ins.destino());
             break;
         case ifGT:
@@ -471,7 +471,7 @@ public class Ensamblador {
             } else {
                 asm.add("mov ebx, " + ins.getOperando(2));
             }
-            asm.add("cmp ebx, eax");
+            asm.add("cmp eax, ebx");
             asm.add("jg " + ins.destino());
             break;
         case ifLT:
@@ -488,7 +488,7 @@ public class Ensamblador {
             } else {
                 asm.add("mov ebx, " + ins.getOperando(2));
             }
-            asm.add("cmp ebx, eax");
+            asm.add("cmp eax, ebx");
             asm.add("jl " + ins.destino());
             break;
         case ifLE:
@@ -505,7 +505,7 @@ public class Ensamblador {
             } else {
                 asm.add("mov ebx, " + ins.getOperando(2));
             }
-            asm.add("cmp ebx, eax");
+            asm.add("cmp eax, ebx");
             asm.add("jle " + ins.destino());
             break;
         case call:
