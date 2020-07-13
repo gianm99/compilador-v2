@@ -340,7 +340,7 @@ sent[Deque<Integer> sents_seg]
 	} decl* sents {
 		ts=ts.subeBloque();
 		backpatch($expr.cierto, ec);
-		$sent_seg = concat($expr.falso, $sents_seg);
+		$sent_seg = concat($expr.falso, $sents.sents_seg);
 	} END
 	| IF expr BEGIN {
 		try{
@@ -352,11 +352,14 @@ sent[Deque<Integer> sents_seg]
 		genera(Instruccion.OP.skip, null, null, ec.toString());
 		te.nuevaEtiqueta(ec, pc);
 	} decl* sents {
-		Deque<Integer> sents_seg1 = $sents.sents_seg;
-	} END ELSE BEGIN {
+	} END {
+		Deque<Integer> sents_seg1 = new ArrayDeque<Integer>();
+		genera(Instruccion.OP.jump, null, null, null);
+		sents_seg1.add(pc);
 		Etiqueta ef = new Etiqueta();
 		genera(Instruccion.OP.skip, null, null, ef.toString());
 		te.nuevaEtiqueta(ef, pc);
+	} ELSE BEGIN {
 	} decl* sents END {
 		ts=ts.subeBloque();
 		backpatch($expr.cierto, ec);
