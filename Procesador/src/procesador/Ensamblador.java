@@ -491,7 +491,7 @@ public class Ensamblador {
         if (x.tipo() == Simbolo.Tipo.CONST) {
             // x es un valor constante
             asm.add("mov " + R + ", " + x);
-        } else if (profx == 0) {
+        } else if (x.getDesp() == 0) {
             // x es una variable global
             asm.add("mov " + R + ", " + x + "  ; " + R + " = " + x);
         } else if (profp == profx && x.getDesp() < 0) {
@@ -541,7 +541,7 @@ public class Ensamblador {
         } else {
             profx = 0;
         }
-        if (profx == 0) {
+        if (x.getDesp() == 0) {
             // x es una variable global
             asm.add("mov " + x + ", " + R);
         } else if (profp == profx && x.getDesp() < 0) {
@@ -594,7 +594,7 @@ public class Ensamblador {
         if (x.tipo() == Simbolo.Tipo.CONST) {
             // x es un valor constante
             asm.add("mov " + R + ", OFFSET " + x + "  ; " + R + " = @ " + x);
-        } else if (profx == 0) {
+        } else if (x.getDesp() == 0) {
             // x es una variable global
             asm.add("mov " + R + ", OFFSET " + x + "  ; " + R + " = @ " + x);
         } else if (profp == profx && x.getDesp() < 0) {
