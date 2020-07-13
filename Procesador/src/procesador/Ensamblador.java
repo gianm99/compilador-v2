@@ -146,24 +146,29 @@ public class Ensamblador {
         asm.add("\tinvoke ExitProcess, 0");
         asm.add("start ENDP");
         // TODO Añadir las subrutinas propias del lenguaje (Input y Output)
-        asm.add("printINT$3:");
-        asm.add("mov esi, OFFSET DISP    ; ESI = @ DISP");
-        asm.add("push [esi]");
-        asm.add("push ebp");
-        asm.add("mov ebp, esp            ; BP = SP");
-        asm.add("mov [esi], ebp          ; DISP(prof4x) = BP");
-        asm.add("sub esp, 12             ; reservar espacio para el string buffer");
-        asm.add("mov esi, [ebp+12]");
-        asm.add("mov eax, [esi]          ; mover a eax el int a imprimir");
-        asm.add("lea edi, [ebp-12]       ; mover a edi la dirección del string buffer");
-        asm.add("call EAX_to_DEC");
-        asm.add("lea edi, [ebp-12]");
-        asm.add("invoke StdOut, edi");
-        asm.add("mov esp, ebp");
-        asm.add("pop ebp");
-        asm.add("mov edi, OFFSET DISP");
-        asm.add("pop [edi]");
-        asm.add("ret");
+        asm.add("read$1:");
+        asm.add("\tret");
+        asm.add("printb$2:");
+        asm.add("\tret");
+        // Función para imprimir un integer
+        asm.add("printi$3:");
+        asm.add("\tmov esi, OFFSET DISP    ; ESI = @ DISP");
+        asm.add("\tpush [esi]");
+        asm.add("\tpush ebp");
+        asm.add("\tmov ebp, esp            ; BP = SP");
+        asm.add("\tmov [esi], ebp          ; DISP(prof4x) = BP");
+        asm.add("\tsub esp, 12             ; reservar espacio para el string buffer");
+        asm.add("\tmov esi, [ebp+12]");
+        asm.add("\tmov eax, [esi]          ; mover a eax el int a imprimir");
+        asm.add("\tlea edi, [ebp-12]       ; mover a edi la dirección del string buffer");
+        asm.add("\tcall EAX_to_DEC");
+        asm.add("\tlea edi, [ebp-12]");
+        asm.add("\tinvoke StdOut, edi");
+        asm.add("\tmov esp, ebp");
+        asm.add("\tpop ebp");
+        asm.add("\tmov edi, OFFSET DISP");
+        asm.add("\tpop [edi]");
+        asm.add("\tret");
         // Función para imprimir un string
         asm.add("prints$4:");
         asm.add("\tmov esi, OFFSET DISP    ; ESI = @ DISP");
@@ -181,28 +186,28 @@ public class Ensamblador {
         asm.add("\tret");
         // Función para convertir de integer a ascii
         asm.add("EAX_to_DEC PROC         ; ARG: EDI pointer to string buffer");
-        asm.add("test eax, eax           ; Test if number is less than zero");
-        asm.add("jnl non_negative");
-        asm.add("neg eax");
-        asm.add("mov byte ptr [edi], '-'");
-        asm.add("inc edi");
-        asm.add("non_negative:");
-        asm.add("mov ebx, 10             ; Divisor = 10");
-        asm.add("xor ecx, ecx            ; ECX=0 (digit counter)");
-        asm.add("@@:                     ; First Loop: store the remainders");
-        asm.add("xor edx, edx");
-        asm.add("div ebx                 ; EDX:EAX / EBX = EAX remainder EDX");
-        asm.add("push dx                 ; push the digit in DL (LIFO)");
-        asm.add("add cl,1                ; = inc cl (digit counter)");
-        asm.add("or  eax, eax            ; AX == 0?");
-        asm.add("jnz @B                  ; no: once more (jump to the first @@ above)");
-        asm.add("@@:                       ; Second loop: load the remainders in reversed order");
-        asm.add("pop ax                  ; get back pushed digits");
-        asm.add("or al, 00110000b        ; to ASCII");
-        asm.add("stosb                   ; Store AL to [EDI] (EDI is a pointer to a buffer)");
-        asm.add("loop @B                 ; until there are no digits left");
-        asm.add("mov byte ptr [edi], 0   ; ASCIIZ terminator (0)");
-        asm.add("ret                     ; RET: EDI pointer to ASCIIZ-string");
+        asm.add("\ttest eax, eax           ; Test if number is less than zero");
+        asm.add("\tjnl non_negative");
+        asm.add("\tneg eax");
+        asm.add("\tmov byte ptr [edi], '-'");
+        asm.add("\tinc edi");
+        asm.add("\tnon_negative:");
+        asm.add("\tmov ebx, 10             ; Divisor = 10");
+        asm.add("\txor ecx, ecx            ; ECX=0 (digit counter)");
+        asm.add("\t@@:                     ; First Loop: store the remainders");
+        asm.add("\txor edx, edx");
+        asm.add("\tdiv ebx                 ; EDX:EAX / EBX = EAX remainder EDX");
+        asm.add("\tpush dx                 ; push the digit in DL (LIFO)");
+        asm.add("\tadd cl,1                ; = inc cl (digit counter)");
+        asm.add("\tor  eax, eax            ; AX == 0?");
+        asm.add("\tjnz @B                  ; no: once more (jump to the first @@ above)");
+        asm.add("\t@@:                       ; Second loop: load the remainders in reversed order");
+        asm.add("\tpop ax                  ; get back pushed digits");
+        asm.add("\tor al, 00110000b        ; to ASCII");
+        asm.add("\tstosb                   ; Store AL to [EDI] (EDI is a pointer to a buffer)");
+        asm.add("\tloop @B                 ; until there are no digits left");
+        asm.add("\tmov byte ptr [edi], 0   ; ASCIIZ terminator (0)");
+        asm.add("\tret                     ; RET: EDI pointer to ASCIIZ-string");
         asm.add("EAX_to_DEC ENDP");
         // Subrutinas definidas por el usuario
         for (int p = 5; p <= tp.getNp(); p++) {
@@ -212,12 +217,12 @@ public class Ensamblador {
             asm.add(pp + ":");
             // pmb
             int prof4x = tp.get(p).getProf() * 4;
-            asm.add("mov  esi, OFFSET DISP  ; ESI = @DISP");
-            asm.add("push [esi+" + prof4x + "]");
-            asm.add("push ebp");
-            asm.add("mov ebp, esp  ; BP = SP");
-            asm.add("mov [esi+" + prof4x + "], ebp  ; DISP(prof) = BP");
-            asm.add("sub esp, " + pp.getOcupVL()
+            asm.add("\tmov  esi, OFFSET DISP  ; ESI = @DISP");
+            asm.add("\tpush [esi+" + prof4x + "]");
+            asm.add("\tpush ebp");
+            asm.add("\tmov ebp, esp  ; BP = SP");
+            asm.add("\tmov [esi+" + prof4x + "], ebp  ; DISP(prof) = BP");
+            asm.add("\tsub esp, " + pp.getOcupVL()
                     + "  ; reserva memoria para las variables locales");
             l++;
             while (true) {
@@ -228,10 +233,10 @@ public class Ensamblador {
                 } else {
                     if (ins.getOpCode() == OP.ret) {
                         // Caso del return
-                        asm.add("mov esp, ebp  ; SP = BP");
-                        asm.add("pop ebp  ; BP = antiguo BP");
-                        asm.add("lea edi, DISP  ; EDI = @DISP");
-                        asm.add("pop [edi+" + prof4x + "]  ; DISP[prof] = antiguo valor");
+                        asm.add("\tmov esp, ebp  ; SP = BP");
+                        asm.add("\tpop ebp  ; BP = antiguo BP");
+                        asm.add("\tlea edi, DISP  ; EDI = @DISP");
+                        asm.add("\tpop [edi+" + prof4x + "]  ; DISP[prof] = antiguo valor");
                         if (ins.getOperando(1) != null) {
                             // Guardar el valor de retorno en %eax
                             Variable var = tv.get(ins.getOperando(1));
@@ -240,10 +245,10 @@ public class Ensamblador {
                                 loadMemReg("eax", var);
                             } else {
                                 // Solo puede ser un int o un boolean
-                                asm.add("mov eax, " + ins.getOperando(1));
+                                asm.add("\tmov eax, " + ins.getOperando(1));
                             }
                         }
-                        asm.add("ret");
+                        asm.add("\tret");
                     } else {
                         // El resto de instrucciones
                         conversion(l);
@@ -273,14 +278,14 @@ public class Ensamblador {
             if (b != null) {
                 loadMemReg("eax", b);
             } else {
-                asm.add("mov eax, " + ins.getOperando(1));
+                asm.add("\tmov eax, " + ins.getOperando(1));
             }
             if (c != null) {
                 loadMemReg("ebx", c);
             } else {
-                asm.add("mov ebx, " + ins.getOperando(2));
+                asm.add("\tmov ebx, " + ins.getOperando(2));
             }
-            asm.add("and eax, ebx");
+            asm.add("\tand eax, ebx");
             storeRegMem(a, "eax");
             break;
         case or:
@@ -291,27 +296,27 @@ public class Ensamblador {
             if (b != null) {
                 loadMemReg("eax", b);
             } else {
-                asm.add("mov eax, " + ins.getOperando(1));
+                asm.add("\tmov eax, " + ins.getOperando(1));
             }
             if (c != null) {
                 loadMemReg("ebx", c);
             } else {
-                asm.add("mov ebx, " + ins.getOperando(2));
+                asm.add("\tmov ebx, " + ins.getOperando(2));
             }
-            asm.add("or eax, ebx");
+            asm.add("\tor eax, ebx");
             storeRegMem(a, "eax");
             break;
         case not:
             // a = not b
             a = tv.get(ins.destino());
             b = tv.get(ins.getOperando(1));
-            asm.add("xor eax, eax  ; EAX = 0");
+            asm.add("\txor eax, eax  ; EAX = 0");
             if (b != null) {
                 loadMemReg("ebx", b);
             } else {
-                asm.add("mov ebx, " + ins.getOperando(1));
+                asm.add("\tmov ebx, " + ins.getOperando(1));
             }
-            asm.add("not eax, ebx");
+            asm.add("\tnot eax, ebx");
             storeRegMem(a, "eax");
             break;
         case add:
@@ -322,14 +327,14 @@ public class Ensamblador {
             if (b != null) {
                 loadMemReg("eax", b);
             } else {
-                asm.add("mov eax, " + ins.getOperando(1));
+                asm.add("\tmov eax, " + ins.getOperando(1));
             }
             if (c != null) {
                 loadMemReg("ebx", c);
             } else {
-                asm.add("mov ebx, " + ins.getOperando(2));
+                asm.add("\tmov ebx, " + ins.getOperando(2));
             }
-            asm.add("add eax, ebx");
+            asm.add("\tadd eax, ebx");
             storeRegMem(a, "eax");
             break;
         case sub:
@@ -340,27 +345,27 @@ public class Ensamblador {
             if (b != null) {
                 loadMemReg("eax", b);
             } else {
-                asm.add("mov eax, " + ins.getOperando(1));
+                asm.add("\tmov eax, " + ins.getOperando(1));
             }
             if (c != null) {
                 loadMemReg("ebx", c);
             } else {
-                asm.add("mov ebx, " + ins.getOperando(2));
+                asm.add("\tmov ebx, " + ins.getOperando(2));
             }
-            asm.add("sub eax, ebx");
+            asm.add("\tsub eax, ebx");
             storeRegMem(a, "eax");
             break;
         case neg:
             // a = -b
             a = tv.get(ins.destino());
             b = tv.get(ins.getOperando(1));
-            asm.add("xor eax, eax  ; EAX = 0");
+            asm.add("\txor eax, eax  ; EAX = 0");
             if (b != null) {
                 loadMemReg("ebx", b);
             } else {
-                asm.add("mov ebx, " + ins.getOperando(1));
+                asm.add("\tmov ebx, " + ins.getOperando(1));
             }
-            asm.add("sub eax, ebx");
+            asm.add("\tsub eax, ebx");
             storeRegMem(a, "eax");
             break;
         case div:
@@ -371,16 +376,16 @@ public class Ensamblador {
             if (b != null) {
                 loadMemReg("eax", b);
             } else {
-                asm.add("mov eax, " + ins.getOperando(1));
+                asm.add("\tmov eax, " + ins.getOperando(1));
             }
-            asm.add("mov edx, eax");
-            asm.add("sar edx, 31");
+            asm.add("\tmov edx, eax");
+            asm.add("\tsar edx, 31");
             if (c != null) {
                 loadMemReg("ebx", c);
             } else {
-                asm.add("mov ebx, " + ins.getOperando(2));
+                asm.add("\tmov ebx, " + ins.getOperando(2));
             }
-            asm.add("idiv ebx");
+            asm.add("\tidiv ebx");
             storeRegMem(a, "eax");
             break;
         case mult:
@@ -391,14 +396,14 @@ public class Ensamblador {
             if (b != null) {
                 loadMemReg("eax", b);
             } else {
-                asm.add("mov eax, " + ins.getOperando(1));
+                asm.add("\tmov eax, " + ins.getOperando(1));
             }
             if (c != null) {
                 loadMemReg("ebx", c);
             } else {
-                asm.add("mov ebx, " + ins.getOperando(2));
+                asm.add("\tmov ebx, " + ins.getOperando(2));
             }
-            asm.add("imul eax, ebx");
+            asm.add("\t\timul eax, ebx");
             storeRegMem(a, "eax");
             break;
         case copy:
@@ -406,7 +411,7 @@ public class Ensamblador {
             a = tv.get(ins.destino());
             b = tv.get(ins.getOperando(1));
             if (b == null) {
-                asm.add("mov eax, " + ins.getOperando(1));
+                asm.add("\tmov eax, " + ins.getOperando(1));
             } else if (b.tipo() == Tipo.CONST && b.getTsub() == TSub.STRING) {
                 loadAddrReg("eax", b);
             } else {
@@ -420,7 +425,7 @@ public class Ensamblador {
             break;
         case jump:
             // goto e
-            asm.add("jmp " + ins.destino());
+            asm.add("\tjmp " + ins.destino());
             break;
         case ifEQ:
             // if a == b goto e
@@ -429,15 +434,15 @@ public class Ensamblador {
             if (a != null) {
                 loadMemReg("eax", a);
             } else {
-                asm.add("mov eax, " + ins.getOperando(1));
+                asm.add("\tmov eax, " + ins.getOperando(1));
             }
             if (b != null) {
                 loadMemReg("ebx", b);
             } else {
-                asm.add("mov ebx, " + ins.getOperando(2));
+                asm.add("\tmov ebx, " + ins.getOperando(2));
             }
-            asm.add("cmp eax, ebx");
-            asm.add("je " + ins.destino());
+            asm.add("\tcmp eax, ebx");
+            asm.add("\tje " + ins.destino());
             break;
         case ifNE:
             // if a != b goto e
@@ -446,15 +451,15 @@ public class Ensamblador {
             if (a != null) {
                 loadMemReg("eax", a);
             } else {
-                asm.add("mov eax, " + ins.getOperando(1));
+                asm.add("\tmov eax, " + ins.getOperando(1));
             }
             if (b != null) {
                 loadMemReg("ebx", b);
             } else {
-                asm.add("mov ebx, " + ins.getOperando(2));
+                asm.add("\tmov ebx, " + ins.getOperando(2));
             }
-            asm.add("cmp eax, ebx");
-            asm.add("jne " + ins.destino());
+            asm.add("\tcmp eax, ebx");
+            asm.add("\tjne " + ins.destino());
             break;
         case ifGE:
             // if a >= b goto e
@@ -463,15 +468,15 @@ public class Ensamblador {
             if (a != null) {
                 loadMemReg("eax", a);
             } else {
-                asm.add("mov eax, " + ins.getOperando(1));
+                asm.add("\tmov eax, " + ins.getOperando(1));
             }
             if (b != null) {
                 loadMemReg("ebx", b);
             } else {
-                asm.add("mov ebx, " + ins.getOperando(2));
+                asm.add("\tmov ebx, " + ins.getOperando(2));
             }
-            asm.add("cmp eax, ebx");
-            asm.add("jge " + ins.destino());
+            asm.add("\tcmp eax, ebx");
+            asm.add("\tjge " + ins.destino());
             break;
         case ifGT:
             // if a > b goto e
@@ -480,15 +485,15 @@ public class Ensamblador {
             if (a != null) {
                 loadMemReg("eax", a);
             } else {
-                asm.add("mov eax, " + ins.getOperando(1));
+                asm.add("\tmov eax, " + ins.getOperando(1));
             }
             if (b != null) {
                 loadMemReg("ebx", b);
             } else {
-                asm.add("mov ebx, " + ins.getOperando(2));
+                asm.add("\tmov ebx, " + ins.getOperando(2));
             }
-            asm.add("cmp eax, ebx");
-            asm.add("jg " + ins.destino());
+            asm.add("\tcmp eax, ebx");
+            asm.add("\tjg " + ins.destino());
             break;
         case ifLT:
             // if a <= b goto e
@@ -497,15 +502,15 @@ public class Ensamblador {
             if (a != null) {
                 loadMemReg("eax", a);
             } else {
-                asm.add("mov eax, " + ins.getOperando(1));
+                asm.add("\tmov eax, " + ins.getOperando(1));
             }
             if (b != null) {
                 loadMemReg("ebx", b);
             } else {
-                asm.add("mov ebx, " + ins.getOperando(2));
+                asm.add("\tmov ebx, " + ins.getOperando(2));
             }
-            asm.add("cmp eax, ebx");
-            asm.add("jl " + ins.destino());
+            asm.add("\tcmp eax, ebx");
+            asm.add("\tjl " + ins.destino());
             break;
         case ifLE:
             // if a < b goto e
@@ -514,27 +519,27 @@ public class Ensamblador {
             if (a != null) {
                 loadMemReg("eax", a);
             } else {
-                asm.add("mov eax, " + ins.getOperando(1));
+                asm.add("\tmov eax, " + ins.getOperando(1));
             }
             if (b != null) {
                 loadMemReg("ebx", b);
             } else {
-                asm.add("mov ebx, " + ins.getOperando(2));
+                asm.add("\tmov ebx, " + ins.getOperando(2));
             }
-            asm.add("cmp eax, ebx");
-            asm.add("jle " + ins.destino());
+            asm.add("\tcmp eax, ebx");
+            asm.add("\tjle " + ins.destino());
             break;
         case call:
             // call ne
             int numpar4 = tp.get(ins.destino()).getNumParams() * 4;
-            asm.add("call " + ins.destino());
-            asm.add("add esp, " + numpar4);
+            asm.add("\tcall " + ins.destino());
+            asm.add("\tadd esp, " + numpar4);
             break;
         case params:
             // params a
             a = tv.get(ins.destino());
             loadAddrReg("eax", a); // No puede ser un literal
-            asm.add("push eax");
+            asm.add("\tpush eax");
             break;
         case st:
             // store a
@@ -568,34 +573,34 @@ public class Ensamblador {
         }
         if (x.tipo() == Simbolo.Tipo.CONST) {
             // x es un valor constante
-            asm.add("mov " + R + ", " + x);
+            asm.add("\tmov " + R + ", " + x);
         } else if (x.getDesp() == 0) {
             // x es una variable global
-            asm.add("mov " + R + ", " + x + "  ; " + R + " = " + x);
+            asm.add("\tmov " + R + ", " + x + "  ; " + R + " = " + x);
         } else if (profp == profx && x.getDesp() < 0) {
             // x es una variable local
             int dx = x.getDesp();
-            asm.add("mov " + R + ", [ebp" + dx + "]");
+            asm.add("\tmov " + R + ", [ebp" + dx + "]");
         } else if (profp == profx) {
             // x es un parámetro local
             int dx = 8 + 4 * x.getNparam();
-            asm.add("mov esi, [ebp+" + dx + "]");
-            asm.add("mov " + R + ", [esi]");
+            asm.add("\tmov esi, [ebp+" + dx + "]");
+            asm.add("\tmov " + R + ", [esi]");
         } else if (profp < profx && x.getDesp() < 0) {
             // x es una variable definida en otro ámbito
             int dx = x.getDesp();
             int prof4x = profx * 4;
-            asm.add("mov esi, OFFSET DISP  ; ESI = @ DISP");
-            asm.add("mov esi, [esi+" + prof4x + "]  ; ESI = DISP[profx] = BPx");
-            asm.add("mov " + R + ", [esi" + dx + "]");
+            asm.add("\tmov esi, OFFSET DISP  ; ESI = @ DISP");
+            asm.add("\tmov esi, [esi+" + prof4x + "]  ; ESI = DISP[profx] = BPx");
+            asm.add("\tmov " + R + ", [esi" + dx + "]");
         } else if (profx < profp) {
             // x es un parámetro definido en otro ámbito
             int dx = 8 + 4 * x.getNparam();
             int prof4x = profx * 4;
-            asm.add("mov esi, OFFSET DISP  ; ESI = @ DISP");
-            asm.add("mov esi, [esi+" + prof4x + "]  ; ESI = DISP[profx] = BPx");
-            asm.add("mov esi, [esi+" + dx + "]  ; ESI = @ param");
-            asm.add("mov " + R + ", [esi]");
+            asm.add("\tmov esi, OFFSET DISP  ; ESI = @ DISP");
+            asm.add("\tmov esi, [esi+" + prof4x + "]  ; ESI = DISP[profx] = BPx");
+            asm.add("\tmov esi, [esi+" + dx + "]  ; ESI = @ param");
+            asm.add("\tmov " + R + ", [esi]");
         }
     }
 
@@ -621,31 +626,31 @@ public class Ensamblador {
         }
         if (x.getDesp() == 0) {
             // x es una variable global
-            asm.add("mov " + x + ", " + R);
+            asm.add("\tmov " + x + ", " + R);
         } else if (profp == profx && x.getDesp() < 0) {
             // x es una variable local
             int dx = x.getDesp();
-            asm.add("mov [ebp" + dx + "], " + R);
+            asm.add("\tmov [ebp" + dx + "], " + R);
         } else if (profp == profx) {
             // x es un parámetro local
             int dx = 8 + 4 * x.getNparam();
-            asm.add("mov edi, [ebp+" + dx + "]");
-            asm.add("mov [edi], " + R);
+            asm.add("\tmov edi, [ebp+" + dx + "]");
+            asm.add("\tmov [edi], " + R);
         } else if (profp < profx && x.getDesp() < 0) {
             // x es una variable definida en otro ámbito
             int dx = x.getDesp();
             int prof4x = profx * 4;
-            asm.add("mov esi, OFFSET DISP  ; ESI = @ DISP");
-            asm.add("mov edi, [esi+" + prof4x + "]  ; EDI = DISP[profx] = BPx");
-            asm.add("mov [edi" + dx + "], R");
+            asm.add("\tmov esi, OFFSET DISP  ; ESI = @ DISP");
+            asm.add("\tmov edi, [esi+" + prof4x + "]  ; EDI = DISP[profx] = BPx");
+            asm.add("\tmov [edi" + dx + "], R");
         } else if (profx < profp) {
             // x es un parámetro definido en otro ámbito
             int dx = 8 + 4 * x.getNparam();
             int prof4x = profx * 4;
-            asm.add("mov esi, OFFSET DISP  ; ESI = @ DISP");
-            asm.add("mov esi, [esi+" + prof4x + "]  ; ESI = BPx");
-            asm.add("mov edi, [esi+" + dx + "]  ; EDI = @ param");
-            asm.add("mov [edi], " + R);
+            asm.add("\tmov esi, OFFSET DISP  ; ESI = @ DISP");
+            asm.add("\tmov esi, [esi+" + prof4x + "]  ; ESI = BPx");
+            asm.add("\tmov edi, [esi+" + dx + "]  ; EDI = @ param");
+            asm.add("\tmov [edi], " + R);
         }
     }
 
@@ -671,32 +676,32 @@ public class Ensamblador {
         }
         if (x.tipo() == Simbolo.Tipo.CONST) {
             // x es un valor constante
-            asm.add("mov " + R + ", OFFSET " + x + "  ; " + R + " = @ " + x);
+            asm.add("\tmov " + R + ", OFFSET " + x + "  ; " + R + " = @ " + x);
         } else if (x.getDesp() == 0) {
             // x es una variable global
-            asm.add("mov " + R + ", OFFSET " + x + "  ; " + R + " = @ " + x);
+            asm.add("\tmov " + R + ", OFFSET " + x + "  ; " + R + " = @ " + x);
         } else if (profp == profx && x.getDesp() < 0) {
             // x es una variable local
             int dx = x.getDesp();
-            asm.add("lea " + R + ", [ebp" + dx + "]");
+            asm.add("\tlea " + R + ", [ebp" + dx + "]");
         } else if (profp == profx) {
             // x es un parámetro local
             int dx = 8 + 4 * x.getNparam();
-            asm.add("mov " + R + ", [ebp+" + dx + "]");
+            asm.add("\tmov " + R + ", [ebp+" + dx + "]");
         } else if (profp < profx && x.getDesp() < 0) {
             // x es una variable definida en otro ámbito
             int dx = x.getDesp();
             int prof4x = profx * 4;
-            asm.add("mov esi, OFFSET DISP  ; ESI = @ DISP");
-            asm.add("mov esi, [esi+" + prof4x + "]  ; ESI = DISP[profx] = BPx");
-            asm.add("lea " + R + ", [esi" + dx + "]");
+            asm.add("\tmov esi, OFFSET DISP  ; ESI = @ DISP");
+            asm.add("\tmov esi, [esi+" + prof4x + "]  ; ESI = DISP[profx] = BPx");
+            asm.add("\tlea " + R + ", [esi" + dx + "]");
         } else if (profx < profp) {
             // x es un parámetro definido en otro ámbito
             int dx = 8 + 4 * x.getNparam();
             int prof4x = profx * 4;
-            asm.add("mov esi, OFFSET DISP  ; ESI = @ DISP");
-            asm.add("mov esi, [esi+" + prof4x + "]  ; ESI = DISP[profx] = BPx");
-            asm.add("mov " + R + ", [esi+" + dx + "]");
+            asm.add("\tmov esi, OFFSET DISP  ; ESI = @ DISP");
+            asm.add("\tmov esi, [esi+" + prof4x + "]  ; ESI = DISP[profx] = BPx");
+            asm.add("\tmov " + R + ", [esi+" + dx + "]");
         }
     }
 
