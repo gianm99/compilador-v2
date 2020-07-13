@@ -477,8 +477,7 @@ referencia
 			genera(Instruccion.OP.call, null, null, s.getNp().toString());
 			if(s.getT()==Tipo.FUNC) {
 				t = tv.nuevaVar(true, pproc.peek(),Tipo.VAR,s.getTsub());
-				tv.get(t).setResultado(true);
-				$r = tv.get(t); // TODO Añadir código de 'store'
+				$r = tv.get(t);
 				$tsub=s.getTsub();
 				genera(Instruccion.OP.st, null, null, tv.get(t).toString());
 			}
@@ -493,7 +492,6 @@ referencia
 		genera(Instruccion.OP.call, null, null, $contIdx.met.toString());
 		if($contIdx.s.getT()==Tipo.FUNC) {
 			t = tv.nuevaVar(true, pproc.peek(),Tipo.VAR,$contIdx.s.getTsub());
-			tv.get(t).setResultado(true);
 			$r = tv.get(t);
 			$tsub = $contIdx.s.getTsub();
 			genera(Instruccion.OP.st, null, null, tv.get(t).toString());
