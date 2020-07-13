@@ -45,7 +45,7 @@ public class Ensamblador {
             System.out.println("Output:\n");
             String s = null;
             while ((s = stdInput.readLine()) != null) {
-            System.out.println(s);
+                System.out.println(s);
             }
             compilado.waitFor();
 
@@ -57,7 +57,7 @@ public class Ensamblador {
             System.out.println("Output:\n");
             s = null;
             while ((s = stdInput.readLine()) != null) {
-            System.out.println(s);
+                System.out.println(s);
             }
             enlazado.waitFor();
             System.out.println(ConsoleColors.YELLOW_BOLD_BRIGHT + "Proceso de ensamblado ("
@@ -130,6 +130,21 @@ public class Ensamblador {
             }
         }
         asm.add(".code");
+        asm.add("start PROC");
+        // Programa principal
+        npActual = 0; // Ya no se está en una subrutina
+        int i = 0;
+        while (i < c3d.size()) {
+            if (c3d.get(i).getOpCode() == OP.pmb) {
+                // Saltar los subprogramas
+                i = saltarSubprograma(i);
+            } else {
+                conversion(i);
+                i++;
+            }
+        }
+        asm.add("invoke ExitProcess, 0");
+        asm.add("start ENDP");
         // TODO Añadir las subrutinas propias del lenguaje (Input y Output)
         // Subrutinas definidas por el usuario
         for (int p = 5; p < tp.getNp(); p++) {
@@ -186,20 +201,7 @@ public class Ensamblador {
             }
             asm.add(pp + "  ENDP");
         }
-        asm.add("start:");
-        // Programa principal
-        npActual = 0; // Ya no se está en una subrutina
-        int i = 0;
-        while (i < c3d.size()) {
-            if (c3d.get(i).getOpCode() == OP.pmb) {
-                // Saltar los subprogramas
-                i = saltarSubprograma(i);
-            } else {
-                conversion(i);
-                i++;
-            }
-        }
-        asm.add("end start");
+        asm.add("END start");
     }
 
     private void conversion(int i) {
