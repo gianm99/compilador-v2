@@ -251,6 +251,7 @@ public class Ensamblador {
         Instruccion ins = c3d.get(i);
         switch (ins.getOpCode()) {
         case and:
+            // a = b and c
             a = tv.get(ins.destino());
             b = tv.get(ins.getOperando(1));
             c = tv.get(ins.getOperando(2));
@@ -268,6 +269,7 @@ public class Ensamblador {
             storeRegMem(a, "eax");
             break;
         case or:
+            // a = b or c
             a = tv.get(ins.destino());
             b = tv.get(ins.getOperando(1));
             c = tv.get(ins.getOperando(2));
@@ -285,6 +287,7 @@ public class Ensamblador {
             storeRegMem(a, "eax");
             break;
         case not:
+            // a = not b
             a = tv.get(ins.destino());
             b = tv.get(ins.getOperando(1));
             asm.add("xor eax, eax  ; EAX = 0");
@@ -297,6 +300,7 @@ public class Ensamblador {
             storeRegMem(a, "eax");
             break;
         case add:
+            // a = b + c
             a = tv.get(ins.destino());
             b = tv.get(ins.getOperando(1));
             c = tv.get(ins.getOperando(2));
@@ -344,6 +348,7 @@ public class Ensamblador {
             asm.add("sub eax, ebx");
             break;
         case div:
+            // a = b / c
             a = tv.get(ins.destino());
             b = tv.get(ins.getOperando(1));
             c = tv.get(ins.getOperando(2));
@@ -363,6 +368,7 @@ public class Ensamblador {
             storeRegMem(a, "eax");
             break;
         case mult:
+            // a = b * c
             a = tv.get(ins.destino());
             b = tv.get(ins.getOperando(1));
             c = tv.get(ins.getOperando(2));
@@ -380,6 +386,7 @@ public class Ensamblador {
             storeRegMem(a, "eax");
             break;
         case copy:
+            // a = b
             a = tv.get(ins.destino());
             b = tv.get(ins.getOperando(1));
             if (b == null) {
@@ -392,12 +399,15 @@ public class Ensamblador {
             storeRegMem(a, "eax");
             break;
         case skip:
+            // e: skip
             asm.add(ins.destino() + " :");
             break;
         case jump:
+            // goto e
             asm.add("jmp " + ins.destino());
             break;
         case ifEQ:
+            // if a == b goto e
             a = tv.get(ins.getOperando(1));
             b = tv.get(ins.getOperando(2));
             if (a != null) {
@@ -414,6 +424,7 @@ public class Ensamblador {
             asm.add("je " + ins.destino());
             break;
         case ifNE:
+            // if a != b goto e
             a = tv.get(ins.getOperando(1));
             b = tv.get(ins.getOperando(2));
             if (a != null) {
@@ -430,6 +441,7 @@ public class Ensamblador {
             asm.add("jne " + ins.destino());
             break;
         case ifGE:
+            // if a >= b goto e
             a = tv.get(ins.getOperando(1));
             b = tv.get(ins.getOperando(2));
             if (a != null) {
@@ -446,6 +458,7 @@ public class Ensamblador {
             asm.add("jge " + ins.destino());
             break;
         case ifGT:
+            // if a > b goto e
             a = tv.get(ins.getOperando(1));
             b = tv.get(ins.getOperando(2));
             if (a != null) {
@@ -462,6 +475,7 @@ public class Ensamblador {
             asm.add("jg " + ins.destino());
             break;
         case ifLT:
+            // if a <= b goto e
             a = tv.get(ins.getOperando(1));
             b = tv.get(ins.getOperando(2));
             if (a != null) {
@@ -478,6 +492,7 @@ public class Ensamblador {
             asm.add("jl " + ins.destino());
             break;
         case ifLE:
+            // if a < b goto e
             a = tv.get(ins.getOperando(1));
             b = tv.get(ins.getOperando(2));
             if (a != null) {
@@ -494,16 +509,19 @@ public class Ensamblador {
             asm.add("jle " + ins.destino());
             break;
         case call:
+            // call ne
             int numpar4 = tp.get(ins.destino()).getNumParams() * 4;
             asm.add("call " + ins.destino());
             asm.add("add esp, " + numpar4);
             break;
-        case params: // TODO Decidir el método de paso de parámetros
+        case params:
+            // params a
             a = tv.get(ins.destino());
             loadAddrReg("eax", a); // No puede ser un literal
             asm.add("push eax");
             break;
         case st:
+            // store a
             a = tv.get(ins.destino());
             storeRegMem(a, "eax");
             break;
