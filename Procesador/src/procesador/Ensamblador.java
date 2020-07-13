@@ -146,6 +146,49 @@ public class Ensamblador {
         asm.add("invoke ExitProcess, 0");
         asm.add("start ENDP");
         // TODO Añadir las subrutinas propias del lenguaje (Input y Output)
+        asm.add("printINT$3:");
+        asm.add("mov esi, OFFSET DISP    ; ESI = @ DISP");
+        asm.add("push [esi]");
+        asm.add("push ebp");
+        asm.add("mov ebp, esp            ; BP = SP");
+        asm.add("mov [esi], ebp          ; DISP(prof4x) = BP");
+        asm.add("sub esp, 12             ; reservar espacio para el string buffer");
+        asm.add("mov esi, [ebp+12]");
+        asm.add("mov eax, [esi]          ; mover a eax el int a imprimir");
+        asm.add("lea edi, [ebp-12]       ; mover a edi la dirección del string buffer");
+        asm.add("call EAX_to_DEC");
+        asm.add("lea edi, [ebp-12]");
+        asm.add("invoke StdOut, edi");
+        asm.add("mov esp, ebp");
+        asm.add("pop ebp");
+        asm.add("mov edi, OFFSET DISP");
+        asm.add("pop [edi]");
+        asm.add("ret");
+        // Función para convertir de integer a ascii
+        asm.add("EAX_to_DEC PROC         ; ARG: EDI pointer to string buffer");
+        asm.add("test eax, eax           ; Test if number is less than zero");
+        asm.add("jnl non_negative");
+        asm.add("neg eax");
+        asm.add("mov byte ptr [edi], '-'");
+        asm.add("inc edi");
+        asm.add("non_negative:");
+        asm.add("mov ebx, 10             ; Divisor = 10");
+        asm.add("xor ecx, ecx            ; ECX=0 (digit counter)");
+        asm.add("@@:                     ; First Loop: store the remainders");
+        asm.add("xor edx, edx");
+        asm.add("div ebx                 ; EDX:EAX / EBX = EAX remainder EDX");
+        asm.add("push dx                 ; push the digit in DL (LIFO)");
+        asm.add("add cl,1                ; = inc cl (digit counter)");
+        asm.add("or  eax, eax            ; AX == 0?");
+        asm.add("jnz @B                  ; no: once more (jump to the first @@ above)");
+        asm.add("@@:                       ; Second loop: load the remainders in reversed order");
+        asm.add("pop ax                  ; get back pushed digits");
+        asm.add("or al, 00110000b        ; to ASCII");
+        asm.add("stosb                   ; Store AL to [EDI] (EDI is a pointer to a buffer)");
+        asm.add("loop @B                 ; until there are no digits left");
+        asm.add("mov byte ptr [edi], 0   ; ASCIIZ terminator (0)");
+        asm.add("ret                     ; RET: EDI pointer to ASCIIZ-string");
+        asm.add("EAX_to_DEC ENDP");
         // Subrutinas definidas por el usuario
         for (int p = 5; p <= tp.getNp(); p++) {
             npActual = p; // La subrutina actual
