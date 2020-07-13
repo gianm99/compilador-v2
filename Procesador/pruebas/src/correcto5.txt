@@ -1,6 +1,6 @@
 var int t=1;
 if(t==1) {
-    printINT(t);
+    printi(t);
 } else {
-    printINT(0);
+    printi(0);
 }

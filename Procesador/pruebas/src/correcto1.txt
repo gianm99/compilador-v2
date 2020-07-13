@@ -11,7 +11,7 @@ func boolean function1(string str, int i, boolean foo){
 	var boolean b;
 	proc prueba(){
 		var int asdf=89;
-		printINT(5);
+		printi(5);
 	}
 	a = 5;
 	b=foo;
@@ -29,7 +29,7 @@ func int funcion2() {
 }
 
 proc main(){
-	printINT(c);
+	printi(c);
 }
 var int z = 2+10;
 var int y = 0;
@@ -38,7 +38,7 @@ if(3>5){
 	a=78;
 	z=z/8+z+89*58;
 }
-printINT(z);
+printi(z);
 main();
 par = function1("HOLA",89,true);
 y=funcion2();
