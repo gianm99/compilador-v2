@@ -1,5 +1,10 @@
 package procesador;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 
 /**
@@ -11,6 +16,7 @@ public class TablaVariables {
 
     private ArrayList<Variable> tv;
     private int nv;
+    private static Writer buffer;
 
     public TablaVariables(String directorio) {
         tv = new ArrayList<Variable>();
@@ -37,11 +43,11 @@ public class TablaVariables {
     public void quitarVar(ArrayList<Instruccion> var) {
         int i = 0;
         while (i < var.size()) {
-            if (get(var.get(i).destino()).getTsub() != Simbolo.TSub.STRING){
+            if (get(var.get(i).destino()).getTsub() != Simbolo.TSub.STRING) {
                 quitarVar(var.get(i).destino());
                 var.remove(i);
             } else {
-                i++; 
+                i++;
             }
         }
     }
@@ -86,5 +92,65 @@ public class TablaVariables {
 
     public void setNv(int nv) {
         this.nv = nv;
+    }
+
+    public void tablaHTML(String directorio) {
+        try {
+            File tsFile = new File(directorio);
+            buffer = new BufferedWriter(new FileWriter(tsFile));
+            String tabla =
+                    "<!DOCTYPE html><html><head><head><style>table, th, td {  border: 1px solid black;  border-collapse: collapse;}th, td {  padding: 5px;  text-align: center;}</style></head><body><table style=\"width:100%; background-color:#727272; font-family:'Courier New'\"><tr style=\"color:white\"><th>tsub</th><th>nombre</th><th>temporal</th> <th>proc</th><th>tipo</th><th>valor</th><th>ocup</th><th>desp</th><th>nparam</th></tr>";
+            Variable var;
+            String valor, proc, nparam, desp;
+            for (int i = 0; i < tv.size(); i++) {
+                var = tv.get(i);
+                tabla += "<tr style=\"background-color:";
+                switch (var.getTsub()) {
+                    case STRING:
+                        tabla += "#D1BCFF\">";
+                        break;
+                    case INT:
+                        tabla += "#FFD1BC\">";
+                        break;
+                    case BOOLEAN:
+                        tabla += "#BCFFD1\">";
+                        break;
+                    case NULL:
+                        tabla += "#D6A384\">";
+                        break;
+                }
+                if(var.getValor() != null){
+                    valor = var.getValor();
+                } else {
+                    valor = "-";
+                }
+                if(var.proc() != 0){
+                    proc = String.valueOf(var.proc());
+                } else {
+                    proc = "-";
+                }
+                if(var.getNparam() != 0){
+                    nparam = String.valueOf(var.getNparam());
+                } else {
+                    nparam = "-";
+                }
+                if(var.getDesp() != 0){
+                    desp = String.valueOf(var.getDesp());
+                } else {
+                    desp = "-";
+                }
+                if (!var.isBorrada())
+                    tabla += "<td>" + var.getTsub() + "</td><td>" + var.toString() + "</td><td>"
+                            + var.isTemporal() + "</td><td>" + proc + "</td><td>" + var.tipo()
+                            + "</td><td>" + valor + "</td><td>" + var.getOcup()
+                            + "</td><td>" + desp + "</td><td>" + nparam
+                            + "</td></tr>";
+            }
+            tabla += "</table></body></html>";
+            buffer.write(tabla);
+            buffer.close();
+        } catch (IOException e) {
+            System.out.println("Error escribiendo la tabla de variables: " + e.getMessage());
+        }
     }
 }

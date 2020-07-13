@@ -28,33 +28,32 @@ public class Optimizador {
         this.te = te;
     }
 
-    private void C3DquitarInstruccion(int posicion){
-        if(C3D.get(posicion).isInstFinal()){
+    private void C3DquitarInstruccion(int posicion) {
+        if (C3D.get(posicion).isInstFinal()) {
             C3D.get(posicion - 1).setInstFinal(true);
-        } 
-        C3D.remove(posicion);  
+        }
+        C3D.remove(posicion);
     }
 
-    private void C3DquitarInstruccion(Instruccion ins){
+    private void C3DquitarInstruccion(Instruccion ins) {
         int posicion = C3D.indexOf(ins);
-        if (C3D.get(posicion).isInstFinal()){
+        if (C3D.get(posicion).isInstFinal()) {
             C3D.get(posicion - 1).setInstFinal(true);
         } else {
             C3D.remove(posicion);
-        }   
+        }
     }
 
     public void optimizar() {
         eliminaCodigoInaccesibleIf();
+        optimizarIfBoolean();
+        optimizarIfNegandoCond();
         eliminaEtiquetasInnecesarias();
         eliminaCodigoInaccesibleEntreEtiquetas();
         eliminaAsignacionesInnecesarias();
         reasignarLineaEtiqueta();
-        // TODO revisar optimizaciones para que se asigne la instrucción final de un subprograma si
-        // se cambia el código de esta
         tv.calculoDespOcupVL(tp);
         imprimirC3D();
-        //int a = 0;
     }
 
     /**
@@ -78,12 +77,27 @@ public class Optimizador {
     /**
      * Comprueba y optimiza el código C3D de los IF con valores sabidos en tiempo de compilación
      */
-    public void eliminaCodigoInaccesibleIf() {
+    private void eliminaCodigoInaccesibleIf() {
         for (int i = 0; i < C3D.size(); i++) {
             Instruccion ins = C3D.get(i);
             if (esIf(ins)) {
                 if (operandosConstantes(ins)) {
                     i += ejecutaIf(ins, i);
+                }
+            }
+        }
+    }
+
+    private void optimizarIfBoolean() {
+        for (int i = 0; i < C3D.size(); i++) {
+            Instruccion ins = C3D.get(i);
+            if (esIf(ins)) {
+                Variable operando1 = tv.get(ins.getOperando(1));
+                if (operando1.getTsub() == Simbolo.TSub.BOOLEAN && operando1 != null) {
+                    ArrayList<Instruccion> arrayaux = new ArrayList<Instruccion>();
+                    arrayaux.add(new Instruccion(OP.copy, C3D.get(i).getOperando(1), "",
+                            C3D.get(i + 3).destino()));
+                    reemplazaCodigo(arrayaux, i, i + 7);
                 }
             }
         }
@@ -278,7 +292,41 @@ public class Optimizador {
         }
         te.getTe().clear();
         te.getTe().addAll(teaux);
-;    }
+    }
+
+    private void optimizarIfNegandoCond() {
+        for (int i = 0; i < C3D.size(); i++) {
+            Instruccion ins = C3D.get(i);
+            if (esIf(ins)) {
+                if (!operandosConstantes(ins)) {
+                    switch (ins.getOpCode()) {
+                        case ifLT:
+                            C3D.get(i).setOpCode(OP.ifGE);
+                            break;
+                        case ifLE:
+                            C3D.get(i).setOpCode(OP.ifGT);
+                            break;
+                        case ifEQ:
+                            C3D.get(i).setOpCode(OP.ifNE);
+                            break;
+                        case ifNE:
+                            C3D.get(i).setOpCode(OP.ifEQ);
+                            break;
+                        case ifGE:
+                            C3D.get(i).setOpCode(OP.ifLT);
+                            break;
+                        case ifGT:
+                            C3D.get(i).setOpCode(OP.ifLE);
+                            break;
+                        default:
+                            break;
+                    }
+                    C3D.get(i).setOperando(3, C3D.get(i + 1).destino());
+                    C3DquitarInstruccion(i + 1);
+                }
+            }
+        }
+    }
 
     /*
      *
@@ -351,11 +399,11 @@ public class Optimizador {
      */
     private void reemplazaCodigo(ArrayList<Instruccion> codigoR, int empieza, int acaba) {
         List<Instruccion> sublistacodigo = this.C3D.subList(empieza, acaba);
-        for(int i = 0; i< sublistacodigo.size();i++){
-            if(sublistacodigo.get(i).isInstFinal()){
+        for (int i = 0; i < sublistacodigo.size(); i++) {
+            if (sublistacodigo.get(i).isInstFinal()) {
                 codigoR.get(codigoR.size() - 1).setInstFinal(true);
                 break;
-            }       
+            }
         }
         sublistacodigo.clear();
         if (codigoR != null)

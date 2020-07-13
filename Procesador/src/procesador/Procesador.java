@@ -72,9 +72,12 @@ public class Procesador {
                 parserC3D.getTv(), parserC3D.getTp());
         normal.ensamblar();
         // Optimización de código
+        parserC3D.getTv().tablaHTML(buildPath + "/tablavariables.html");
+        parserC3D.getTp().tablaHTML(buildPath + "/tablaprocedimientos.html");
         Optimizador optimizador = new Optimizador(buildPath + filename + "_OPT", parserC3D.getC3D(),
                 parserC3D.getTv(), parserC3D.getTp(), parserC3D.getTe());
         optimizador.optimizar();
+        optimizador.getTv().tablaHTML(buildPath + "/tablavariables_OPT.html");
         // Ensamblado de código optimizado
         // Ensamblador optimizado = new Ensamblador(buildPath + filename + "_OPT",
         //         optimizador.getC3D(), optimizador.getTv(), optimizador.getTp());
