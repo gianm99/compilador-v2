@@ -197,6 +197,7 @@ public class Ensamblador {
             asm.add(pp + ":");
             // pmb
             int prof4x = tp.get(p).getProf() * 4;
+            asm.add("mov  esi, OFFSET DISP  ; ESI = @DISP");
             asm.add("push [esi+" + prof4x + "]");
             asm.add("push ebp");
             asm.add("mov ebp, esp  ; BP = SP");
@@ -345,6 +346,7 @@ public class Ensamblador {
                 asm.add("mov ebx, " + ins.getOperando(1));
             }
             asm.add("sub eax, ebx");
+            storeRegMem(a, "eax");
             break;
         case div:
             // a = b / c
