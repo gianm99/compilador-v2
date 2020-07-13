@@ -193,8 +193,8 @@ public class Ensamblador {
         for (int p = 5; p <= tp.getNp(); p++) {
             npActual = p; // La subrutina actual
             Procedimiento pp = tp.get(p);
-            asm.add(pp + "  PROC");
             int l = pp.getInicio().getNl();
+            asm.add(pp + ":");
             // pmb
             int prof4x = tp.get(p).getProf() * 4;
             asm.add("push [esi+" + prof4x + "]");
@@ -241,7 +241,6 @@ public class Ensamblador {
                     }
                 }
             }
-            asm.add(pp + "  ENDP");
         }
         asm.add("END start");
     }
