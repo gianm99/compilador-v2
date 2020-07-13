@@ -123,7 +123,7 @@ public class Ensamblador {
         // DISP
         asm.add("DISP  DW  1000 DUP (?)");
         // Variables globales
-        for (int x = 1; x < tv.getNv(); x++) {
+        for (int x = 1; x <= tv.getNv(); x++) {
             Variable vx = tv.get(x);
             if (vx.tipo() == Simbolo.Tipo.VAR && !vx.isBorrada() && vx.proc() == 0) {
                 asm.add(vx + "  DD  ?");
@@ -147,26 +147,25 @@ public class Ensamblador {
         asm.add("start ENDP");
         // TODO Añadir las subrutinas propias del lenguaje (Input y Output)
         // Subrutinas definidas por el usuario
-        for (int p = 5; p < tp.getNp(); p++) {
+        for (int p = 5; p <= tp.getNp(); p++) {
             npActual = p; // La subrutina actual
             Procedimiento pp = tp.get(p);
-            int i = pp.getInicio().getNl();
             asm.add(pp + "  PROC");
+            int l = pp.getInicio().getNl();
             // pmb
             int prof4x = tp.get(p).getProf() * 4;
-            asm.add("lea  esi, DISP  ; ESI = @DISP");
             asm.add("push [esi+" + prof4x + "]");
             asm.add("push ebp");
             asm.add("mov ebp, esp  ; BP = SP");
             asm.add("mov [esi+" + prof4x + "], ebp  ; DISP(prof) = BP");
             asm.add("sub esp, " + pp.getOcupVL()
                     + "  ; reserva memoria para las variables locales");
-            i++;
+            l++;
             while (true) {
-                Instruccion ins = c3d.get(i);
+                Instruccion ins = c3d.get(l);
                 if (ins.getOpCode() == OP.pmb) {
                     // Saltar las declaraciones de subrutinas locales
-                    i = saltarSubprograma(i);
+                    l = saltarSubprograma(l);
                 } else {
                     if (ins.getOpCode() == OP.ret) {
                         // Caso del return
@@ -188,14 +187,14 @@ public class Ensamblador {
                         asm.add("ret");
                     } else {
                         // El resto de instrucciones
-                        conversion(i);
+                        conversion(l);
                     }
                     if (ins.isInstFinal()) {
                         // Si es la última instrucción, sale del bucle
                         break;
                     } else {
                         // Si no, continua
-                        i++;
+                        l++;
                     }
                 }
             }
