@@ -121,7 +121,7 @@ public class Ensamblador {
         }
         asm.add(".data?");
         // DISP
-        asm.add("DISP  DW  1000 DUP (?)");
+        asm.add("\tDISP  DW  1000 DUP (?)");
         // Variables globales
         for (int x = 1; x <= tv.getNv(); x++) {
             Variable vx = tv.get(x);
@@ -143,7 +143,7 @@ public class Ensamblador {
                 i++;
             }
         }
-        asm.add("invoke ExitProcess, 0");
+        asm.add("\tinvoke ExitProcess, 0");
         asm.add("start ENDP");
         // TODO Añadir las subrutinas propias del lenguaje (Input y Output)
         asm.add("printINT$3:");
@@ -164,6 +164,21 @@ public class Ensamblador {
         asm.add("mov edi, OFFSET DISP");
         asm.add("pop [edi]");
         asm.add("ret");
+        // Función para imprimir un string
+        asm.add("prints$4:");
+        asm.add("\tmov esi, OFFSET DISP    ; ESI = @ DISP");
+        asm.add("\tpush [esi]");
+        asm.add("\tpush ebp");
+        asm.add("\tmov ebp, esp            ; BP = SP");
+        asm.add("\tmov [esi], ebp          ; DISP(prof4x) = BP");
+        asm.add("\tmov esi, [ebp+12]");
+        asm.add("\tmov edi, [esi]          ; mover a edi la dirección del string");
+        asm.add("\tinvoke StdOut, edi");
+        asm.add("\tmov esp, ebp");
+        asm.add("\tpop ebp");
+        asm.add("\tmov edi, OFFSET DISP");
+        asm.add("\tpop [edi]");
+        asm.add("\tret");
         // Función para convertir de integer a ascii
         asm.add("EAX_to_DEC PROC         ; ARG: EDI pointer to string buffer");
         asm.add("test eax, eax           ; Test if number is less than zero");
