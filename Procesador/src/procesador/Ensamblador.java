@@ -145,7 +145,8 @@ public class Ensamblador {
         }
         asm.add("\tinvoke ExitProcess, 0");
         asm.add("start ENDP");
-        // TODO Añadir las subrutinas propias del lenguaje (Input y Output)
+        // TODO Añadir la subrutina de input
+        // Función para leer un string
         asm.add("read$1:");
         asm.add("\tret");
         // Función para imprimir un boolean
