@@ -81,7 +81,7 @@ public class TablaVariables {
                 int ocupx = vx.getOcup();
                 Procedimiento pp = tp.get(p);
                 pp.setOcupVL(pp.getOcupVL() + ocupx);
-                vx.setDesp(-pp.getOcupVL()); // TODO Preguntar a Pere Palmer esto
+                vx.setDesp(-pp.getOcupVL());
             }
         }
     }

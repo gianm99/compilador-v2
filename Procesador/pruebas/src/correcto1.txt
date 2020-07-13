@@ -4,13 +4,14 @@ const int asdf=32;
 const boolean VERDAD=true;
 var string s2 = s1;
 var int c=a;
-var boolean par = true;
+# var boolean par = VERDAD && (false || true);
+var boolean par = VERDAD;
 func boolean function1(string str, int i, boolean foo){
 	var int a = 2;
 	var boolean b;
 	proc prueba(){
 		var int asdf=89;
-		printINT(5);
+		printi(5);
 	}
 	a = 5;
 	b=foo;
@@ -28,16 +29,16 @@ func int funcion2() {
 }
 
 proc main(){
-	printINT(c);
+	printi(c);
 }
 var int z = 2+10;
 var int y = 0;
-y=funcion2();
 if(3>5){
 	var boolean b;
 	a=78;
 	z=z/8+z+89*58;
 }
-printINT(z);
+printi(z);
 main();
 par = function1("HOLA",89,true);
+y=funcion2();

@@ -8,8 +8,9 @@ public class Instruccion {
     private String[] instruccion = new String[4];
     private boolean instFinal;
 
+    // TODO Crear nueva operación 'store'
     public enum OP {
-        copy, add, sub, mult, div, neg, and, or, not, skip, ifLT, ifLE, ifEQ, ifNE, ifGE, ifGT, jump, LT, LE, EQ, NEQ, GE, GT, pmb, call, ret, params
+        copy, add, sub, mult, div, neg, and, or, not, skip, ifLT, ifLE, ifEQ, ifNE, ifGE, ifGT, jump, pmb, call, ret, st, params
     }
 
     public Instruccion(OP opCode, String op1, String op2, String op3) {
@@ -43,14 +44,6 @@ public class Instruccion {
         case copy:
             s = instruccion[3] + " " + instruccion[0] + " " + instruccion[1];
             break;
-        case LT:
-        case LE:
-        case EQ:
-        case NEQ:
-        case GE:
-        case GT:
-            s = instruccion[1] + " " + instruccion[0] + " " + instruccion[2];
-            break;
         case neg:
             s = instruccion[3] + " = " + instruccion[0] + instruccion[1];
             break;
@@ -81,11 +74,12 @@ public class Instruccion {
         case params:
             s = instruccion[0] + " " + instruccion[3];
             break;
+        case st:
+            s = instruccion[0] + " " + instruccion[3];
+            break;
         }
         return s;
     }
-
-
 
     public String[] getInstruccion() {
         return instruccion;
@@ -115,7 +109,7 @@ public class Instruccion {
         return opCode;
     }
 
-    public void setOpCode(OP op){
+    public void setOpCode(OP op) {
         this.opCode = op;
         switch (opCode) {
             case add:
@@ -199,8 +193,6 @@ public class Instruccion {
                 break;
         }
     }
-
-
 
     @Override
     public boolean equals(Object obj) {

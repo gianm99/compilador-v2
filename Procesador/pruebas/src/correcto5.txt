@@ -1,0 +1,6 @@
+var int t=1;
+if(t==1) {
+    printi(t);
+} else {
+    printi(0);
+}
