@@ -112,21 +112,23 @@ public class Ensamblador {
             }
         }
         asm.add(".data");
+        asm.add("\tinputPtr DD offset inputBuffer"); // Variable para control de input
         // Strings constantes
         for (int x = 1; x <= tv.getNv(); x++) {
             Variable vx = tv.get(x);
             if (vx.tipo() == Simbolo.Tipo.CONST && vx.getTsub() == Simbolo.TSub.STRING) {
-                asm.add(vx + "  DB  " + vx.getValor() + ",0");
+                asm.add("\t" + vx + "  DB  " + vx.getValor() + ",0");
             }
         }
         asm.add(".data?");
+        asm.add("inputBuffer db 65536 dup(?)"); // Buffer del input (256^2 bytes)
         // DISP
         asm.add("\tDISP  DW  1000 DUP (?)");
         // Variables globales
         for (int x = 1; x <= tv.getNv(); x++) {
             Variable vx = tv.get(x);
             if (vx.tipo() == Simbolo.Tipo.VAR && !vx.isBorrada() && vx.proc() == 0) {
-                asm.add(vx + "  DD  ?");
+                asm.add("\t" + vx + "  DD  ?");
             }
         }
         asm.add(".code");
@@ -145,9 +147,33 @@ public class Ensamblador {
         }
         asm.add("\tinvoke ExitProcess, 0");
         asm.add("start ENDP");
-        // TODO Añadir la subrutina de input
         // Función para leer un string
         asm.add("read$1:");
+        asm.add("\tmov esi, OFFSET DISP    ; ESI = @ DISP");
+        asm.add("\tpush [esi]");
+        asm.add("\tpush ebp");
+        asm.add("\tmov ebp, esp            ; BP = SP");
+        asm.add("\tmov [esi], ebp          ; DISP(prof4x) = BP");
+        asm.add("\tsub esp, 4");
+        asm.add("\tpush 254");
+        asm.add("\tpush inputPtr");
+        asm.add("\tcall StdIn");
+        asm.add("\tpush inputPtr");
+        asm.add("\tcall strlen");
+        asm.add("\tmov [ebp-4], eax        ; guardar resultado de strlen");
+        asm.add("\tmov eax, inputPtr       ; guardar el inputPtr");
+        asm.add("\tmov ebx, eax            ; preparar comprobacion");
+        asm.add("\tadd ebx, [ebp-4]        ; sumar longitud del string");
+        asm.add("\tsub ebx, OFFSET inputBuffer");
+        asm.add("\tcmp ebx, SIZEOF inputBuffer");
+        asm.add("\tjl @F                   ; comprobar direccion");
+        asm.add("\tmov ebx, OFFSET inputBuffer");
+        asm.add("\tmov inputPtr, ebx       ; reiniciar puntero");
+        asm.add("@@:");
+        asm.add("\tmov esp, ebp");
+        asm.add("\tpop ebp");
+        asm.add("\tmov edi, OFFSET DISP");
+        asm.add("\tpop [edi]");
         asm.add("\tret");
         // Función para imprimir un boolean
         asm.add("printb$2:");
@@ -217,6 +243,7 @@ public class Ensamblador {
         asm.add("\tmov edi, OFFSET DISP");
         asm.add("\tpop [edi]");
         asm.add("\tret");
+        // Funciones necesarias para las funciones de input/output
         // Función para convertir de integer a ascii
         asm.add("EAX_to_DEC PROC         ; ARG: EDI pointer to string buffer");
         asm.add("\ttest eax, eax           ; Test if number is less than zero");
@@ -242,6 +269,28 @@ public class Ensamblador {
         asm.add("\tmov byte ptr [edi], 0   ; ASCIIZ terminator (0)");
         asm.add("\tret                     ; RET: EDI pointer to ASCIIZ-string");
         asm.add("EAX_to_DEC ENDP");
+        // Función que calcula la longitud de un string
+        asm.add("strlen:");
+        asm.add("\tmov esi, OFFSET DISP    ; ESI = @ DISP");
+        asm.add("\tpush [esi]");
+        asm.add("\tpush ebp");
+        asm.add("\tmov ebp, esp            ; BP = SP");
+        asm.add("\tmov [esi], ebp          ; DISP(prof4x) = BP");
+        asm.add("\tmov esi, [ebp+12]");
+        asm.add("\txor eax, eax");
+        asm.add("\tloop_len:");
+        asm.add("\tmov ebx, [esi]");
+        asm.add("\tcmp ebx, 0");
+        asm.add("\tje done");
+        asm.add("\tinc esi");
+        asm.add("\tinc eax");
+        asm.add("\tjmp loop_len");
+        asm.add("\tdone:");
+        asm.add("\tmov esp, ebp");
+        asm.add("\tpop ebp");
+        asm.add("\tmov edi, OFFSET DISP");
+        asm.add("\tpop [edi]");
+        asm.add("\tret");
         // Subrutinas definidas por el usuario
         for (int p = 5; p <= tp.getNp(); p++) {
             npActual = p; // La subrutina actual
