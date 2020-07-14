@@ -134,24 +134,6 @@ public class Instruccion {
             case copy:
                 instruccion[0] = "=";
                 break;
-            case LT:
-                instruccion[0] = "<";
-                break;
-            case LE:
-                instruccion[0] = "<=";
-                break;
-            case EQ:
-                instruccion[0] = "==";
-                break;
-            case NEQ:
-                instruccion[0] = "!=";
-                break;
-            case GE:
-                instruccion[0] = ">=";
-                break;
-            case GT:
-                instruccion[0] = ">";
-                break;
             case not:
                 instruccion[0] = "!";
                 break;
