@@ -8,7 +8,8 @@ import java.io.Writer;
 import java.util.ArrayList;
 
 /**
- * TablaVariable. Clase que sirve para almacenar las variables que aparecen en el código.
+ * TablaVariable. Clase que sirve para almacenar las variables que aparecen en
+ * el código.
  * 
  * @author Gian Lucas Martín Chamorro
  */
@@ -66,9 +67,11 @@ public class TablaVariables {
     }
 
     /**
-     * Calcula el desp de todas las variables y el ocupVL de todos los procedimientos.
+     * Calcula el desp de todas las variables y el ocupVL de todos los
+     * procedimientos.
      * 
-     * @param tp La tabla de procedimientos que actualiza.
+     * @param tp
+     *               La tabla de procedimientos que actualiza.
      */
     public void calculoDespOcupVL(TablaProcedimientos tp) {
         for (int p = 1; p <= tp.getNp(); p++) {
@@ -98,43 +101,48 @@ public class TablaVariables {
         try {
             File tsFile = new File(directorio);
             buffer = new BufferedWriter(new FileWriter(tsFile));
-            String tabla =
-                    "<!DOCTYPE html><html><head><head><style>table, th, td {  border: 1px solid black;  border-collapse: collapse;}th, td {  padding: 5px;  text-align: center;}</style></head><body><table style=\"width:100%; background-color:#727272; font-family:'Courier New'\"><tr style=\"color:white\"><th>tsub</th><th>nombre</th><th>temporal</th> <th>proc</th><th>tipo</th><th>valor</th><th>ocup</th><th>desp</th><th>nparam</th></tr>";
+            String tabla = "<!DOCTYPE html><html><head><head><style>table, th, td {  border: 1px solid\n"
+                    + " black;  border-collapse: collapse;}th, td {  padding: 5px;  text-align:\n"
+                    + " center;}</style></head><body><table style=\"width:100%; \n"
+                    + "background-color:#727272; font-family:'Courier New'\"><tr \n"
+                    + "style=\"color:white\"><th>tsub</th><th>nombre</th><th>temporal</th>\n"
+                    + " <th>proc</th><th>tipo</th><th>valor</th><th>ocup</th>\n"
+                    + "<th>desp</th><th>nparam</th></tr>";
             Variable var;
             String valor, proc, nparam, desp;
             for (int i = 0; i < tv.size(); i++) {
                 var = tv.get(i);
                 tabla += "<tr style=\"background-color:";
                 switch (var.getTsub()) {
-                    case STRING:
-                        tabla += "#D1BCFF\">";
-                        break;
-                    case INT:
-                        tabla += "#FFD1BC\">";
-                        break;
-                    case BOOLEAN:
-                        tabla += "#BCFFD1\">";
-                        break;
-                    case NULL:
-                        tabla += "#D6A384\">";
-                        break;
+                case STRING:
+                    tabla += "#D1BCFF\">";
+                    break;
+                case INT:
+                    tabla += "#FFD1BC\">";
+                    break;
+                case BOOLEAN:
+                    tabla += "#BCFFD1\">";
+                    break;
+                case NULL:
+                    tabla += "#D6A384\">";
+                    break;
                 }
-                if(var.getValor() != null){
+                if (var.getValor() != null) {
                     valor = var.getValor();
                 } else {
                     valor = "-";
                 }
-                if(var.proc() != 0){
+                if (var.proc() != 0) {
                     proc = String.valueOf(var.proc());
                 } else {
                     proc = "-";
                 }
-                if(var.getNparam() != 0){
+                if (var.getNparam() != 0) {
                     nparam = String.valueOf(var.getNparam());
                 } else {
                     nparam = "-";
                 }
-                if(var.getDesp() != 0){
+                if (var.getDesp() != 0) {
                     desp = String.valueOf(var.getDesp());
                 } else {
                     desp = "-";
@@ -142,9 +150,8 @@ public class TablaVariables {
                 if (!var.isBorrada())
                     tabla += "<td>" + var.getTsub() + "</td><td>" + var.toString() + "</td><td>"
                             + var.isTemporal() + "</td><td>" + proc + "</td><td>" + var.tipo()
-                            + "</td><td>" + valor + "</td><td>" + var.getOcup()
-                            + "</td><td>" + desp + "</td><td>" + nparam
-                            + "</td></tr>";
+                            + "</td><td>" + valor + "</td><td>" + var.getOcup() + "</td><td>" + desp
+                            + "</td><td>" + nparam + "</td></tr>";
             }
             tabla += "</table></body></html>";
             buffer.write(tabla);
