@@ -79,8 +79,10 @@ public void backpatch(Deque<Integer> lista, Etiqueta e){
 }
 
 public Deque<Integer> concat(Deque<Integer> dq1, Deque<Integer> dq2){
-	if(dq2!=null) {
-		while(dq2.size()>0){
+	if(dq1==null) {
+		return dq2;
+	} else if(dq2!=null) {
+		while(dq2.size()>0) {
 			dq1.add(dq2.removeFirst());
 		}
 	}
