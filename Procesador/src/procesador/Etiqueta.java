@@ -6,13 +6,12 @@ package procesador;
  * @author Gian Lucas Martín Chamorro
  */
 public class Etiqueta {
-    private int nl; // Número de línea
     private int ne; // Número de etiqueta
-    private static int ce = 0; // Cantidad de etiquetas
+    private int linea; // Número de línea
 
-    public Etiqueta() {
-        ce++; // Aumenta la cantidad de etiquetas generadas
-        ne = ce; // Asigna el número de etiqueta
+    public Etiqueta(int ne) {
+        this.ne = ne; // Asigna el número de etiqueta
+        this.linea= 0; // Al principio la línea no está asignada
     }
 
     public static int get(String etiqueta) {
@@ -23,12 +22,12 @@ public class Etiqueta {
         return ne;
     }
 
-    public int getNl() {
-        return nl;
+    public int getLinea() {
+        return linea;
     }
 
-    public void setNl(int nl) {
-        this.nl = nl;
+    public void setLinea(int linea) {
+        this.linea = linea;
     }
 
     @Override

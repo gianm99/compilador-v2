@@ -8,7 +8,8 @@ import java.io.IOException;
 import java.io.Writer;
 
 /**
- * TablaProcedimientos. Clase que sirve para almacenar los procedimientos que aparecen en el código.
+ * TablaProcedimientos. Clase que sirve para almacenar los procedimientos que
+ * aparecen en el código.
  * 
  * @author Gian Lucas Martín Chamorro
  */
@@ -58,34 +59,35 @@ public class TablaProcedimientos {
         try {
             File tsFile = new File(directorio);
             buffer = new BufferedWriter(new FileWriter(tsFile));
-            String tabla =
-                    "<!DOCTYPE html><html><head><head><style>table, th, td {  border: 1px solid black;  border-collapse: collapse;}th, td {  padding: 5px;  text-align: center;}</style></head><body><table style=\"width:100%; background-color:#727272; font-family:'Courier New'\"><tr style=\"color:white\"><th>tipo</th><th>nombre</th><th>prof</th><th>inicio</th><th>numParams</th><th>ocupVL</th></tr>";
+            String tabla = "<!DOCTYPE html><html><head><head><style>table, th, td {  border: 1px solid black;  border-collapse: collapse;}th, td {  padding: 5px;  text-align: center;}</style></head><body><table style=\"width:100%; background-color:#727272; font-family:'Courier New'\"><tr style=\"color:white\"><th>tipo</th><th>nombre</th><th>prof</th><th>inicio</th><th>numParams</th><th>ocupVL</th></tr>";
             Procedimiento proc;
             String inicio, numParams;
             for (int i = 0; i < tp.size(); i++) {
                 proc = tp.get(i);
                 tabla += "<tr style=\"background-color:";
                 switch (proc.getTipo()) {
-                    case FUNC:
-                        tabla += "#D1BCFF\">";
-                        break;
-                    case PROC:
-                        tabla += "#FFD1BC\">";
-                        break;
+                case FUNC:
+                    tabla += "#D1BCFF\">";
+                    break;
+                case PROC:
+                    tabla += "#FFD1BC\">";
+                    break;
+                default:
+                    break;
                 }
-                if(proc.getInicio() != null){
-                    inicio = proc.getInicio().toString();
+                if (proc.getInicio() != 0) {
+                    inicio = String.valueOf(proc.getInicio());
                 } else {
                     inicio = "-";
                 }
-                if(proc.getNumParams() != 0){
+                if (proc.getNumParams() != 0) {
                     numParams = String.valueOf(proc.getNumParams());
                 } else {
                     numParams = "-";
                 }
                 tabla += "<td>" + proc.getTipo() + "</td><td>" + proc.toString() + "</td><td>"
-                        + proc.getProf() + "</td><td>" + inicio + "</td><td>"
-                        + numParams + "</td><td>" + proc.getOcupVL() + "</td></tr>";
+                        + proc.getProf() + "</td><td>" + inicio + "</td><td>" + numParams
+                        + "</td><td>" + proc.getOcupVL() + "</td></tr>";
             }
             tabla += "</table></body></html>";
             buffer.write(tabla);

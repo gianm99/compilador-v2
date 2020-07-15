@@ -3,29 +3,27 @@ package procesador;
 import java.util.ArrayList;
 
 public class TablaEtiquetas {
-    
-    private ArrayList<Etiqueta> te;
+    private int ne; // Número de etiquetas
+    private ArrayList<Etiqueta> te; // Tabla de etiquetas
 
     public TablaEtiquetas() {
+        this.ne = 0; // Al principio hay 0
         this.te = new ArrayList<Etiqueta>();
     }
 
-    public void nuevaEtiqueta(Etiqueta e, int nl){
-        e.setNl(nl);
-        te.add(e);
+    public int nuevaEtiqueta() {
+        ne++; // Aumenta el número de etiquetas
+        te.add(new Etiqueta(ne));
+        return ne;
     }
 
-    public ArrayList<Etiqueta> getTe() {
-        return te;
-    }
-
-    public void setTe(ArrayList<Etiqueta> te) {
-        this.te = te;
+    public Etiqueta get(int etiqueta) {
+        return te.get(etiqueta-1);
     }
 
     public Etiqueta get(String etiqueta) {
         if (etiqueta != null) {
-            return te.get(Integer.parseInt(etiqueta) - 1);
+            return get(Integer.parseInt(etiqueta.substring(1)));
         } else {
             return null;
         }

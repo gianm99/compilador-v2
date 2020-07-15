@@ -7,9 +7,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
-import org.antlr.v4.codegen.SourceGenTriggers;
 import procesador.Instruccion.OP;
-import procesador.Simbolo.TSub;
 
 public class Optimizador {
 
@@ -75,7 +73,8 @@ public class Optimizador {
     }
 
     /**
-     * Comprueba y optimiza el código C3D de los IF con valores sabidos en tiempo de compilación
+     * Comprueba y optimiza el código C3D de los IF con valores sabidos en tiempo de
+     * compilación
      */
     private void eliminaCodigoInaccesibleIf() {
         for (int i = 0; i < C3D.size(); i++) {
@@ -104,8 +103,8 @@ public class Optimizador {
     }
 
     /**
-     * Comprueba y elimina todas las etiquetas de salto (skip) las cuales no tengan una instrucción
-     * de salto (goto) asignadas
+     * Comprueba y elimina todas las etiquetas de salto (skip) las cuales no tengan
+     * una instrucción de salto (goto) asignadas
      */
     private void eliminaEtiquetasInnecesarias() {
         ArrayList<String> skips = new ArrayList<String>();
@@ -155,10 +154,11 @@ public class Optimizador {
     }
 
     /**
-     * Para cada conjunto de instrucciones entre un goto y su skip más cercano, si no se detecta un
-     * skip de otra etiqueta, elimina el código entre goto y el skip, sin incluir el skip. Después
-     * llama a la función "eliminaEtiquetasInnecesarias()" para borrar todos los skips que no tengan
-     * un gotos asocioados después de aplicar esta optimización
+     * Para cada conjunto de instrucciones entre un goto y su skip más cercano, si
+     * no se detecta un skip de otra etiqueta, elimina el código entre goto y el
+     * skip, sin incluir el skip. Después llama a la función
+     * "eliminaEtiquetasInnecesarias()" para borrar todos los skips que no tengan un
+     * gotos asocioados después de aplicar esta optimización
      */
     private void eliminaCodigoInaccesibleEntreEtiquetas() {
         ArrayList<Instruccion> aux = new ArrayList<Instruccion>();
@@ -183,8 +183,9 @@ public class Optimizador {
     }
 
     /**
-     * Reduce el número de variables temporales para las asignaciones, siempre y cuando no sean de
-     * tipo String o necesitados para pasar por parámetro para una función.
+     * Reduce el número de variables temporales para las asignaciones, siempre y
+     * cuando no sean de tipo String o necesitados para pasar por parámetro para una
+     * función.
      */
     private void eliminaAsignacionesInnecesarias() {
         ArrayList<Instruccion> InstrucVars = new ArrayList<Instruccion>();
@@ -280,18 +281,13 @@ public class Optimizador {
         }
     }
 
-    private void reasignarLineaEtiqueta() { // TODO mirar que funciona el reasignado
-        ArrayList<Etiqueta> teaux = new ArrayList<Etiqueta>();
-        Etiqueta e;
+    private void reasignarLineaEtiqueta() {
         for (int i = 0; i < C3D.size(); i++) {
-            if (C3D.get(i).getOpCode() == Instruccion.OP.skip) {
-                e = te.get(C3D.get(i).destino().substring(1));
-                e.setNl(i + 1);
-                teaux.add(e);
+            Instruccion ins = C3D.get(i);
+            if (ins.getOpCode() == OP.skip) {
+                te.get(ins.destino()).setLinea(i + 1);
             }
         }
-        te.getTe().clear();
-        te.getTe().addAll(teaux);
     }
 
     private void optimizarIfNegandoCond() {
@@ -300,26 +296,26 @@ public class Optimizador {
             if (esIf(ins)) {
                 if (!operandosConstantes(ins)) {
                     switch (ins.getOpCode()) {
-                        case ifLT:
-                            C3D.get(i).setOpCode(OP.ifGE);
-                            break;
-                        case ifLE:
-                            C3D.get(i).setOpCode(OP.ifGT);
-                            break;
-                        case ifEQ:
-                            C3D.get(i).setOpCode(OP.ifNE);
-                            break;
-                        case ifNE:
-                            C3D.get(i).setOpCode(OP.ifEQ);
-                            break;
-                        case ifGE:
-                            C3D.get(i).setOpCode(OP.ifLT);
-                            break;
-                        case ifGT:
-                            C3D.get(i).setOpCode(OP.ifLE);
-                            break;
-                        default:
-                            break;
+                    case ifLT:
+                        C3D.get(i).setOpCode(OP.ifGE);
+                        break;
+                    case ifLE:
+                        C3D.get(i).setOpCode(OP.ifGT);
+                        break;
+                    case ifEQ:
+                        C3D.get(i).setOpCode(OP.ifNE);
+                        break;
+                    case ifNE:
+                        C3D.get(i).setOpCode(OP.ifEQ);
+                        break;
+                    case ifGE:
+                        C3D.get(i).setOpCode(OP.ifLT);
+                        break;
+                    case ifGT:
+                        C3D.get(i).setOpCode(OP.ifLE);
+                        break;
+                    default:
+                        break;
                     }
                     C3D.get(i).setOperando(3, C3D.get(i + 1).destino());
                     C3DquitarInstruccion(i + 1);
@@ -341,10 +337,11 @@ public class Optimizador {
      */
 
     /**
-     * Devuelve la línea en la lista C3D donde la variable ha sido usada para una asignación (sin
-     * ser esta el destino de la propia asignación)
+     * Devuelve la línea en la lista C3D donde la variable ha sido usada para una
+     * asignación (sin ser esta el destino de la propia asignación)
      * 
-     * @param var String que contiene el nombre de la variable
+     * @param var
+     *                String que contiene el nombre de la variable
      * @return Línea en la lista C3D
      */
     private int devolverLineaVariableUsada(String var) {
@@ -364,11 +361,13 @@ public class Optimizador {
     }
 
     /**
-     * Devuelve las líneas de código C3D que comprenden desde la posición inicial "pos" hasta la
-     * posición final "posEtiqueta"
+     * Devuelve las líneas de código C3D que comprenden desde la posición inicial
+     * "pos" hasta la posición final "posEtiqueta"
      *
-     * @param pos         Posición inicial
-     * @param posEtiqueta Posición final marcado por una etiqueta
+     * @param pos
+     *                        Posición inicial
+     * @param posEtiqueta
+     *                        Posición final marcado por una etiqueta
      * @return Devuelve el código entre las dos posiciones
      */
     private ArrayList<Instruccion> recogerCodigo(int pos, int posEtiqueta) {
@@ -390,12 +389,15 @@ public class Optimizador {
     }
 
     /**
-     * Reemplaza el código de C3D entre la posición incial "empieza" y la posición final "acaba" por
-     * la lista de instrucciones de codigoR.
+     * Reemplaza el código de C3D entre la posición incial "empieza" y la posición
+     * final "acaba" por la lista de instrucciones de codigoR.
      * 
-     * @param codigoR Lista de instrucciones a sustituir en el código de C3D
-     * @param empieza Posición inicial del C3D
-     * @param acaba   Posición final del C3D
+     * @param codigoR
+     *                    Lista de instrucciones a sustituir en el código de C3D
+     * @param empieza
+     *                    Posición inicial del C3D
+     * @param acaba
+     *                    Posición final del C3D
      */
     private void reemplazaCodigo(ArrayList<Instruccion> codigoR, int empieza, int acaba) {
         List<Instruccion> sublistacodigo = this.C3D.subList(empieza, acaba);
@@ -413,7 +415,8 @@ public class Optimizador {
     /**
      * Comprueba si la instrucción "ins" es una instrucción de tipo IF
      * 
-     * @param ins Instrucción a comprobar
+     * @param ins
+     *                Instrucción a comprobar
      * @return Valor de la comprobación
      */
     private boolean esIf(Instruccion ins) {
@@ -426,7 +429,8 @@ public class Optimizador {
     /**
      * Comprueba si la instrucción "ins" es una instrucción de tipo aritmético
      * 
-     * @param ins Instrucción a comprobar
+     * @param ins
+     *                Instrucción a comprobar
      * @return Valor de la comprobación
      */
     private boolean esArit(Instruccion ins) {
@@ -437,7 +441,8 @@ public class Optimizador {
     /**
      * Comprueba si los 2 opereandos de la instrucción "ins" son valores constantes
      * 
-     * @param ins Instrucción a comprobar
+     * @param ins
+     *                Instrucción a comprobar
      * @return Valor de la comprobación
      */
     private Boolean operandosConstantes(Instruccion ins) {
@@ -456,11 +461,14 @@ public class Optimizador {
     }
 
     /**
-     * Para cada caso de IF en relación al operador relacional usado en él, comprueba si es cierto o
-     * falso y llama a la función que realizará la optimización del IF
+     * Para cada caso de IF en relación al operador relacional usado en él,
+     * comprueba si es cierto o falso y llama a la función que realizará la
+     * optimización del IF
      * 
-     * @param ins     Instrucción de tipo IF a comprobar
-     * @param empieza Número de la instrucción en la lista C3D
+     * @param ins
+     *                    Instrucción de tipo IF a comprobar
+     * @param empieza
+     *                    Número de la instrucción en la lista C3D
      * @return Número de líneas reemplazadas por la función de optimización del IF
      */
     private int ejecutaIf(Instruccion ins, int empieza) {
@@ -480,50 +488,51 @@ public class Optimizador {
             c2 = Integer.parseInt(ins.getOperando(2)); // Literal
         }
         switch (ins.getOpCode()) {
-            case ifLT:
-                if (c1 < c2) {
-                    lineasReemplazo = optimizarIfCierto(empieza);
-                } else {
-                    lineasReemplazo = optimizarIfFalso(empieza);
-                }
-                break;
-            case ifLE:
-                if (c1 <= c2) {
-                    lineasReemplazo = optimizarIfCierto(empieza);
-                } else {
-                    lineasReemplazo = optimizarIfFalso(empieza);
-                }
-                break;
-            case ifEQ:
-                if (c1 == c2) {
-                    lineasReemplazo = optimizarIfCierto(empieza);
-                } else {
-                    lineasReemplazo = optimizarIfFalso(empieza);
-                }
-                break;
-            case ifNE:
-                if (c1 != c2) {
-                    lineasReemplazo = optimizarIfCierto(empieza);;
-                } else {
-                    lineasReemplazo = optimizarIfFalso(empieza);
-                }
-                break;
-            case ifGE:
-                if (c1 >= c2) {
-                    lineasReemplazo = optimizarIfCierto(empieza);
-                } else {
-                    lineasReemplazo = optimizarIfFalso(empieza);
-                }
-                break;
-            case ifGT:
-                if (c1 > c2) {
-                    lineasReemplazo = optimizarIfCierto(empieza);
-                } else {
-                    lineasReemplazo = optimizarIfFalso(empieza);
-                }
-                break;
-            default:
-                break;
+        case ifLT:
+            if (c1 < c2) {
+                lineasReemplazo = optimizarIfCierto(empieza);
+            } else {
+                lineasReemplazo = optimizarIfFalso(empieza);
+            }
+            break;
+        case ifLE:
+            if (c1 <= c2) {
+                lineasReemplazo = optimizarIfCierto(empieza);
+            } else {
+                lineasReemplazo = optimizarIfFalso(empieza);
+            }
+            break;
+        case ifEQ:
+            if (c1 == c2) {
+                lineasReemplazo = optimizarIfCierto(empieza);
+            } else {
+                lineasReemplazo = optimizarIfFalso(empieza);
+            }
+            break;
+        case ifNE:
+            if (c1 != c2) {
+                lineasReemplazo = optimizarIfCierto(empieza);
+                ;
+            } else {
+                lineasReemplazo = optimizarIfFalso(empieza);
+            }
+            break;
+        case ifGE:
+            if (c1 >= c2) {
+                lineasReemplazo = optimizarIfCierto(empieza);
+            } else {
+                lineasReemplazo = optimizarIfFalso(empieza);
+            }
+            break;
+        case ifGT:
+            if (c1 > c2) {
+                lineasReemplazo = optimizarIfCierto(empieza);
+            } else {
+                lineasReemplazo = optimizarIfFalso(empieza);
+            }
+            break;
+        default:
+            break;
         }
         return lineasReemplazo;
     }
@@ -531,7 +540,8 @@ public class Optimizador {
     /**
      * Optimiza un IF cierto
      * 
-     * @param empieza Número de la instrucción en la lista C3D
+     * @param empieza
+     *                    Número de la instrucción en la lista C3D
      * @return Número de líneas reemplazadas por la función
      */
     private int optimizarIfCierto(int empieza) {
@@ -550,7 +560,8 @@ public class Optimizador {
     /**
      * Optimiza un IF falso
      * 
-     * @param empieza Número de la instrucción en la lista C3D
+     * @param empieza
+     *                    Número de la instrucción en la lista C3D
      * @return Número de líneas reemplazadas por la función
      */
     private int optimizarIfFalso(int empieza) {
@@ -569,12 +580,12 @@ public class Optimizador {
         return tv;
     }
 
-    public void setTv(TablaVariables tv) {
-        this.tv = tv;
-    }
-
     public TablaProcedimientos getTp() {
         return tp;
+    }
+
+    public TablaEtiquetas getTe() {
+        return te;
     }
 
     public void setTp(TablaProcedimientos tp) {
