@@ -156,7 +156,7 @@ decl:
 		int nv=0;
 		try {
 			s=ts.consulta($ID.getText());
-			nv=tv.nuevaVar(false,pproc.peek(),Tipo.VAR, s.getTsub());
+			nv=tv.nuevaVar(false,pproc.peek(),Tipo.VAR, s.tsub());
 			tv.get(nv).setId(s.getId());
 			s.setNv(nv);
 		} catch(TablaSimbolos.TablaSimbolosException e) {
@@ -164,7 +164,7 @@ decl:
 		}
 	} (
 		'=' expr {
-			if(s.getTsub()==TSub.BOOLEAN) {
+			if(s.tsub()==TSub.BOOLEAN) {
 				Etiqueta ec=te.get(te.nuevaEtiqueta());
 				Etiqueta ef=te.get(te.nuevaEtiqueta());
 				Etiqueta efin=te.get(te.nuevaEtiqueta());
@@ -202,7 +202,7 @@ decl:
 				default:
 					break;
 			}
-			int nv=tv.nuevaVar(false,pproc.peek(),Simbolo.Tipo.CONST, s.getTsub());
+			int nv=tv.nuevaVar(false,pproc.peek(),Simbolo.Tipo.CONST, s.tsub());
 			tv.get(nv).setId(s.getId());
 			tv.get(nv).setValor(s.getValor());
 			s.setNv(nv);
@@ -223,7 +223,7 @@ decl:
 		int nparam=1;
 		while(aux!=null) {
 			try {
-				int nv=tv.nuevaVar(false,pproc.peek(),Tipo.VAR, aux.getTsub());
+				int nv=tv.nuevaVar(false,pproc.peek(),Tipo.VAR, aux.tsub());
 				tv.get(nv).setNparam(nparam);
 				tv.get(nv).setId(aux.getId());
 				ts.consulta(aux.getId()).setNv(nv);
@@ -257,7 +257,7 @@ decl:
 		int nparam=1;
 		while(aux!=null) {
 			try {
-				int nv=tv.nuevaVar(false,pproc.peek(),Tipo.VAR, aux.getTsub());
+				int nv=tv.nuevaVar(false,pproc.peek(),Tipo.VAR, aux.tsub());
 				tv.get(nv).setNparam(nparam);
 				tv.get(nv).setId(aux.getId());
 				ts.consulta(aux.getId()).setNv(nv);
@@ -524,9 +524,9 @@ referencia
 		try {
 			s = ts.consulta($ID.getText());
 			if (s.getT() == Tipo.CONST){
-				t = tv.nuevaVar(true,pproc.peek(),Tipo.VAR,s.getTsub());
+				t = tv.nuevaVar(true,pproc.peek(),Tipo.VAR,s.tsub());
 				tv.get(t).setTemporal(true);
-				switch(s.getTsub()) {
+				switch(s.tsub()) {
 					case BOOLEAN:
 						genera(OP.copy, s.getValor(), null, tv.get(t).toString());
 						if(s.getValor().equals("true")){
@@ -548,7 +548,7 @@ referencia
 			} else {
 				$r = tv.get(s.getNv());
 			}
-			$tsub=s.getTsub();
+			$tsub=s.tsub();
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
@@ -560,9 +560,9 @@ referencia
 			s = ts.consulta($ID.getText());
 			genera(OP.call, null, null, s.getNp().toString());
 			if(s.getT()==Tipo.FUNC) {
-				t = tv.nuevaVar(true, pproc.peek(),Tipo.VAR,s.getTsub());
+				t = tv.nuevaVar(true, pproc.peek(),Tipo.VAR,s.tsub());
 				$r = tv.get(t);
-				$tsub=s.getTsub();
+				$tsub=s.tsub();
 				genera(OP.st, null, null, tv.get(t).toString());
 			}
 		} catch(TablaSimbolos.TablaSimbolosException e) {
@@ -575,9 +575,9 @@ referencia
 		genera(OP.params, null, null, $contIdx.pparams.pop().toString());
 		genera(OP.call, null, null, $contIdx.met.toString());
 		if($contIdx.s.getT()==Tipo.FUNC) {
-			t = tv.nuevaVar(true, pproc.peek(),Tipo.VAR,$contIdx.s.getTsub());
+			t = tv.nuevaVar(true, pproc.peek(),Tipo.VAR,$contIdx.s.tsub());
 			$r = tv.get(t);
-			$tsub = $contIdx.s.getTsub();
+			$tsub = $contIdx.s.tsub();
 			genera(OP.st, null, null, tv.get(t).toString());
 		}
 	};

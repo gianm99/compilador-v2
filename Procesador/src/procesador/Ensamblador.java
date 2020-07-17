@@ -118,7 +118,7 @@ public class Ensamblador {
         // Strings constantes
         for (int x = 1; x <= tv.getNv(); x++) {
             Variable vx = tv.get(x);
-            if (vx.tipo() == Simbolo.Tipo.CONST && vx.getTsub() == Simbolo.TSub.STRING) {
+            if (vx.tipo() == Simbolo.Tipo.CONST && vx.tsub() == Simbolo.TSub.STRING) {
                 asm.add("\t" + vx + "  DB  " + vx.getValor() + ",0");
             }
         }

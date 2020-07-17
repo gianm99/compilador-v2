@@ -57,7 +57,7 @@ public class Variable {
         this.valor = valor;
     }
 
-    public Simbolo.TSub getTsub() {
+    public Simbolo.TSub tsub() {
         return tsub;
     }
 
