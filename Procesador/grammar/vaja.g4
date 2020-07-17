@@ -598,6 +598,9 @@ exprMult_
 		if($exprNeg.tsub!=Simbolo.TSub.INT) {
 			errores+="Error semántico - Línea "+$exprNeg.start.getLine()+
 			": tipos incompatibles (esperado INT, encontrado "+$exprNeg.tsub+")\n";
+		} else if($exprNeg.cero) {
+			errores+="Error semántico - Línea "+$exprNeg.start.getLine()+
+			": división por cero\n";
 		}
 		$tsub=Simbolo.TSub.INT;
 	}
@@ -605,22 +608,25 @@ exprMult_
 
 // Expresión de negación
 exprNeg
-	returns[Simbolo.TSub tsub]:
+	returns[Simbolo.TSub tsub, boolean cero]:
 	SUB primario {
 		if($primario.tsub!=Simbolo.TSub.INT) {
 			errores+="Error semántico - Línea "+$primario.start.getLine()+
 			": tipos incompatibles (esperado INT, encontrado "+$primario.tsub+")\n";
 		}
 		$tsub=Simbolo.TSub.INT;
+		$cero=$primario.cero;
 	}
 	| primario {
 		$tsub=$primario.tsub;
+		$cero=$primario.cero;
 	};
 
 primario
-	returns[Simbolo.TSub tsub]:
+	returns[Simbolo.TSub tsub, boolean cero]:
 	'(' expr ')' {
 		$tsub=$expr.tsub;
+		$cero=false;
 	}
 	| referencia[false] {
 		if($referencia.s==null) {
@@ -629,10 +635,14 @@ primario
 			$tsub=Simbolo.TSub.NULL;
 		} else {
 			$tsub=$referencia.s.tsub();
+			if($referencia.s.getT()==Simbolo.Tipo.CONST && $referencia.s.tsub()==Simbolo.TSub.INT) {
+				$cero=$referencia.s.getValor().equals("0");
+			}
 		}
 	}
 	| literal {
 		$tsub=$literal.tsub;
+		$cero=$literal.cero;
 	};
 
 tipo
@@ -648,15 +658,18 @@ tipo
 	};
 
 literal
-	returns[Simbolo.TSub tsub]:
+	returns[Simbolo.TSub tsub, boolean cero]:
 	LiteralInteger {
 		$tsub=Simbolo.TSub.INT;
+		$cero=$LiteralInteger.getText().equals("0");
 	}
 	| LiteralBoolean {
 		$tsub=Simbolo.TSub.BOOLEAN;
+		$cero=false;
 	}
 	| LiteralString {
 		$tsub=Simbolo.TSub.STRING;
+		$cero=false;
 	};
 
 // Palabras reservadas
