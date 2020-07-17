@@ -123,7 +123,7 @@ public class Ensamblador {
             }
         }
         asm.add(".data?");
-        asm.add("inputBuffer db 65536 dup(?)"); // Buffer del input (256^2 bytes)
+        asm.add("\tinputBuffer db 65536 dup(?)"); // Buffer del input (256^2 bytes)
         // DISP
         asm.add("\tDISP  DW  1000 DUP (?)");
         // Variables globales
@@ -505,7 +505,7 @@ public class Ensamblador {
             break;
         case skip:
             // e: skip
-            asm.add(ins.destino() + " :");
+            asm.add(ins.destino() + ":");
             break;
         case jump:
             // goto e
@@ -622,7 +622,7 @@ public class Ensamblador {
         case params:
             // params a
             a = tv.get(ins.destino());
-            loadAddrReg("eax", a); // No puede ser un literal
+            loadAddrReg("eax", a); // TODO Solucionar el caso de strings literales
             asm.add("\tpush eax");
             break;
         case st:
