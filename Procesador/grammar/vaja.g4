@@ -258,10 +258,10 @@ sent:
 				// Return no vacío en un procedimiento
 				errores+="Error semántico - Línea "+$RETURN.getLine()+
 				": return de expresión en un procedimiento\n";
-			} else if(funcion.getTsub()!=$expr.tsub) {
+			} else if(funcion.tsub()!=$expr.tsub) {
 				// Return de tipo incorrecto
 				errores+="Error semántico - Línea "+$RETURN.getLine()+
-				": return de tipo incorrecto (esperado '"+pproc.peek().getTsub()+
+				": return de tipo incorrecto (esperado '"+pproc.peek().tsub()+
 				"', encontrado '"+$expr.tsub+"')\n";
 			} else if(profCondRep==0) {
 				// Return correcto
@@ -291,9 +291,9 @@ sent:
 			} else if($referencia.s.getT()==Simbolo.Tipo.FUNC || $referencia.s.getT()==Simbolo.Tipo.PROC) {
 				errores+="Error semántico - Línea "+$ASSIGN.getLine()+
 				": no se esperaba una función o un procedimiento\n";
-			} else if($referencia.s.getTsub()!=$expr.tsub) {
+			} else if($referencia.s.tsub()!=$expr.tsub) {
 				errores+="Error semántico - Línea "+$ASSIGN.getLine()+
-				": asignación de tipo incorrecto (esperado '"+$referencia.s.getTsub()+
+				": asignación de tipo incorrecto (esperado '"+$referencia.s.tsub()+
 				"', encontrado '"+$expr.tsub+"')\n";
 			}
 		}
@@ -388,9 +388,9 @@ contIdx
 					errores+="Error semántico - Línea "+$ID.getLine()+
 					": demasiados argumentos para "+$ID.getText()+"\n";
 					break;
-				} else if(aux!=param.getTsub()) {
+				} else if(aux!=param.tsub()) {
 					errores+="Error semántico - Línea "+$ID.getLine()+
-					": tipos incompatibles (esperado '"+param.getTsub()+
+					": tipos incompatibles (esperado '"+param.tsub()+
 					"', encontrado '"+aux+"')\n";
 					break;
 				}
@@ -607,7 +607,7 @@ primario
 			": tipos incompatibles (encontrado NULL)\n";
 			$tsub=Simbolo.TSub.NULL;
 		} else {
-			$tsub=$referencia.s.getTsub();
+			$tsub=$referencia.s.tsub();
 		}
 	}
 	| literal {
