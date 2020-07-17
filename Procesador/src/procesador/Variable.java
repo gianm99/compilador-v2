@@ -57,24 +57,16 @@ public class Variable {
         this.valor = valor;
     }
 
-    public Simbolo.TSub getTsub() {
+    public Simbolo.TSub tsub() {
         return tsub;
     }
 
-    public boolean isTemporal() {
+    public boolean temporal() {
         return temporal;
     }
 
-    public void setTemporal(boolean temporal) {
-        this.temporal = temporal;
-    }
-
-    public int getNv() {
+    public int nv() {
         return nv;
-    }
-
-    public void setNv(int nv) {
-        this.nv = nv;
     }
 
     public Simbolo.Tipo tipo() {

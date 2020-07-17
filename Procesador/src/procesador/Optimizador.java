@@ -92,7 +92,7 @@ public class Optimizador {
             Instruccion ins = C3D.get(i);
             if (esIf(ins)) {
                 Variable operando1 = tv.get(ins.getOperando(1));
-                if (operando1.getTsub() == Simbolo.TSub.BOOLEAN && operando1 != null) {
+                if (operando1.tsub() == Simbolo.TSub.BOOLEAN && operando1 != null) {
                     ArrayList<Instruccion> arrayaux = new ArrayList<Instruccion>();
                     arrayaux.add(new Instruccion(OP.copy, C3D.get(i).getOperando(1), "",
                             C3D.get(i + 3).destino()));
@@ -196,7 +196,7 @@ public class Optimizador {
             if (C3D.get(i).destino().charAt(0) == 't' && C3D.get(i).destino().charAt(1) == '$') {
                 if ((C3D.get(i).getOpCode() == Instruccion.OP.copy)) {
                     if (!InstrucVars.contains(C3D.get(i))
-                            && !(tv.get(C3D.get(i).destino()).getTsub() == Simbolo.TSub.STRING)) {
+                            && !(tv.get(C3D.get(i).destino()).tsub() == Simbolo.TSub.STRING)) {
                         InstrucVars.add(C3D.get(i));
                     }
                 } else if (C3D.get(i).getOpCode() == Instruccion.OP.params) {
