@@ -45,22 +45,6 @@ public void genera(OP codigo, String op1, String op2, String destino){
 	C3D.add(new Instruccion(codigo, op1, op2, destino));
 }
 
-public ArrayList<Instruccion> getC3D() {
-	return C3D;
-}
-
-public TablaVariables getTv() {
-	return tv;
-}
-
-public TablaProcedimientos getTp() {
-	return tp;
-}
-
-public TablaEtiquetas getTe(){
-	return te;
- }
-
 public void imprimirC3D(){
 	Writer buffer;
 	File interFile = new File(directorio+"_C3D.txt");
@@ -117,6 +101,23 @@ public OP valorSaltoCond(String s){
 	}
 	return op;
 }
+
+public ArrayList<Instruccion> getC3D() {
+	return C3D;
+}
+
+public TablaVariables getTv() {
+	return tv;
+}
+
+public TablaProcedimientos getTp() {
+	return tp;
+}
+
+public TablaEtiquetas getTe(){
+	return te;
+ }
+
 }
 
 programa:
