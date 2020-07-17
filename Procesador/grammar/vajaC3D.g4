@@ -7,6 +7,7 @@ options
 @parser::header {
 package antlr;
 import procesador.*;
+import procesador.Instruccion.OP;
 import procesador.Simbolo.Tipo;
 import procesador.Simbolo.TSub;
 import java.io.*;
@@ -36,26 +37,13 @@ public vajaC3D(TokenStream input, String directorio, TablaSimbolos ts){
 	this.te = new TablaEtiquetas();
 }
 
-public void genera(Instruccion.OP codigo, String op1, String op2, String op3){
+public void genera(OP codigo, String op1, String op2, String destino){
 	pc++;
-	C3D.add(new Instruccion(codigo, op1, op2, op3));
+	if(codigo==OP.skip) {
+		te.get(destino).setLinea(pc);
+	}
+	C3D.add(new Instruccion(codigo, op1, op2, destino));
 }
-
-public ArrayList<Instruccion> getC3D() {
-	return C3D;
-}
-
-public TablaVariables getTv() {
-	return tv;
-}
-
-public TablaProcedimientos getTp() {
-	return tp;
-}
-
-public TablaEtiquetas getTe(){
-	return te;
- }
 
 public void imprimirC3D(){
 	Writer buffer;
@@ -78,6 +66,10 @@ public void backpatch(Deque<Integer> lista, Etiqueta e){
 	}
 }
 
+public void backpatch(int linea, Etiqueta e){
+	C3D.get(linea-1).setEtiqueta(e.toString());
+}
+
 public Deque<Integer> concat(Deque<Integer> dq1, Deque<Integer> dq2){
 	if(dq1==null) {
 		return dq2;
@@ -89,30 +81,47 @@ public Deque<Integer> concat(Deque<Integer> dq1, Deque<Integer> dq2){
 	return dq1;
 }
 
-public Instruccion.OP valorSaltoCond(String s){
-	Instruccion.OP op = null;
+public OP valorSaltoCond(String s){
+	OP op = null;
 	switch(s){
 		case "==":
-			op = Instruccion.OP.ifEQ;
+			op = OP.ifEQ;
 			break;
 		case "!=":
-			op = Instruccion.OP.ifNE;
+			op = OP.ifNE;
 			break;
 		case "<":
-			op = Instruccion.OP.ifLT;
+			op = OP.ifLT;
 			break;
 		case ">":
-			op = Instruccion.OP.ifGT;
+			op = OP.ifGT;
 			break;
 		case ">=":
-			op = Instruccion.OP.ifGE;
+			op = OP.ifGE;
 			break;
 		case "<=":
-			op = Instruccion.OP.ifLE;
+			op = OP.ifLE;
 			break;
 	}
 	return op;
 }
+
+public ArrayList<Instruccion> getC3D() {
+	return C3D;
+}
+
+public TablaVariables getTv() {
+	return tv;
+}
+
+public TablaProcedimientos getTp() {
+	return tp;
+}
+
+public TablaEtiquetas getTe(){
+	return te;
+ }
+
 }
 
 programa:
@@ -134,9 +143,8 @@ programa:
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
 	} decl* sents EOF {
-	Etiqueta e=new Etiqueta();
-	genera(Instruccion.OP.skip, null, null, e.toString());
-	te.nuevaEtiqueta(e, pc);
+	Etiqueta e=te.get(te.nuevaEtiqueta());
+	genera(OP.skip, null, null, e.toString());
 	backpatch($sents.sents_seg,e);
 	tv.calculoDespOcupVL(tp);
 	imprimirC3D();
@@ -157,22 +165,19 @@ decl:
 	} (
 		'=' expr {
 			if(s.getTsub()==TSub.BOOLEAN) {
-				Etiqueta ec=new Etiqueta();
-				Etiqueta ef=new Etiqueta();
-				Etiqueta efin=new Etiqueta();
-				genera(Instruccion.OP.skip, null, null, ec.toString());
-				te.nuevaEtiqueta(ec, pc);
-				genera(Instruccion.OP.copy, "-1", null, tv.get(nv).toString());
-				genera(Instruccion.OP.jump, null, null, efin.toString());
-				genera(Instruccion.OP.skip, null, null, ef.toString());
-				te.nuevaEtiqueta(ef, pc);
-				genera(Instruccion.OP.copy, "0", null, tv.get(nv).toString());
-				genera(Instruccion.OP.skip, null, null, efin.toString());
-				te.nuevaEtiqueta(efin, pc);
+				Etiqueta ec=te.get(te.nuevaEtiqueta());
+				Etiqueta ef=te.get(te.nuevaEtiqueta());
+				Etiqueta efin=te.get(te.nuevaEtiqueta());
+				genera(OP.skip, null, null, ec.toString());
+				genera(OP.copy, "-1", null, tv.get(nv).toString());
+				genera(OP.jump, null, null, efin.toString());
+				genera(OP.skip, null, null, ef.toString());
+				genera(OP.copy, "0", null, tv.get(nv).toString());
+				genera(OP.skip, null, null, efin.toString());
 				backpatch($expr.cierto,ec);
 				backpatch($expr.falso,ef);
 			} else {
-				genera(Instruccion.OP.copy, $expr.r.toString(), null, tv.get(nv).toString());
+				genera(OP.copy, $expr.r.toString(), null, tv.get(nv).toString());
 			}
 	}
 	)? ';'
@@ -228,12 +233,11 @@ decl:
 			aux=aux.getNext();
 			nparam++;
 		}
-		Etiqueta e=new Etiqueta();
-		$encabezado.met.setInicio(e);
+		Etiqueta e=te.get(te.nuevaEtiqueta());
+		$encabezado.met.setInicio(e.getNe());
 		$encabezado.met.setNumParams(nparam-1);
-		genera(Instruccion.OP.skip, null, null, e.toString());
-		te.nuevaEtiqueta(e, pc);
-		genera(Instruccion.OP.pmb, null, null, $encabezado.met.toString());
+		genera(OP.skip, null, null, e.toString());
+		genera(OP.pmb, null, null, $encabezado.met.toString());
 	} decl* sents {
 		C3D.get(pc-1).setInstFinal(true);
 		pproc.pop();
@@ -263,14 +267,13 @@ decl:
 			aux=aux.getNext();
 			nparam++;
 		}
-		Etiqueta e=new Etiqueta();
-		$encabezado.met.setInicio(e);
+		Etiqueta e=te.get(te.nuevaEtiqueta());
+		$encabezado.met.setInicio(e.getNe());
 		$encabezado.met.setNumParams(nparam-1);
-		genera(Instruccion.OP.skip, null, null, e.toString());
-		te.nuevaEtiqueta(e, pc);
-		genera(Instruccion.OP.pmb, null, null, $encabezado.met.toString());;
+		genera(OP.skip, null, null, e.toString());
+		genera(OP.pmb, null, null, $encabezado.met.toString());;
 	} decl* sents {
-		genera(Instruccion.OP.ret, null, null, String.valueOf($encabezado.met.getNp()));
+		genera(OP.ret, null, null, String.valueOf($encabezado.met.getNp()));
 		C3D.get(pc-1).setInstFinal(true);
 		pproc.pop();
 		profundidad--;
@@ -300,9 +303,8 @@ parametro: tipo ID;
 sents
 	returns[Deque<Integer> sents_seg]:
 	sent[$sents_seg] {
-		Etiqueta ec = new Etiqueta();
-		genera(Instruccion.OP.skip, null, null, ec.toString());
-		te.nuevaEtiqueta(ec, pc);
+		Etiqueta ec = te.get(te.nuevaEtiqueta());
+		genera(OP.skip, null, null, ec.toString());
 	} sents_[$sents_seg] {
 		backpatch($sent.sent_seg, ec);
 		if($sents_.sents_seg_!=null) {
@@ -315,9 +317,8 @@ sents
 sents_[Deque<Integer> sents_seg]
 	returns[Deque<Integer> sents_seg_]:
 	sent[$sents_seg] {
-		Etiqueta ec = new Etiqueta();
-		genera(Instruccion.OP.skip, null, null, ec.toString());
-		te.nuevaEtiqueta(ec, pc);
+		Etiqueta ec = te.get(te.nuevaEtiqueta());
+		genera(OP.skip, null, null, ec.toString());
 	} sents_[$sents_seg] {
 		backpatch($sent.sent_seg, ec);
 		if($sents_.sents_seg_!=null) {
@@ -336,9 +337,8 @@ sent[Deque<Integer> sents_seg]
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
-		Etiqueta ec = new Etiqueta();
-		genera(Instruccion.OP.skip, null, null, ec.toString());
-		te.nuevaEtiqueta(ec, pc);
+		Etiqueta ec = te.get(te.nuevaEtiqueta());
+		genera(OP.skip, null, null, ec.toString());
 	} decl* sents {
 		ts=ts.subeBloque();
 		backpatch($expr.cierto, ec);
@@ -350,17 +350,15 @@ sent[Deque<Integer> sents_seg]
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
-		Etiqueta ec = new Etiqueta();
-		genera(Instruccion.OP.skip, null, null, ec.toString());
-		te.nuevaEtiqueta(ec, pc);
+		Etiqueta ec = te.get(te.nuevaEtiqueta());
+		genera(OP.skip, null, null, ec.toString());
 	} decl* sents {
 	} END {
 		Deque<Integer> sents_seg1 = new ArrayDeque<Integer>();
-		genera(Instruccion.OP.jump, null, null, null);
+		genera(OP.jump, null, null, null);
 		sents_seg1.add(pc);
-		Etiqueta ef = new Etiqueta();
-		genera(Instruccion.OP.skip, null, null, ef.toString());
-		te.nuevaEtiqueta(ef, pc);
+		Etiqueta ef = te.get(te.nuevaEtiqueta());
+		genera(OP.skip, null, null, ef.toString());
 	} ELSE BEGIN {
 	} decl* sents END {
 		ts=ts.subeBloque();
@@ -368,71 +366,155 @@ sent[Deque<Integer> sents_seg]
 		backpatch($expr.falso, ef);
 		$sent_seg = concat(sents_seg1, $sents.sents_seg);
 	}
+	| contcase endcase END {
+		genera(OP.skip, null, null, $contcase.etest.toString());
+		while($contcase.pilacond.size()!=0) {
+			Etiqueta econd = $contcase.pilacond.remove();
+			Etiqueta etest = $contcase.pilatest.remove();
+			Variable v = tv.get($contcase.pilavar.remove());
+			Etiqueta esent = $contcase.pilasent.remove();
+			genera(OP.jump, null, null, econd.toString());
+			genera(OP.skip, null, null, etest.toString());
+			genera(OP.ifEQ, $contcase.r.toString(), v.toString(), esent.toString());
+		}
+		if($endcase.e!=null) {
+			if(!$contcase.acababreak && $contcase.pilaefi.size()>0) {
+				int seg = $contcase.pilaefi.removeLast();
+				backpatch(seg, $endcase.e);
+			}
+			genera(OP.jump, null, null, $endcase.e.toString());
+			genera(OP.skip, null, null, $endcase.efi.toString());
+		}
+		Etiqueta efi = te.get(te.nuevaEtiqueta());
+		backpatch($contcase.pilaefi, efi);
+		genera(OP.skip, null, null, efi.toString());
+	}
 	| WHILE {
 		try{
 			ts=ts.bajaBloque();
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
-		Etiqueta ei = new Etiqueta();
-		genera(Instruccion.OP.skip, null, null, ei.toString());
-		te.nuevaEtiqueta(ei, pc);
+		Etiqueta ei = te.get(te.nuevaEtiqueta());
+		genera(OP.skip, null, null, ei.toString());
 	} expr BEGIN {
-		Etiqueta ec = new Etiqueta();
-		genera(Instruccion.OP.skip, null, null, ec.toString());
-		te.nuevaEtiqueta(ec, pc);
+		Etiqueta ec = te.get(te.nuevaEtiqueta());
+		genera(OP.skip, null, null, ec.toString());
 	} decl* sents {
 		ts=ts.subeBloque();
 		backpatch($expr.cierto,ec);
 		backpatch($sent_seg,ei);
 		$sent_seg=$expr.falso;
-		genera(Instruccion.OP.jump, null, null, ei.toString());
+		genera(OP.jump, null, null, ei.toString());
 	} END
 	| RETURN expr ';' {
 		if($expr.cierto!=null || $expr.falso!=null) {//cambiar
-			Etiqueta ec=new Etiqueta();
-			Etiqueta ef=new Etiqueta();
-			Etiqueta efin=new Etiqueta();
-			genera(Instruccion.OP.skip, null, null, ec.toString());
-			te.nuevaEtiqueta(ec, pc);
-			genera(Instruccion.OP.copy, "-1", null, $expr.r.toString());
+			Etiqueta ec=te.get(te.nuevaEtiqueta());
+			Etiqueta ef=te.get(te.nuevaEtiqueta());
+			Etiqueta efin=te.get(te.nuevaEtiqueta());
+			genera(OP.skip, null, null, ec.toString());
+			genera(OP.copy, "-1", null, $expr.r.toString());
 			$expr.r.setValor("-1");
-			genera(Instruccion.OP.jump, null, null, efin.toString());
-			genera(Instruccion.OP.skip, null, null, ef.toString());
-			te.nuevaEtiqueta(ef, pc);
-			genera(Instruccion.OP.copy, "0", null, $expr.r.toString());
+			genera(OP.jump, null, null, efin.toString());
+			genera(OP.skip, null, null, ef.toString());
+			genera(OP.copy, "0", null, $expr.r.toString());
 			$expr.r.setValor("0");
-			genera(Instruccion.OP.skip, null, null, efin.toString());
-			te.nuevaEtiqueta(efin, pc);
+			genera(OP.skip, null, null, efin.toString());
 			backpatch($expr.cierto,ec);
 			backpatch($expr.falso,ef);
 		}
-		genera(Instruccion.OP.ret, $expr.r.toString(), null, pproc.peek().toString());
+		genera(OP.ret, $expr.r.toString(), null, pproc.peek().toString());
 	}
 	| RETURN ';' {
-		genera(Instruccion.OP.ret, null, null, pproc.peek().toString());
+		genera(OP.ret, null, null, pproc.peek().toString());
 	}
 	| referencia '=' expr ';' {
 		if($referencia.tsub==TSub.BOOLEAN) {
-			Etiqueta ec=new Etiqueta();
-			Etiqueta ef=new Etiqueta();
-			Etiqueta efin=new Etiqueta();
-			genera(Instruccion.OP.skip, null, null, ec.toString());
-			te.nuevaEtiqueta(ec, pc);
-			genera(Instruccion.OP.copy, "-1", null, $referencia.r.toString());
-			genera(Instruccion.OP.jump, null, null, efin.toString());
-			genera(Instruccion.OP.skip, null, null, ef.toString());
-			te.nuevaEtiqueta(ef, pc);
-			genera(Instruccion.OP.copy, "0", null, $referencia.r.toString());
-			genera(Instruccion.OP.skip, null, null, efin.toString());
-			te.nuevaEtiqueta(efin, pc);
+			Etiqueta ec=te.get(te.nuevaEtiqueta());
+			Etiqueta ef=te.get(te.nuevaEtiqueta());
+			Etiqueta efin=te.get(te.nuevaEtiqueta());
+			genera(OP.skip, null, null, ec.toString());
+			genera(OP.copy, "-1", null, $referencia.r.toString());
+			genera(OP.jump, null, null, efin.toString());
+			genera(OP.skip, null, null, ef.toString());
+			genera(OP.copy, "0", null, $referencia.r.toString());
+			genera(OP.skip, null, null, efin.toString());
 			backpatch($expr.cierto,ec);
 			backpatch($expr.falso,ef);
 		} else {
-			genera(Instruccion.OP.copy, $expr.r.toString(), null, $referencia.r.toString());
+			genera(OP.copy, $expr.r.toString(), null, $referencia.r.toString());
 		}
 	}
 	| referencia ';';
+
+contcase
+	returns[Variable r, boolean acababreak, Etiqueta etest, Deque<Integer> pilaefi, Deque<Etiqueta> pilasent, Deque<Integer> pilavar, Deque<Etiqueta> pilacond, Deque<Etiqueta> pilatest]
+		:
+	SWITCH expr BEGIN {
+		$etest = te.get(te.nuevaEtiqueta());
+		genera(OP.jump, null, null, $etest.toString());
+		$r = $expr.r;
+		$pilaefi = new ArrayDeque<>();
+		$pilasent = new ArrayDeque<Etiqueta>();
+		$pilavar = new ArrayDeque<Integer>();
+		$pilacond = new ArrayDeque<Etiqueta>();
+		$pilatest = new ArrayDeque<Etiqueta>();
+	} contcase_[$r, true, $etest, $pilaefi, $pilasent, $pilavar, $pilacond, $pilatest] {
+		$acababreak = $contcase_.acababreak;
+	};
+
+contcase_[Variable r, boolean acababreak1, Etiqueta etest, Deque<Integer> pilaefi, Deque<Etiqueta> pilasent, Deque<Integer> pilavar, Deque<Etiqueta> pilacond, Deque<Etiqueta> pilatest]
+	returns[boolean acababreak]:
+	caso {
+		if(!$acababreak1 && $pilaefi.size()>0) {
+			int seg = $pilaefi.removeLast();
+			backpatch(seg, $caso.esent);
+		}
+		$pilaefi.add($caso.seg);
+		$pilacond.add($caso.econd);
+		$pilavar.add($caso.r.getNv());
+		$pilatest.add($caso.etest);
+		$pilasent.add($caso.esent);
+	} contcase_[$r, $caso.acababreak, $etest, $pilaefi, $pilasent, $pilavar, $pilacond, $pilatest] {
+		$acababreak=$contcase_.acababreak;
+	}
+	| {
+		$acababreak=$acababreak1;
+	}; // lambda
+
+caso
+	returns[Variable r, Etiqueta econd, Etiqueta etest, Etiqueta esent, int seg, boolean acababreak]
+		:
+	CASE {
+		$econd = te.get(te.nuevaEtiqueta());
+		genera(OP.skip, null, null, $econd.toString());
+	} expr ':' {
+		$etest = te.get(te.nuevaEtiqueta());
+		genera(OP.jump, null, null, $etest.toString());
+		$esent = te.get(te.nuevaEtiqueta());
+		genera(OP.skip, null, null, $esent.toString());
+	} sents {
+		$acababreak=false;
+	} (
+		BREAK ';' {
+		$acababreak=true;
+	}
+	)? {
+		$r = $expr.r;
+		genera(OP.jump, null, null, null);
+		$seg = pc;
+	};
+
+endcase
+	returns[Etiqueta e, Etiqueta efi]:
+	DEFAULT ':' {
+		$e = te.get(te.nuevaEtiqueta());
+		genera(OP.skip, null, null, $e.toString());
+	} sents {
+		$efi = te.get(te.nuevaEtiqueta());
+		genera(OP.jump, null, null, $efi.toString());
+	}
+	|; // lambda
 
 referencia
 	returns[Variable r, TSub tsub]:
@@ -446,7 +528,7 @@ referencia
 				tv.get(t).setTemporal(true);
 				switch(s.getTsub()) {
 					case BOOLEAN:
-						genera(Instruccion.OP.copy, s.getValor(), null, tv.get(t).toString());
+						genera(OP.copy, s.getValor(), null, tv.get(t).toString());
 						if(s.getValor().equals("true")){
 							tv.get(t).setValor("-1");
 						} else {
@@ -454,11 +536,11 @@ referencia
 						}
 						break;
 					case INT:
-						genera(Instruccion.OP.copy, s.getValor(), null, tv.get(t).toString());
+						genera(OP.copy, s.getValor(), null, tv.get(t).toString());
 						tv.get(t).setValor(s.getValor());
 						break;
 					case STRING:
-						genera(Instruccion.OP.copy, tv.get(s.getNv()).toString(), null, tv.get(t).toString());
+						genera(OP.copy, tv.get(s.getNv()).toString(), null, tv.get(t).toString());
 						tv.get(t).setValor(s.getValor());
 						break;
 				}
@@ -476,12 +558,12 @@ referencia
 		int t;
 		try {
 			s = ts.consulta($ID.getText());
-			genera(Instruccion.OP.call, null, null, s.getNp().toString());
+			genera(OP.call, null, null, s.getNp().toString());
 			if(s.getT()==Tipo.FUNC) {
 				t = tv.nuevaVar(true, pproc.peek(),Tipo.VAR,s.getTsub());
 				$r = tv.get(t);
 				$tsub=s.getTsub();
-				genera(Instruccion.OP.st, null, null, tv.get(t).toString());
+				genera(OP.st, null, null, tv.get(t).toString());
 			}
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
@@ -490,13 +572,13 @@ referencia
 	| contIdx ')' {
 		int t;
 		while($contIdx.pparams.size()>0)
-		genera(Instruccion.OP.params, null, null, $contIdx.pparams.pop().toString());
-		genera(Instruccion.OP.call, null, null, $contIdx.met.toString());
+		genera(OP.params, null, null, $contIdx.pparams.pop().toString());
+		genera(OP.call, null, null, $contIdx.met.toString());
 		if($contIdx.s.getT()==Tipo.FUNC) {
 			t = tv.nuevaVar(true, pproc.peek(),Tipo.VAR,$contIdx.s.getTsub());
 			$r = tv.get(t);
 			$tsub = $contIdx.s.getTsub();
-			genera(Instruccion.OP.st, null, null, tv.get(t).toString());
+			genera(OP.st, null, null, tv.get(t).toString());
 		}
 	};
 
@@ -513,18 +595,15 @@ contIdx
 			$pparams.push($expr.r);
 			// Boolean parámetro
 			if($expr.cierto!=null || $expr.falso!=null) {
-				Etiqueta ec=new Etiqueta();
-				Etiqueta ef=new Etiqueta();
-				Etiqueta efin=new Etiqueta();
-				genera(Instruccion.OP.skip, null, null, ec.toString());
-				te.nuevaEtiqueta(ec, pc);
-				genera(Instruccion.OP.copy, "-1", null, $expr.r.toString());
-				genera(Instruccion.OP.jump, null, null, efin.toString());
-				genera(Instruccion.OP.skip, null, null, ef.toString());
-				te.nuevaEtiqueta(ef, pc);
-				genera(Instruccion.OP.copy, "0", null, $expr.r.toString());
-				genera(Instruccion.OP.skip, null, null, efin.toString());
-				te.nuevaEtiqueta(efin, pc);
+				Etiqueta ec=te.get(te.nuevaEtiqueta());
+				Etiqueta ef=te.get(te.nuevaEtiqueta());
+				Etiqueta efin=te.get(te.nuevaEtiqueta());
+				genera(OP.skip, null, null, ec.toString());
+				genera(OP.copy, "-1", null, $expr.r.toString());
+				genera(OP.jump, null, null, efin.toString());
+				genera(OP.skip, null, null, ef.toString());
+				genera(OP.copy, "0", null, $expr.r.toString());
+				genera(OP.skip, null, null, efin.toString());
 				backpatch($expr.cierto,ec);
 				backpatch($expr.falso,ef);
 			}
@@ -538,18 +617,15 @@ contIdx_[Deque<Variable> pparams]:
 		$pparams.push($expr.r);
 		// Boolean parámetro
 		if($expr.cierto!=null || $expr.falso!=null) {
-			Etiqueta ec=new Etiqueta();
-			Etiqueta ef=new Etiqueta();
-			Etiqueta efin=new Etiqueta();
-			genera(Instruccion.OP.skip, null, null, ec.toString());
-			te.nuevaEtiqueta(ec, pc);
-			genera(Instruccion.OP.copy, "-1", null, $expr.r.toString());
-			genera(Instruccion.OP.jump, null, null, efin.toString());
-			genera(Instruccion.OP.skip, null, null, ef.toString());
-			te.nuevaEtiqueta(ef, pc);
-			genera(Instruccion.OP.copy, "0", null, $expr.r.toString());
-			genera(Instruccion.OP.skip, null, null, efin.toString());
-			te.nuevaEtiqueta(efin, pc);
+			Etiqueta ec=te.get(te.nuevaEtiqueta());
+			Etiqueta ef=te.get(te.nuevaEtiqueta());
+			Etiqueta efin=te.get(te.nuevaEtiqueta());
+			genera(OP.skip, null, null, ec.toString());
+			genera(OP.copy, "-1", null, $expr.r.toString());
+			genera(OP.jump, null, null, efin.toString());
+			genera(OP.skip, null, null, ef.toString());
+			genera(OP.copy, "0", null, $expr.r.toString());
+			genera(OP.skip, null, null, efin.toString());
 			backpatch($expr.cierto,ec);
 			backpatch($expr.falso,ef);
 		}
@@ -582,9 +658,8 @@ exprOr
 exprOr_[Variable t1, Deque<Integer> cierto1, Deque<Integer> falso1]
 	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
 	OR {
-		Etiqueta e = new Etiqueta();
-		genera(Instruccion.OP.skip, null, null, e.toString());
-		te.nuevaEtiqueta(e, pc);
+		Etiqueta e = te.get(te.nuevaEtiqueta());
+		genera(OP.skip, null, null, e.toString());
 	} exprAnd {
 		backpatch($falso1, e);
 		$cierto = concat($cierto1, $exprAnd.cierto);
@@ -616,9 +691,8 @@ exprAnd
 exprAnd_[Variable t1, Deque<Integer> cierto1, Deque<Integer> falso1]
 	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
 	AND {
-		Etiqueta e = new Etiqueta();
-		genera(Instruccion.OP.skip, null, null, e.toString());
-		te.nuevaEtiqueta(e, pc);
+		Etiqueta e = te.get(te.nuevaEtiqueta());
+		genera(OP.skip, null, null, e.toString());
 	} exprNot {
 		backpatch($cierto1, e);
 		$falso = concat($falso1, $exprNot.falso);
@@ -666,7 +740,7 @@ exprComp_[Variable t1]
 		genera(valorSaltoCond($OPREL.getText()), $t1.toString(), $exprAdit.r.toString(), null);
 		$cierto=new ArrayDeque<Integer>();
  		$cierto.add(pc);
-		genera(Instruccion.OP.jump, null, null, null);
+		genera(OP.jump, null, null, null);
 		$falso=new ArrayDeque<Integer>();
  		$falso.add(pc);
 		$r = $exprAdit.r;
@@ -694,7 +768,7 @@ exprAdit_[Variable t1]
 	ADD exprMult {
 		int t = tv.nuevaVar(true,pproc.peek(),Tipo.VAR,TSub.INT);
 		tv.get(t).setTemporal(true);
-		genera(Instruccion.OP.add, $t1.toString(), $exprMult.r.toString(), tv.get(t).toString());
+		genera(OP.add, $t1.toString(), $exprMult.r.toString(), tv.get(t).toString());
 		$r=tv.get(t);
 		$cierto=$exprMult.cierto;
 		$falso=$exprMult.falso;
@@ -708,7 +782,7 @@ exprAdit_[Variable t1]
 	| SUB exprMult {
 		int t = tv.nuevaVar(true,pproc.peek(),Tipo.VAR,TSub.INT);
 		tv.get(t).setTemporal(true);
-		genera(Instruccion.OP.sub, $t1.toString(), $exprMult.r.toString(), tv.get(t).toString());
+		genera(OP.sub, $t1.toString(), $exprMult.r.toString(), tv.get(t).toString());
 		$r=tv.get(t);
 		$cierto=$exprMult.cierto;
 		$falso=$exprMult.falso;
@@ -741,7 +815,7 @@ exprMult_[Variable t1]
 	MULT exprNeg {
 		int t = tv.nuevaVar(true,pproc.peek(),Tipo.VAR,TSub.INT);
 		tv.get(t).setTemporal(true);
-		genera(Instruccion.OP.mult, $t1.toString(), $exprNeg.r.toString(), tv.get(t).toString());
+		genera(OP.mult, $t1.toString(), $exprNeg.r.toString(), tv.get(t).toString());
 		$r=tv.get(t);
 		$cierto=$exprNeg.cierto;
 		$falso=$exprNeg.falso;
@@ -755,7 +829,7 @@ exprMult_[Variable t1]
 	| DIV exprNeg {
 		int t = tv.nuevaVar(true,pproc.peek(),Tipo.VAR,TSub.INT);
 		tv.get(t).setTemporal(true);
-		genera(Instruccion.OP.div, $t1.toString(), $exprNeg.r.toString(), tv.get(t).toString());
+		genera(OP.div, $t1.toString(), $exprNeg.r.toString(), tv.get(t).toString());
 		$r=tv.get(t);
 		$cierto=$exprNeg.cierto;
 		$falso=$exprNeg.falso;
@@ -774,7 +848,7 @@ exprNeg
 	SUB primario {
 		int t = tv.nuevaVar(true,pproc.peek(),Tipo.VAR,TSub.INT);
 		tv.get(t).setTemporal(true);
-		genera(Instruccion.OP.neg, $primario.r.toString(), null, tv.get(t).toString());
+		genera(OP.neg, $primario.r.toString(), null, tv.get(t).toString());
 		$r = tv.get(t);
 		$cierto = $primario.cierto;
 		$falso = $primario.falso;
@@ -795,10 +869,10 @@ primario
 	| referencia {
 		$r = $referencia.r;
 		if($referencia.tsub==TSub.BOOLEAN) {
-			genera(Instruccion.OP.ifEQ, $r.toString(), "-1", null);
+			genera(OP.ifEQ, $r.toString(), "-1", null);
 			$cierto=new ArrayDeque<Integer>();
 			$cierto.add(pc);
-			genera(Instruccion.OP.jump, null, null, null);
+			genera(OP.jump, null, null, null);
 			$falso=new ArrayDeque<Integer>();
 			$falso.add(pc);
 		}
@@ -809,16 +883,16 @@ primario
 			case BOOLEAN:
 				t = tv.nuevaVar(true,pproc.peek(), Tipo.VAR,TSub.BOOLEAN);
 				if($literal.text.equals("true")) {
-					genera(Instruccion.OP.copy, "-1", null, tv.get(t).toString());
+					genera(OP.copy, "-1", null, tv.get(t).toString());
 					tv.get(t).setValor("-1");
-					genera(Instruccion.OP.jump, null, null, null);
+					genera(OP.jump, null, null, null);
 					$cierto=new ArrayDeque<Integer>();
 					$cierto.add(pc);
 					$falso = null;
 				} else {
-					genera(Instruccion.OP.copy, "0", null, tv.get(t).toString());
+					genera(OP.copy, "0", null, tv.get(t).toString());
 					tv.get(t).setValor("0");
-					genera(Instruccion.OP.jump, null, null, null);
+					genera(OP.jump, null, null, null);
 					$falso=new ArrayDeque<Integer>();
 					$falso.add(pc);
 					$cierto = null;
@@ -830,7 +904,7 @@ primario
 				break;
 			case INT:
 				t = tv.nuevaVar(true,pproc.peek(), Tipo.VAR,TSub.INT);
-				genera(Instruccion.OP.copy, $literal.text, null, tv.get(t).toString());
+				genera(OP.copy, $literal.text, null, tv.get(t).toString());
 				tv.get(t).setValor($literal.text);
 				break;
 			default:

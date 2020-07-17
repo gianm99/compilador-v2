@@ -14,19 +14,21 @@ import procesador.Simbolo.Tipo;
 
 public class Ensamblador {
     private String directorio;
-    private ArrayList<Instruccion> c3d;
+    private ArrayList<Instruccion> C3D;
     private ArrayList<String> asm;
     private TablaVariables tv;
     private TablaProcedimientos tp;
+    private TablaEtiquetas te;
     private int npActual; // El número de procedimiento actual
 
-    public Ensamblador(String directorio, ArrayList<Instruccion> c3d, TablaVariables tv,
-            TablaProcedimientos tp) {
+    public Ensamblador(String directorio, ArrayList<Instruccion> C3D, TablaVariables tv,
+            TablaProcedimientos tp, TablaEtiquetas te) {
         this.directorio = directorio;
-        this.c3d = c3d;
+        this.C3D = C3D;
         this.asm = new ArrayList<>();
         this.tv = tv;
         this.tp = tp;
+        this.te = te;
         this.npActual = 0;
     }
 
@@ -121,7 +123,7 @@ public class Ensamblador {
             }
         }
         asm.add(".data?");
-        asm.add("inputBuffer db 65536 dup(?)"); // Buffer del input (256^2 bytes)
+        asm.add("\tinputBuffer db 65536 dup(?)"); // Buffer del input (256^2 bytes)
         // DISP
         asm.add("\tDISP  DW  1000 DUP (?)");
         // Variables globales
@@ -136,8 +138,8 @@ public class Ensamblador {
         // Programa principal
         npActual = 0; // Ya no se está en una subrutina
         int i = 0;
-        while (i < c3d.size()) {
-            if (c3d.get(i).getOpCode() == OP.pmb) {
+        while (i < C3D.size()) {
+            if (C3D.get(i).getOpCode() == OP.pmb) {
                 // Saltar los subprogramas
                 i = saltarSubprograma(i);
             } else {
@@ -185,17 +187,17 @@ public class Ensamblador {
         asm.add("\tsub esp, 16             ; espacio para 'true' y 'false'");
         asm.add("\tmov esi, [ebp+12]");
         asm.add("\tmov eax, [esi]");
-        asm.add("\tmov byte ptr [ebp-4], 0");
-        asm.add("\tmov byte ptr [ebp-5], 'e'");
-        asm.add("\tmov byte ptr [ebp-6], 'u'");
-        asm.add("\tmov byte ptr [ebp-7], 'r'");
         asm.add("\tmov byte ptr [ebp-8], 't'");
-        asm.add("\tmov byte ptr [ebp-11], 0");
-        asm.add("\tmov byte ptr [ebp-12], 'e'");
-        asm.add("\tmov byte ptr [ebp-13], 's'");
-        asm.add("\tmov byte ptr [ebp-14], 'l'");
-        asm.add("\tmov byte ptr [ebp-15], 'a'");
+        asm.add("\tmov byte ptr [ebp-7], 'r'");
+        asm.add("\tmov byte ptr [ebp-6], 'u'");
+        asm.add("\tmov byte ptr [ebp-5], 'e'");
+        asm.add("\tmov byte ptr [ebp-4], 0");
         asm.add("\tmov byte ptr [ebp-16], 'f'");
+        asm.add("\tmov byte ptr [ebp-15], 'a'");
+        asm.add("\tmov byte ptr [ebp-14], 'l'");
+        asm.add("\tmov byte ptr [ebp-13], 's'");
+        asm.add("\tmov byte ptr [ebp-12], 'e'");
+        asm.add("\tmov byte ptr [ebp-11], 0");
         asm.add("\ttest eax, eax           ; comprobar si es 0 (falso) o -1 (verdadero)");
         asm.add("\tjnl falso");
         asm.add("\tlea edi, [ebp-8]");
@@ -295,7 +297,7 @@ public class Ensamblador {
         for (int p = 5; p <= tp.getNp(); p++) {
             npActual = p; // La subrutina actual
             Procedimiento pp = tp.get(p);
-            int l = pp.getInicio().getNl();
+            int l = te.get(pp.getInicio()).getLinea();
             asm.add(pp + ":");
             // pmb
             int prof4x = tp.get(p).getProf() * 4;
@@ -308,7 +310,7 @@ public class Ensamblador {
                     + "  ; reserva memoria para las variables locales");
             l++;
             while (true) {
-                Instruccion ins = c3d.get(l);
+                Instruccion ins = C3D.get(l);
                 if (ins.getOpCode() == OP.pmb) {
                     // Saltar las declaraciones de subrutinas locales
                     l = saltarSubprograma(l);
@@ -350,7 +352,7 @@ public class Ensamblador {
 
     private void conversion(int i) {
         Variable a, b, c;
-        Instruccion ins = c3d.get(i);
+        Instruccion ins = C3D.get(i);
         switch (ins.getOpCode()) {
         case and:
             // a = b and c
@@ -503,7 +505,7 @@ public class Ensamblador {
             break;
         case skip:
             // e: skip
-            asm.add(ins.destino() + " :");
+            asm.add(ins.destino() + ":");
             break;
         case jump:
             // goto e
@@ -620,7 +622,7 @@ public class Ensamblador {
         case params:
             // params a
             a = tv.get(ins.destino());
-            loadAddrReg("eax", a); // No puede ser un literal
+            loadAddrReg("eax", a); // TODO Solucionar el caso de strings literales
             asm.add("\tpush eax");
             break;
         case st:
@@ -799,9 +801,9 @@ public class Ensamblador {
         int prof = 1;
         i++;
         while (prof != 0) {
-            if (c3d.get(i).isInstFinal()) {
+            if (C3D.get(i).isInstFinal()) {
                 prof--;
-            } else if (c3d.get(i).getOpCode() == OP.pmb) {
+            } else if (C3D.get(i).getOpCode() == OP.pmb) {
                 prof++;
             }
             i++;
