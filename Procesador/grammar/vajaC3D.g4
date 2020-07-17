@@ -525,7 +525,6 @@ referencia
 			s = ts.consulta($ID.getText());
 			if (s.getT() == Tipo.CONST){
 				t = tv.nuevaVar(true,pproc.peek(),Tipo.VAR,s.tsub());
-				tv.get(t).setTemporal(true);
 				switch(s.tsub()) {
 					case BOOLEAN:
 						genera(OP.copy, s.getValor(), null, tv.get(t).toString());
@@ -767,7 +766,6 @@ exprAdit_[Variable t1]
 	returns[Variable r, Deque<Integer> cierto, Deque<Integer falso>]:
 	ADD exprMult {
 		int t = tv.nuevaVar(true,pproc.peek(),Tipo.VAR,TSub.INT);
-		tv.get(t).setTemporal(true);
 		genera(OP.add, $t1.toString(), $exprMult.r.toString(), tv.get(t).toString());
 		$r=tv.get(t);
 		$cierto=$exprMult.cierto;
@@ -781,7 +779,6 @@ exprAdit_[Variable t1]
 	}
 	| SUB exprMult {
 		int t = tv.nuevaVar(true,pproc.peek(),Tipo.VAR,TSub.INT);
-		tv.get(t).setTemporal(true);
 		genera(OP.sub, $t1.toString(), $exprMult.r.toString(), tv.get(t).toString());
 		$r=tv.get(t);
 		$cierto=$exprMult.cierto;
@@ -814,7 +811,6 @@ exprMult_[Variable t1]
 	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
 	MULT exprNeg {
 		int t = tv.nuevaVar(true,pproc.peek(),Tipo.VAR,TSub.INT);
-		tv.get(t).setTemporal(true);
 		genera(OP.mult, $t1.toString(), $exprNeg.r.toString(), tv.get(t).toString());
 		$r=tv.get(t);
 		$cierto=$exprNeg.cierto;
@@ -828,7 +824,6 @@ exprMult_[Variable t1]
 	}
 	| DIV exprNeg {
 		int t = tv.nuevaVar(true,pproc.peek(),Tipo.VAR,TSub.INT);
-		tv.get(t).setTemporal(true);
 		genera(OP.div, $t1.toString(), $exprNeg.r.toString(), tv.get(t).toString());
 		$r=tv.get(t);
 		$cierto=$exprNeg.cierto;
@@ -847,7 +842,6 @@ exprNeg
 	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
 	SUB primario {
 		int t = tv.nuevaVar(true,pproc.peek(),Tipo.VAR,TSub.INT);
-		tv.get(t).setTemporal(true);
 		genera(OP.neg, $primario.r.toString(), null, tv.get(t).toString());
 		$r = tv.get(t);
 		$cierto = $primario.cierto;
@@ -910,7 +904,6 @@ primario
 			default:
 				break;
 		}
-		tv.get(t).setTemporal(true);
 		$r = tv.get(t);
 	};
 
