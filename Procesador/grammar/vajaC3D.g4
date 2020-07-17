@@ -66,6 +66,10 @@ public void backpatch(Deque<Integer> lista, Etiqueta e){
 	}
 }
 
+public void backpatch(int linea, Etiqueta e){
+	C3D.get(linea-1).setEtiqueta(e.toString());
+}
+
 public Deque<Integer> concat(Deque<Integer> dq1, Deque<Integer> dq2){
 	if(dq1==null) {
 		return dq2;
