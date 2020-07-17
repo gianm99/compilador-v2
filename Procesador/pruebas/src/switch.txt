@@ -1,4 +1,4 @@
-const string mensaje = " Ha funcionado correctamente";
+var string mensaje = " Hola mundo";
 var int i = 2;
 switch(i) {
     case 1:
