@@ -366,6 +366,29 @@ sent[Deque<Integer> sents_seg]
 		backpatch($expr.falso, ef);
 		$sent_seg = concat(sents_seg1, $sents.sents_seg);
 	}
+	| contcase endcase END {
+		genera(OP.skip, null, null, $contcase.etest.toString());
+		while($contcase.pilacond.size()!=0) {
+			Etiqueta econd = $contcase.pilacond.remove();
+			Etiqueta etest = $contcase.pilatest.remove();
+			Variable v = tv.get($contcase.pilavar.remove());
+			Etiqueta esent = $contcase.pilasent.remove();
+			genera(OP.jump, null, null, econd.toString());
+			genera(OP.skip, null, null, etest.toString());
+			genera(OP.ifEQ, $contcase.r.toString(), v.toString(), esent.toString());
+		}
+		if($endcase.e!=null) {
+			if(!$contcase.acababreak && $contcase.pilaefi.size()>0) {
+				int seg = $contcase.pilaefi.removeLast();
+				backpatch(seg, $endcase.e);
+			}
+			genera(OP.jump, null, null, $endcase.e.toString());
+			genera(OP.skip, null, null, $endcase.efi.toString());
+		}
+		Etiqueta efi = te.get(te.nuevaEtiqueta());
+		backpatch($contcase.pilaefi, efi);
+		genera(OP.skip, null, null, efi.toString());
+	}
 	| WHILE {
 		try{
 			ts=ts.bajaBloque();
@@ -423,6 +446,75 @@ sent[Deque<Integer> sents_seg]
 		}
 	}
 	| referencia ';';
+
+contcase
+	returns[Variable r, boolean acababreak, Etiqueta etest, Deque<Integer> pilaefi, Deque<Etiqueta> pilasent, Deque<Integer> pilavar, Deque<Etiqueta> pilacond, Deque<Etiqueta> pilatest]
+		:
+	SWITCH expr BEGIN {
+		$etest = te.get(te.nuevaEtiqueta());
+		genera(OP.jump, null, null, $etest.toString());
+		$r = $expr.r;
+		$pilaefi = new ArrayDeque<>();
+		$pilasent = new ArrayDeque<Etiqueta>();
+		$pilavar = new ArrayDeque<Integer>();
+		$pilacond = new ArrayDeque<Etiqueta>();
+		$pilatest = new ArrayDeque<Etiqueta>();
+	} contcase_[$r, true, $etest, $pilaefi, $pilasent, $pilavar, $pilacond, $pilatest] {
+		$acababreak = $contcase_.acababreak;
+	};
+
+contcase_[Variable r, boolean acababreak1, Etiqueta etest, Deque<Integer> pilaefi, Deque<Etiqueta> pilasent, Deque<Integer> pilavar, Deque<Etiqueta> pilacond, Deque<Etiqueta> pilatest]
+	returns[boolean acababreak]:
+	caso {
+		if(!$acababreak1 && $pilaefi.size()>0) {
+			int seg = $pilaefi.removeLast();
+			backpatch(seg, $caso.esent);
+		}
+		$pilaefi.add($caso.seg);
+		$pilacond.add($caso.econd);
+		$pilavar.add($caso.r.getNv());
+		$pilatest.add($caso.etest);
+		$pilasent.add($caso.esent);
+	} contcase_[$r, $caso.acababreak, $etest, $pilaefi, $pilasent, $pilavar, $pilacond, $pilatest] {
+		$acababreak=$contcase_.acababreak;
+	}
+	| {
+		$acababreak=$acababreak1;
+	}; // lambda
+
+caso
+	returns[Variable r, Etiqueta econd, Etiqueta etest, Etiqueta esent, int seg, boolean acababreak]
+		:
+	CASE {
+		$econd = te.get(te.nuevaEtiqueta());
+		genera(OP.skip, null, null, $econd.toString());
+	} expr ':' {
+		$etest = te.get(te.nuevaEtiqueta());
+		genera(OP.jump, null, null, $etest.toString());
+		$esent = te.get(te.nuevaEtiqueta());
+		genera(OP.skip, null, null, $esent.toString());
+	} sents {
+		$acababreak=false;
+	} (
+		BREAK ';' {
+		$acababreak=true;
+	}
+	)? {
+		$r = $expr.r;
+		genera(OP.jump, null, null, null);
+		$seg = pc;
+	};
+
+endcase
+	returns[Etiqueta e, Etiqueta efi]:
+	DEFAULT ':' {
+		$e = te.get(te.nuevaEtiqueta());
+		genera(OP.skip, null, null, $e.toString());
+	} sents {
+		$efi = te.get(te.nuevaEtiqueta());
+		genera(OP.jump, null, null, $efi.toString());
+	}
+	|; // lambda
 
 referencia
 	returns[Variable r, TSub tsub]:

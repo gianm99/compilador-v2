@@ -232,6 +232,9 @@ sent:
 		profCondRep--;
 		ts=ts.saleBloque();
 	} END
+	| contcase endcase {
+		profCondRep--;
+	} END
 	| WHILE expr {
 		if($expr.tsub!=Simbolo.TSub.BOOLEAN) {
 			errores+="Error semántico - Línea "+$WHILE.getLine()+
@@ -304,6 +307,30 @@ sent:
 			}
 		}
 	};
+
+contcase:
+	SWITCH expr {
+		if($expr.tsub!=Simbolo.TSub.INT) {
+			errores+="Error semántico - Línea "+$SWITCH.getLine()+
+			": tipos incompatibles (esperado 'INT', encontrado '"+$expr.tsub+"')\n";
+		}
+	} BEGIN {
+		profCondRep++;
+	} contcase_;
+
+contcase_:
+	caso contcase_
+	| ; // lambda
+
+caso:
+	CASE expr {
+	if($expr.tsub!=Simbolo.TSub.INT) {
+		errores+="Error semántico - Línea "+$CASE.getLine()+
+		": tipos incompatibles (esperado 'INT', encontrado '"+$expr.tsub+"')\n";
+	}
+} ':' sents (BREAK ';')? ;
+
+endcase: DEFAULT ':' sents |;
 
 referencia[boolean asignacion]
 	returns[Simbolo s]:
@@ -625,6 +652,10 @@ STRING: 'string';
 WHILE: 'while';
 IF: 'if';
 ELSE: 'else';
+SWITCH: 'switch';
+CASE: 'case';
+DEFAULT: 'default';
+BREAK: 'break';
 // Enteros
 LiteralInteger: DecimalLiteral;
 fragment DecimalLiteral: DecimalPositivo | '0';
