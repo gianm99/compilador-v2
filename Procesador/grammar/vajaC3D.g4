@@ -472,7 +472,7 @@ contcase_[Variable r, boolean acababreak1, Etiqueta etest, Deque<Integer> pilaef
 		}
 		$pilaefi.add($caso.seg);
 		$pilacond.add($caso.econd);
-		$pilavar.add($caso.r.getNv());
+		$pilavar.add($caso.r.nv());
 		$pilatest.add($caso.etest);
 		$pilasent.add($caso.esent);
 	} contcase_[$r, $caso.acababreak, $etest, $pilaefi, $pilasent, $pilavar, $pilacond, $pilatest] {

@@ -61,11 +61,11 @@ public class Variable {
         return tsub;
     }
 
-    public boolean isTemporal() {
+    public boolean temporal() {
         return temporal;
     }
 
-    public int getNv() {
+    public int nv() {
         return nv;
     }
 

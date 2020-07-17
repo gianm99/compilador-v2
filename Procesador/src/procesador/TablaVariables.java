@@ -149,7 +149,7 @@ public class TablaVariables {
                 }
                 if (!var.isBorrada())
                     tabla += "<td>" + var.tsub() + "</td><td>" + var.toString() + "</td><td>"
-                            + var.isTemporal() + "</td><td>" + proc + "</td><td>" + var.tipo()
+                            + var.temporal() + "</td><td>" + proc + "</td><td>" + var.tipo()
                             + "</td><td>" + valor + "</td><td>" + var.getOcup() + "</td><td>" + desp
                             + "</td><td>" + nparam + "</td></tr>";
             }
