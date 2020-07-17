@@ -94,9 +94,11 @@ decl:
 }
 	)? ';'
 	| CONSTANT tipo ID {
+	Simbolo s = null;
 	try {
 		ts.inserta($ID.getText(),new Simbolo($ID.getText(),null,Simbolo.Tipo.CONST,$tipo.tsub));
-		ts.consulta($ID.getText()).setInicializada(true);
+		s = ts.consulta($ID.getText());
+		s.setInicializada(true);
 	} catch(TablaSimbolos.TablaSimbolosException e) {
 		errores+="Error semántico - Línea "+$ID.getLine()+": constante '"+$ID.getText()+
 		"' redeclarada\n";
@@ -105,6 +107,25 @@ decl:
 	if($literal.tsub!=$tipo.tsub) {
 		errores+="Error semántico - Línea "+$ID.getLine()+": tipos incompatibles (esperado '"+
 		$tipo.tsub+"')\n";
+	}
+	if(s!=null) {
+		switch($literal.tsub) {
+			case INT:
+				s.setValor($literal.text);
+				break;
+			case BOOLEAN:
+				if($literal.text.equals("true")) {
+					s.setValor("-1");
+				} else {
+					s.setValor("0");
+				}
+				break;
+			case STRING:
+				s.setValor($literal.text);
+				break;
+			default:
+				break;
+		}
 	}
 }
 	| FUNCTION tipo encabezado[$tipo.tsub] BEGIN {

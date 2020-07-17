@@ -185,23 +185,6 @@ decl:
 		Simbolo s;
 		try {
 			s = ts.consulta($ID.getText());
-			switch($literal.tsub) {
-				case INT:
-					s.setValor($literal.text);
-					break;
-				case BOOLEAN:
-					if($literal.text.equals("true")) {
-						s.setValor("-1");
-					} else {
-						s.setValor("0");
-					}
-					break;
-				case STRING:
-					s.setValor($literal.text);
-					break;
-				default:
-					break;
-			}
 			int nv=tv.nuevaVar(false,pproc.peek(),Simbolo.Tipo.CONST, s.tsub());
 			tv.get(nv).setId(s.getId());
 			tv.get(nv).setValor(s.getValor());
