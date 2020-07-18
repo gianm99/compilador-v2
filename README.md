@@ -45,7 +45,7 @@ El proceso de optimización del *back-end* puede constar de diferentes elementos
 
 Se tendrá que entregar una documentación describiendo el trabajo realizado y el código generado, que tiene que funcionar perfectamente y sin errores, el código fuente también se tiene que poder compilar sin errores ni avisos de ningún tipo.
 
-Una vez entregada la práctica se tendrá que realizar una entrevista para discutir los diferentes aspectos.
+~~Una vez entregada la práctica se tendrá que realizar una entrevista para discutir los diferentes aspectos.~~
 
 ## Elementos de evaluación
 
