@@ -112,7 +112,7 @@ public class Optimizador {
         ArrayList<String> gotos = new ArrayList<String>();
         for (int i = 0; i < C3D.size(); i++) {
             Instruccion ins = C3D.get(i);
-            if (ins.getOpCode() == Instruccion.OP.skip) {
+            if (ins.getOpCode() == Instruccion.OP.skip && !te.get(ins.destino()).isDeproc()) {
                 skips.add(ins.destino());
             } else if (ins.getOpCode() == Instruccion.OP.jump || esIf(ins)) {
                 gotos.add(ins.destino());
@@ -285,7 +285,7 @@ public class Optimizador {
         Etiqueta e;
         for (int i = 0; i < C3D.size(); i++) {
             if (C3D.get(i).getOpCode() == Instruccion.OP.skip) {
-                e = te.get(C3D.get(i).destino().substring(1));
+                e = te.get(C3D.get(i).destino());
                 e.setNl(i + 1);
                 teaux.add(e);
             }

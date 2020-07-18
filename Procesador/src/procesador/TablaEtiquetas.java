@@ -10,8 +10,9 @@ public class TablaEtiquetas {
         this.te = new ArrayList<Etiqueta>();
     }
 
-    public void nuevaEtiqueta(Etiqueta e, int nl){
+    public void nuevaEtiqueta(Etiqueta e, int nl, boolean deproc){
         e.setNl(nl);
+        e.setDeproc(deproc);
         te.add(e);
     }
 
@@ -24,11 +25,13 @@ public class TablaEtiquetas {
     }
 
     public Etiqueta get(String etiqueta) {
-        if (etiqueta != null) {
-            return te.get(Integer.parseInt(etiqueta) - 1);
-        } else {
+        if (etiqueta == null) {
+            return null;
+        } 
+        if(etiqueta.equals("")){
             return null;
         }
+        return te.get(Integer.parseInt(etiqueta.substring(1)) - 1);
     }
 
 }

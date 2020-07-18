@@ -9,6 +9,7 @@ public class Etiqueta {
     private int nl; // Número de línea
     private int ne; // Número de etiqueta
     private static int ce = 0; // Cantidad de etiquetas
+    private boolean deproc;
 
     public Etiqueta() {
         ce++; // Aumenta la cantidad de etiquetas generadas
@@ -34,5 +35,13 @@ public class Etiqueta {
     @Override
     public String toString() {
         return "e" + ne;
+    }
+
+    public boolean isDeproc() {
+        return deproc;
+    }
+
+    public void setDeproc(boolean deproc) {
+        this.deproc = deproc;
     }
 }
