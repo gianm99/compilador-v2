@@ -83,12 +83,8 @@ public class Simbolo {
 		this.t = t;
 	}
 
-	public TSub getTsub() {
+	public TSub tsub() {
 		return tsub;
-	}
-
-	public void setTsub(TSub tsub) {
-		this.tsub = tsub;
 	}
 
 	public boolean isReturnEncontrado() {

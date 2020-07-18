@@ -1,0 +1,14 @@
+var string mensaje = " Hola mundo";
+var int i = 2;
+switch(i) {
+    case 1:
+        printi(1);
+    case 2:
+        printi(2);
+    case 3:
+        printi(3);
+        break;
+    default:
+        printi(i);
+}
+prints(mensaje);

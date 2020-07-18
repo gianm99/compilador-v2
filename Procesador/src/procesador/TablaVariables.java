@@ -44,7 +44,7 @@ public class TablaVariables {
     public void quitarVar(ArrayList<Instruccion> var) {
         int i = 0;
         while (i < var.size()) {
-            if (get(var.get(i).destino()).getTsub() != Simbolo.TSub.STRING) {
+            if (get(var.get(i).destino()).tsub() != Simbolo.TSub.STRING) {
                 quitarVar(var.get(i).destino());
                 var.remove(i);
             } else {
@@ -113,7 +113,7 @@ public class TablaVariables {
             for (int i = 0; i < tv.size(); i++) {
                 var = tv.get(i);
                 tabla += "<tr style=\"background-color:";
-                switch (var.getTsub()) {
+                switch (var.tsub()) {
                 case STRING:
                     tabla += "#D1BCFF\">";
                     break;
@@ -148,8 +148,8 @@ public class TablaVariables {
                     desp = "-";
                 }
                 if (!var.isBorrada())
-                    tabla += "<td>" + var.getTsub() + "</td><td>" + var.toString() + "</td><td>"
-                            + var.isTemporal() + "</td><td>" + proc + "</td><td>" + var.tipo()
+                    tabla += "<td>" + var.tsub() + "</td><td>" + var.toString() + "</td><td>"
+                            + var.temporal() + "</td><td>" + proc + "</td><td>" + var.tipo()
                             + "</td><td>" + valor + "</td><td>" + var.getOcup() + "</td><td>" + desp
                             + "</td><td>" + nparam + "</td></tr>";
             }

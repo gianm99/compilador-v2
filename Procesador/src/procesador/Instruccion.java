@@ -8,7 +8,6 @@ public class Instruccion {
     private String[] instruccion = new String[4];
     private boolean instFinal;
 
-    // TODO Crear nueva operación 'store'
     public enum OP {
         copy, add, sub, mult, div, neg, and, or, not, skip, ifLT, ifLE, ifEQ, ifNE, ifGE, ifGT, jump, pmb, call, ret, st, params
     }
@@ -172,6 +171,9 @@ public class Instruccion {
                 break;
             case params:
                 instruccion[0] = "param_s";
+                break;
+            case st:
+                instruccion[0] = "store";
                 break;
         }
     }

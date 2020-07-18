@@ -94,9 +94,11 @@ decl:
 }
 	)? ';'
 	| CONSTANT tipo ID {
+	Simbolo s = null;
 	try {
 		ts.inserta($ID.getText(),new Simbolo($ID.getText(),null,Simbolo.Tipo.CONST,$tipo.tsub));
-		ts.consulta($ID.getText()).setInicializada(true);
+		s = ts.consulta($ID.getText());
+		s.setInicializada(true);
 	} catch(TablaSimbolos.TablaSimbolosException e) {
 		errores+="Error semántico - Línea "+$ID.getLine()+": constante '"+$ID.getText()+
 		"' redeclarada\n";
@@ -105,6 +107,25 @@ decl:
 	if($literal.tsub!=$tipo.tsub) {
 		errores+="Error semántico - Línea "+$ID.getLine()+": tipos incompatibles (esperado '"+
 		$tipo.tsub+"')\n";
+	}
+	if(s!=null) {
+		switch($literal.tsub) {
+			case INT:
+				s.setValor($literal.text);
+				break;
+			case BOOLEAN:
+				if($literal.text.equals("true")) {
+					s.setValor("-1");
+				} else {
+					s.setValor("0");
+				}
+				break;
+			case STRING:
+				s.setValor($literal.text);
+				break;
+			default:
+				break;
+		}
 	}
 }
 	| FUNCTION tipo encabezado[$tipo.tsub] BEGIN {
@@ -232,6 +253,9 @@ sent:
 		profCondRep--;
 		ts=ts.saleBloque();
 	} END
+	| contcase endcase {
+		profCondRep--;
+	} END
 	| WHILE expr {
 		if($expr.tsub!=Simbolo.TSub.BOOLEAN) {
 			errores+="Error semántico - Línea "+$WHILE.getLine()+
@@ -255,10 +279,10 @@ sent:
 				// Return no vacío en un procedimiento
 				errores+="Error semántico - Línea "+$RETURN.getLine()+
 				": return de expresión en un procedimiento\n";
-			} else if(funcion.getTsub()!=$expr.tsub) {
+			} else if(funcion.tsub()!=$expr.tsub) {
 				// Return de tipo incorrecto
 				errores+="Error semántico - Línea "+$RETURN.getLine()+
-				": return de tipo incorrecto (esperado '"+pproc.peek().getTsub()+
+				": return de tipo incorrecto (esperado '"+pproc.peek().tsub()+
 				"', encontrado '"+$expr.tsub+"')\n";
 			} else if(profCondRep==0) {
 				// Return correcto
@@ -288,9 +312,9 @@ sent:
 			} else if($referencia.s.getT()==Simbolo.Tipo.FUNC || $referencia.s.getT()==Simbolo.Tipo.PROC) {
 				errores+="Error semántico - Línea "+$ASSIGN.getLine()+
 				": no se esperaba una función o un procedimiento\n";
-			} else if($referencia.s.getTsub()!=$expr.tsub) {
+			} else if($referencia.s.tsub()!=$expr.tsub) {
 				errores+="Error semántico - Línea "+$ASSIGN.getLine()+
-				": asignación de tipo incorrecto (esperado '"+$referencia.s.getTsub()+
+				": asignación de tipo incorrecto (esperado '"+$referencia.s.tsub()+
 				"', encontrado '"+$expr.tsub+"')\n";
 			}
 		}
@@ -304,6 +328,30 @@ sent:
 			}
 		}
 	};
+
+contcase:
+	SWITCH expr {
+		if($expr.tsub!=Simbolo.TSub.INT) {
+			errores+="Error semántico - Línea "+$SWITCH.getLine()+
+			": tipos incompatibles (esperado 'INT', encontrado '"+$expr.tsub+"')\n";
+		}
+	} BEGIN {
+		profCondRep++;
+	} contcase_;
+
+contcase_:
+	caso contcase_
+	| ; // lambda
+
+caso:
+	CASE expr {
+	if($expr.tsub!=Simbolo.TSub.INT) {
+		errores+="Error semántico - Línea "+$CASE.getLine()+
+		": tipos incompatibles (esperado 'INT', encontrado '"+$expr.tsub+"')\n";
+	}
+} ':' sents (BREAK ';')? ;
+
+endcase: DEFAULT ':' sents |;
 
 referencia[boolean asignacion]
 	returns[Simbolo s]:
@@ -361,9 +409,9 @@ contIdx
 					errores+="Error semántico - Línea "+$ID.getLine()+
 					": demasiados argumentos para "+$ID.getText()+"\n";
 					break;
-				} else if(aux!=param.getTsub()) {
+				} else if(aux!=param.tsub()) {
 					errores+="Error semántico - Línea "+$ID.getLine()+
-					": tipos incompatibles (esperado '"+param.getTsub()+
+					": tipos incompatibles (esperado '"+param.tsub()+
 					"', encontrado '"+aux+"')\n";
 					break;
 				}
@@ -550,6 +598,9 @@ exprMult_
 		if($exprNeg.tsub!=Simbolo.TSub.INT) {
 			errores+="Error semántico - Línea "+$exprNeg.start.getLine()+
 			": tipos incompatibles (esperado INT, encontrado "+$exprNeg.tsub+")\n";
+		} else if($exprNeg.cero) {
+			errores+="Error semántico - Línea "+$exprNeg.start.getLine()+
+			": división por cero\n";
 		}
 		$tsub=Simbolo.TSub.INT;
 	}
@@ -557,22 +608,25 @@ exprMult_
 
 // Expresión de negación
 exprNeg
-	returns[Simbolo.TSub tsub]:
+	returns[Simbolo.TSub tsub, boolean cero]:
 	SUB primario {
 		if($primario.tsub!=Simbolo.TSub.INT) {
 			errores+="Error semántico - Línea "+$primario.start.getLine()+
 			": tipos incompatibles (esperado INT, encontrado "+$primario.tsub+")\n";
 		}
 		$tsub=Simbolo.TSub.INT;
+		$cero=$primario.cero;
 	}
 	| primario {
 		$tsub=$primario.tsub;
+		$cero=$primario.cero;
 	};
 
 primario
-	returns[Simbolo.TSub tsub]:
+	returns[Simbolo.TSub tsub, boolean cero]:
 	'(' expr ')' {
 		$tsub=$expr.tsub;
+		$cero=false;
 	}
 	| referencia[false] {
 		if($referencia.s==null) {
@@ -580,11 +634,15 @@ primario
 			": tipos incompatibles (encontrado NULL)\n";
 			$tsub=Simbolo.TSub.NULL;
 		} else {
-			$tsub=$referencia.s.getTsub();
+			$tsub=$referencia.s.tsub();
+			if($referencia.s.getT()==Simbolo.Tipo.CONST && $referencia.s.tsub()==Simbolo.TSub.INT) {
+				$cero=$referencia.s.getValor().equals("0");
+			}
 		}
 	}
 	| literal {
 		$tsub=$literal.tsub;
+		$cero=$literal.cero;
 	};
 
 tipo
@@ -600,15 +658,18 @@ tipo
 	};
 
 literal
-	returns[Simbolo.TSub tsub]:
+	returns[Simbolo.TSub tsub, boolean cero]:
 	LiteralInteger {
 		$tsub=Simbolo.TSub.INT;
+		$cero=$LiteralInteger.getText().equals("0");
 	}
 	| LiteralBoolean {
 		$tsub=Simbolo.TSub.BOOLEAN;
+		$cero=false;
 	}
 	| LiteralString {
 		$tsub=Simbolo.TSub.STRING;
+		$cero=false;
 	};
 
 // Palabras reservadas
@@ -625,6 +686,10 @@ STRING: 'string';
 WHILE: 'while';
 IF: 'if';
 ELSE: 'else';
+SWITCH: 'switch';
+CASE: 'case';
+DEFAULT: 'default';
+BREAK: 'break';
 // Enteros
 LiteralInteger: DecimalLiteral;
 fragment DecimalLiteral: DecimalPositivo | '0';

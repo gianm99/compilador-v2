@@ -11,7 +11,7 @@ public class Procedimiento {
     private String id;
     private int np; // Número de procedimiento
     private int prof; // Nivel de la declaración
-    private Etiqueta inicio; // Etiqueta de inicio
+    private int inicio; // Etiqueta de inicio
     private int numParams; // Número de parámetros
     private int ocupVL; // Ocupación de las variables locales
     private Simbolo.Tipo tipo; // Función o Procedimiento
@@ -40,11 +40,11 @@ public class Procedimiento {
         this.np = np;
     }
 
-    public Etiqueta getInicio() {
+    public int getInicio() {
         return inicio;
     }
 
-    public void setInicio(Etiqueta inicio) {
+    public void setInicio(int inicio) {
         this.inicio = inicio;
     }
 
