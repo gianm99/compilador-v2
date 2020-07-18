@@ -1,5 +1,5 @@
-var string mensaje = " Hola mundo";
-var int i = 2;
+string mensaje = " Hola mundo";
+int i = 2;
 switch(i) {
     case 1:
         printi(1);

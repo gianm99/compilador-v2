@@ -1,16 +1,15 @@
-var int a=3;
+int a=3;
 const string s1 = "Hola mundo";
 const int asdf=32;
 const boolean VERDAD=true;
-var string s2 = s1;
-var int c=a;
-# var boolean par = VERDAD && (false || true);
-var boolean par = VERDAD;
+string s2 = s1;
+int c=a;
+boolean par = VERDAD && (false || true);
 func boolean function1(string str, int i, boolean foo){
-	var int a = 2;
-	var boolean b;
+	int a = 2;
+	boolean b;
 	proc prueba(){
-		var int asdf=89;
+		int asdf=89;
 		printi(5);
 	}
 	a = 5;
@@ -31,10 +30,10 @@ func int funcion2() {
 proc main(){
 	printi(c);
 }
-var int z = 2+10;
-var int y = 0;
+int z = 2+10;
+int y = 0;
 if(3>5){
-	var boolean b;
+	boolean b;
 	a=78;
 	z=z/8+z+89*58;
 }

@@ -151,7 +151,7 @@ programa:
 };
 
 decl:
-	VARIABLE tipo ID {
+	tipo ID {
 		Simbolo s=new Simbolo();
 		int nv=0;
 		try {

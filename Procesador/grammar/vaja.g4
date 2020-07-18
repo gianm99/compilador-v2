@@ -72,7 +72,7 @@ programa:
 };
 
 decl:
-	VARIABLE tipo ID {
+	tipo ID {
 	try{
 		ts.inserta($ID.getText(),new Simbolo($ID.getText(),null,Simbolo.Tipo.VAR,$tipo.tsub));
 	} catch(TablaSimbolos.TablaSimbolosException e) {
@@ -339,9 +339,7 @@ contcase:
 		profCondRep++;
 	} contcase_;
 
-contcase_:
-	caso contcase_
-	| ; // lambda
+contcase_: caso contcase_ |; // lambda
 
 caso:
 	CASE expr {
@@ -349,7 +347,7 @@ caso:
 		errores+="Error semántico - Línea "+$CASE.getLine()+
 		": tipos incompatibles (esperado 'INT', encontrado '"+$expr.tsub+"')\n";
 	}
-} ':' sents (BREAK ';')? ;
+} ':' sents (BREAK ';')?;
 
 endcase: DEFAULT ':' sents |;
 
