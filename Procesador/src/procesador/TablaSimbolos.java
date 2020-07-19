@@ -132,6 +132,34 @@ public class TablaSimbolos {
 
     }
 
+    public void inserta(String id, Tabla t) throws TablaSimbolosException {
+        if(this.existe(id)) {
+            throw new TablaSimbolosException("identificador repetido: " + id);
+        }
+        tabla.put(id, t);
+        try {
+            // TS poner elemento
+            buffer.write("<td>" + t.getId() + "</td>" + "<td>" + t.getT() + "</td>" + "<td>"
+                    + t.tsub() + "</td>\n");
+            if (t.getNext() != null) { // TODO Hacer algo aquí con los índices
+                Simbolo sn = t.getNext();
+                buffer.write("<td>" + "<table style='width:100%'>" + "<tr>" + "<th>Id</th>"
+                        + "<th>Tipo</th>" + "<th>Tipo Subyacente</th>" + "</tr>" + "<tr>\n");
+                while (sn != null) {
+                    buffer.write("<td>" + sn.getId() + "</td>" + "<td>" + sn.getT() + "</td>"
+                            + "<td>" + sn.tsub() + "</td></tr>\n");
+                    sn = sn.getNext();
+                }
+                buffer.write("</table>" + "</td>\n");
+            } else {
+                buffer.write("<td>" + "null" + "</td>\n");
+            }
+            buffer.write("</tr>" + "<tr>\n");
+        } catch (IOException e) {
+            System.out.println("error escribiendo la tabla de símbolos: " + e.getMessage());
+        }
+    }
+
     private boolean existe(String id) {
         return this.tabla.get(id) != null;
     }
