@@ -314,9 +314,9 @@ sent:
 			if($referencia.s.getT()==Simbolo.Tipo.CONST) {
 				errores+="Error semántico - Línea "+$ASSIGN.getLine()+": "+$referencia.s.getId()+
 				"es una constante\n";
-			} else if($referencia.s.getT()==Simbolo.Tipo.FUNC || $referencia.s.getT()==Simbolo.Tipo.PROC) {
+			} else if($referencia.s.getT()==Simbolo.Tipo.FUNC || $referencia.s.tsub()==Simbolo.TSub.NULL) {
 				errores+="Error semántico - Línea "+$ASSIGN.getLine()+
-				": no se esperaba una función o un procedimiento\n";
+				": no se pueden asignar valores a esta referencia\n";
 			} else if($referencia.s.tsub()!=$expr.tsub) {
 				errores+="Error semántico - Línea "+$ASSIGN.getLine()+
 				": asignación de tipo incorrecto (esperado '"+$referencia.s.tsub()+
