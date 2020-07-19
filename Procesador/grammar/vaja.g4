@@ -79,19 +79,19 @@ decl:
 		errores+="Error semántico - Línea "+$ID.getLine()+": variable '"+$ID.getText()+
 		"' redeclarada\n";
 	}
-} (
+	} (
 		'=' expr {
-	try{
-		ts.consulta($ID.getText()).setInicializada(true);
-	} catch(TablaSimbolos.TablaSimbolosException e) {
-		errores+="Error semántico - Línea "+$ID.getLine()+": variable '"+$ID.getText()+
-		"' no existe\n";
-	}
-	if($expr.tsub!=$tipo.tsub) {
-		errores+="Error semántico - Línea "+$ID.getLine()+": tipos incompatibles (esperado '"+
-		$tipo.tsub+"', encontrado '"+$expr.tsub+"')\n";
-	}
-}
+		try{
+			ts.consulta($ID.getText()).setInicializada(true);
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			errores+="Error semántico - Línea "+$ID.getLine()+": variable '"+$ID.getText()+
+			"' no existe\n";
+		}
+		if($expr.tsub!=$tipo.tsub) {
+			errores+="Error semántico - Línea "+$ID.getLine()+": tipos incompatibles (esperado '"+
+			$tipo.tsub+"', encontrado '"+$expr.tsub+"')\n";
+		}
+		}
 	)? ';'
 	| CONSTANT tipo ID {
 	Simbolo s = null;
@@ -103,31 +103,31 @@ decl:
 		errores+="Error semántico - Línea "+$ID.getLine()+": constante '"+$ID.getText()+
 		"' redeclarada\n";
 	}
-} '=' literal ';' {
-	if($literal.tsub!=$tipo.tsub) {
-		errores+="Error semántico - Línea "+$ID.getLine()+": tipos incompatibles (esperado '"+
-		$tipo.tsub+"')\n";
-	}
-	if(s!=null) {
-		switch($literal.tsub) {
-			case INT:
-				s.setValor($literal.text);
-				break;
-			case BOOLEAN:
-				if($literal.text.equals("true")) {
-					s.setValor("-1");
-				} else {
-					s.setValor("0");
-				}
-				break;
-			case STRING:
-				s.setValor($literal.text);
-				break;
-			default:
-				break;
+	} '=' literal ';' {
+		if($literal.tsub!=$tipo.tsub) {
+			errores+="Error semántico - Línea "+$ID.getLine()+": tipos incompatibles (esperado '"+
+			$tipo.tsub+"')\n";
+		}
+		if(s!=null) {
+			switch($literal.tsub) {
+				case INT:
+					s.setValor($literal.text);
+					break;
+				case BOOLEAN:
+					if($literal.text.equals("true")) {
+						s.setValor("-1");
+					} else {
+						s.setValor("0");
+					}
+					break;
+				case STRING:
+					s.setValor($literal.text);
+					break;
+				default:
+					break;
+			}
 		}
 	}
-}
 	| declArray ']' ';'
 	| FUNCTION tipo encabezado[$tipo.tsub] BEGIN {
 		try {
@@ -194,9 +194,82 @@ decl:
 		}
 	};
 
-declArray: 	tipo ID '[' literal declArray_;
+declArray:
+	tipo ID '[' {
+		Simbolo s = new Simbolo($ID.getText(),null,Simbolo.Tipo.VAR,Simbolo.TSub.NULL);
+		Tabla dt = new Tabla($tipo.tsub); 
+		s.setDt(dt);
+		try{
+			ts.inserta($ID.getText(),s);
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			errores+="Error semántico - Línea "+$ID.getLine()+": variable '"+$ID.getText()+
+			"' redeclarada\n";
+		}
+		int li = 0;
+	} (
+		numero '..' {
+		if(!$numero.constante) {
+			errores+="Error semántico - Línea "+$ID.getLine()+
+			": los límites del índice deben ser valores constantes\n";
+		}
+		li = $numero.valor;
+	}
+	)? numero {
+		if(!$numero.constante) {
+			errores+="Error semántico - Línea "+$ID.getLine()+
+			": los límites del índice deben ser valores constantes\n";
+		}
+		int lf = $numero.valor;
+		if(li>lf) {
+			errores+="Error semántico - Línea "+$numero.start.getLine()+
+			": el límite inferior no puede ser mayor al superior\n";
+		}
+		dt.nuevoIndice(li, lf);
+	} declArray_[dt] {
+		dt.calcularDimensiones();
+		dt.calcularB();
+	};
 
-declArray_: ']' '[' literal declArray_;
+numero
+	returns[int valor, boolean constante]:
+	LiteralInteger {
+		$valor=Integer.parseInt($LiteralInteger.getText());
+		$constante=true;
+	}
+	| referencia[false] {
+		if($referencia.s!=null && $referencia.s.getT()==Simbolo.Tipo.CONST) {
+			$valor=Integer.parseInt($referencia.s.getValor());
+			$constante=true;
+		} else {
+			$valor=0;
+			$constante=false;
+		}
+};
+
+declArray_[Tabla dt]:
+	']' '[' {
+		int li = 0;
+	} (
+		numero '..' {
+		if(!$numero.constante) {
+			errores+="Error semántico - Línea "+$numero.start.getLine()+
+			": los límites del índice deben ser valores constantes\n";
+		}
+		li = $numero.valor;
+	}
+	)? numero {
+		if(!$numero.constante) {
+			errores+="Error semántico - Línea "+$numero.start.getLine()+
+			": los límites del índice deben ser valores constantes\n";
+		}
+		int lf = $numero.valor;
+		if(li>lf) {
+			errores+="Error semántico - Línea "+$numero.start.getLine()+
+			": el límite inferior no puede ser mayor al superior\n";
+		}
+		$dt.nuevoIndice(li, lf);
+	} declArray_[$dt]
+	|; // lambda 
 
 encabezado[Simbolo.TSub tsub]
 	returns[Simbolo met]:
@@ -314,13 +387,21 @@ sent:
 			if($referencia.s.getT()==Simbolo.Tipo.CONST) {
 				errores+="Error semántico - Línea "+$ASSIGN.getLine()+": "+$referencia.s.getId()+
 				"es una constante\n";
-			} else if($referencia.s.getT()==Simbolo.Tipo.FUNC || $referencia.s.tsub()==Simbolo.TSub.NULL) {
-				errores+="Error semántico - Línea "+$ASSIGN.getLine()+
-				": no se pueden asignar valores a esta referencia\n";
-			} else if($referencia.s.tsub()!=$expr.tsub) {
-				errores+="Error semántico - Línea "+$ASSIGN.getLine()+
-				": asignación de tipo incorrecto (esperado '"+$referencia.s.tsub()+
-				"', encontrado '"+$expr.tsub+"')\n";
+			} else{
+				Simbolo.TSub tsubyacente;
+				if($referencia.dt!=null && $referencia.dimCorrectas) {
+					tsubyacente = $referencia.dt.tsubt(); // Tabla bien usada
+				} else {
+					tsubyacente = $referencia.s.tsub(); // Demás casos
+				}
+				if($referencia.s.getT()==Simbolo.Tipo.FUNC || tsubyacente==Simbolo.TSub.NULL) {
+					errores+="Error semántico - Línea "+$ASSIGN.getLine()+
+					": no se pueden asignar valores a esta referencia\n";
+				} else if(tsubyacente!=$expr.tsub) {
+						errores+="Error semántico - Línea "+$ASSIGN.getLine()+
+						": asignación de tipo incorrecto (esperado '"+tsubyacente+
+						"', encontrado '"+$expr.tsub+"')\n";
+				}
 			}
 		}
 	}
@@ -357,7 +438,7 @@ caso:
 endcase: DEFAULT ':' sents |;
 
 referencia[boolean asignacion]
-	returns[Simbolo s]:
+	returns[Simbolo s, Tabla dt, boolean dimCorrectas]:
 	ID {
 		try {
 			$s=ts.consulta($ID.getText());
@@ -374,7 +455,23 @@ referencia[boolean asignacion]
 			$s=null;
 		}
 	}
-	| idx ']'
+	| idx ']' {
+		if($idx.dt!=null) {
+			// Comprobar la cantidad de indirecciones usadas
+			int d = $idx.dt.dimensiones();
+			if($idx.dimensiones<d) {
+				errores+="Error semántico - Línea "+$idx.start.getLine()+
+				": la tabla tiene más dimensiones\n";
+				$dimCorrectas=false;
+			} else if($idx.dimensiones>d){
+				errores+="Error semántico - Línea "+$idx.start.getLine()+
+				": la tabla no tiene tantas dimensiones\n";
+				$dimCorrectas=false;
+			} else {
+				$dimCorrectas=true;
+			}
+		}
+	}
 	| ID '(' ')' {
 		try {
 			$s=ts.consulta($ID.getText());
@@ -391,9 +488,44 @@ referencia[boolean asignacion]
 		$s=$contIdx.met;
 	};
 
-idx: ID '[' expr idx_;
+idx
+	returns[Simbolo t, int dimensiones, Tabla dt]:
+	ID '[' expr {
+	int d = 1;
+	try {
+		$t = ts.consulta($ID.getText());
+	} catch(TablaSimbolos.TablaSimbolosException e) {
+		errores+="Error semántico - Línea "+$ID.getLine()+": "+e.getMessage()+"\n";
+	}
+	if($expr.tsub!=Simbolo.TSub.INT) {
+		errores+="Error semántico - Línea "+$expr.start.getLine()+": "+$expr.text+
+		" no es un valor numérico\n";
+	}
+	if($t!=null) {
+		$dt=$t.getDt();
+		if($dt==null) {
+			errores+="Error semántico - Línea "+$ID.getLine()+": "+$ID.getText()+
+			" no es una tabla\n";
+		}
+	}
+} idx_[d] {
+	$dimensiones = $idx_.dimensiones;
+};
 
-idx_: ']' '[' expr idx_ |;
+idx_[int dimensiones1]
+	returns[int dimensiones]:
+	']' '[' expr {
+		if($expr.tsub!=Simbolo.TSub.INT) {
+			errores+="Error semántico - Línea "+$expr.start.getLine()+": "+$expr.text+
+			" no es un valor numérico\n";
+		}
+		int d = $dimensiones1 + 1;
+	} idx_[d] {
+		$dimensiones=$idx_.dimensiones;
+	}
+	| {
+	$dimensiones=$dimensiones1;
+};
 
 contIdx
 	returns[Simbolo met]:
@@ -645,6 +777,8 @@ primario
 			$tsub=$referencia.s.tsub();
 			if($referencia.s.getT()==Simbolo.Tipo.CONST && $referencia.s.tsub()==Simbolo.TSub.INT) {
 				$cero=$referencia.s.getValor().equals("0");
+			} else if($referencia.dt!=null && $referencia.dimCorrectas) {
+				$tsub=$referencia.s.getDt().tsubt(); // Para los elementos de tablas
 			}
 		}
 	}
