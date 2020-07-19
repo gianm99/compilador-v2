@@ -1,0 +1,9 @@
+Declaración de arrays
+1. Si se marcan los dos límites, que el superior sea menor al inferior.
+
+Uso de arrays
+1. No es una tabla.
+2. Menos dimensiones de las reales.
+3. Más dimensiones de las reales.
+4. Las expresiones de las indirecciones no son números.
+5. Los valores de las indirecciones son conocidos en tiempo de compilación y están fuera de los límites (Complicado).
