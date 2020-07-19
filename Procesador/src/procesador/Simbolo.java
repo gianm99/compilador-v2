@@ -17,6 +17,7 @@ public class Simbolo {
 	private boolean inicializada;
 	private int nv;
 	private Procedimiento np;
+	private Tabla dt; // Descripción de tabla
 
 	public enum Tipo {
 		CONST, VAR, PROC, FUNC, ARG, NULO;
@@ -109,5 +110,13 @@ public class Simbolo {
 
 	public void setNv(int nv) {
 		this.nv = nv;
+	}
+
+	public Tabla getDt() {
+		return dt;
+	}
+
+	public void setDt(Tabla dt) {
+		this.dt = dt;
 	}
 }

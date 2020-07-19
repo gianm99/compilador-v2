@@ -1,5 +1,7 @@
 package procesador;
 
+import procesador.Simbolo.TSub;
+
 /**
  * La clase Tabla representa una tabla o 'array' y contiene la información
  * necesaria para verificar que se usan de forma correcta en los archivos que se
@@ -7,16 +9,15 @@ package procesador;
  *
  * @author @gianm99
  */
-public class Tabla extends Simbolo {
+public class Tabla {
     private TSub tsubt; // Tipo subyacente de la tabla
     private Indice primero, ultimo; // Inicio y fin de lista de índices
     private int b; // Desplazamiento conocido en tiempo de compilación
     private int ocupacion; // Ocupación (bytes) de cada elemento
     private int dimensiones; // Número de dimensiones de la tabla
 
-    public Tabla(String id, TSub tsubt) {
+    public Tabla(TSub tsubt) {
         // TSub.NULL porque la tabla no tiene tipo subyacente
-        super(id, null, Tipo.VAR, TSub.NULL);
         this.tsubt = tsubt;
         this.primero = null;
         this.ultimo = null;
