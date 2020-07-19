@@ -128,6 +128,7 @@ decl:
 		}
 	}
 }
+	| declArray ']' ';'
 	| FUNCTION tipo encabezado[$tipo.tsub] BEGIN {
 		try {
 			ts.inserta($encabezado.met.getId(),$encabezado.met);
@@ -192,6 +193,10 @@ decl:
 			": no se puede definir un procedimiento en una estructura condicional o repetitiva\n";
 		}
 	};
+
+declArray: 	tipo ID '[' literal declArray_;
+
+declArray_: ']' '[' literal declArray_;
 
 encabezado[Simbolo.TSub tsub]
 	returns[Simbolo met]:
@@ -369,6 +374,7 @@ referencia[boolean asignacion]
 			$s=null;
 		}
 	}
+	| idx ']'
 	| ID '(' ')' {
 		try {
 			$s=ts.consulta($ID.getText());
@@ -384,6 +390,10 @@ referencia[boolean asignacion]
 	| contIdx ')' {
 		$s=$contIdx.met;
 	};
+
+idx: ID '[' expr idx_;
+
+idx_: ']' '[' expr idx_ |;
 
 contIdx
 	returns[Simbolo met]:
