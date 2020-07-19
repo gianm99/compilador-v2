@@ -10,7 +10,7 @@ public class Indice {
     private int li; // Límite inferior
     private int lf; // Límite superior
     private int d; // Dimensión del índice
-    private Indice siguiente;
+    private Indice siguiente; // Puntero al siguiente índice
 
     Indice(int li, int lf) {
         this.li = li;
@@ -19,22 +19,48 @@ public class Indice {
         this.siguiente = null;
     }
 
+    /**
+     * Devuelve el siguiente índice.
+     * 
+     * @return El siguiente índice.
+     */
     public Indice siguiente() {
         return siguiente;
     }
 
+    /**
+     * Asigna el siguiente índice.
+     * 
+     * @param indice
+     *                   El índice siguiente al actual.
+     */
     public void setSiguiente(Indice indice) {
         this.siguiente = indice;
     }
 
+    /**
+     * Devuelve el límite inferior.
+     * 
+     * @return El límite inferior
+     */
     public int li() {
         return li;
     }
 
+    /**
+     * Devuelve el límite superior.
+     * 
+     * @return El límite superior.
+     */
     public int lf() {
         return lf;
     }
 
+    /**
+     * Devuelve la dimensión del índice.
+     * 
+     * @return La dimensión del índice.
+     */
     public int d() {
         return d;
     }
