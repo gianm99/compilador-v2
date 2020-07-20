@@ -1,14 +1,12 @@
-const int MAX = 10;
 int i = 0;
-int a[MAX][MAX];
-a[0][1]=1;
-a[0][2]=2;
-a[0][3]=3;
-a[0][4]=4;
-a[0][5]=5;
-while(i<MAX) {
+int a[2][2];
+a[0][0]=1;
+a[0][1]=2;
+a[1][0]=3;
+a[1][1]=4;
+while(i<2) {
     int j = 0;
-    while(j<MAX) {
+    while(j<2) {
         printi(a[i][j]);
         j=j+1;
     }

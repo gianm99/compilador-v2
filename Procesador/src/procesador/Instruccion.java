@@ -8,7 +8,6 @@ public class Instruccion {
     private String[] instruccion = new String[4];
     private boolean instFinal;
 
-    // TODO Adaptar las funciones para añadir las nuevas instrucciones
     public enum OP {
         copy, add, sub, mod, mult, div, neg, and, or, not, skip, ifLT, ifLE, ifEQ, ifNE, ifGE, ifGT, jump, pmb, call, ret, st, params, ind_val, ind_ass
     }

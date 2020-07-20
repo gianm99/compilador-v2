@@ -130,7 +130,11 @@ public class Ensamblador {
         for (int x = 1; x <= tv.getNv(); x++) {
             Variable vx = tv.get(x);
             if (vx.tipo() == Simbolo.Tipo.VAR && !vx.isBorrada() && vx.proc() == 0) {
-                asm.add("\t" + vx + "  DD  ?");
+                if (vx.getElementos() > 1) {
+                    asm.add("\t " + vx + "  DD  " + vx.getElementos() + " dup (?)");
+                } else {
+                    asm.add("\t" + vx + "  DD  ?");
+                }
             }
         }
         asm.add(".code");
@@ -520,6 +524,40 @@ public class Ensamblador {
             }
             storeRegMem(a, "eax");
             break;
+        case ind_val:
+            // a = b [c]
+            a = tv.get(ins.destino());
+            b = tv.get(ins.getOperando(1));
+            c = tv.get(ins.getOperando(2));
+            loadAddrReg("eax", b);
+            if (c != null) {
+                loadMemReg("ebx", c);
+            } else {
+                asm.add("\tmov ebx, " + ins.getOperando(2));
+            }
+            asm.add("add eax, ebx  ; EAX = @ b[c]");
+            asm.add("mov eax, [eax]  ; EAX = b[c]");
+            storeRegMem(a, "eax");
+            break;
+        case ind_ass:
+            // a [b] = c
+            a = tv.get(ins.destino());
+            b = tv.get(ins.getOperando(1));
+            c = tv.get(ins.getOperando(2));
+            loadAddrReg("eax", a);
+            if (b != null) {
+                loadMemReg("ebx", b);
+            } else {
+                asm.add("\tmov ebx, " + ins.getOperando(1));
+            }
+            asm.add("add eax, ebx  ; EAX = @ a[b]");
+            if (c != null) {
+                loadMemReg("ebx", c);
+            } else {
+                asm.add("\tmov ebx, " + ins.getOperando(2));
+            }
+            asm.add("mov [eax], ebx  ; a[b] = c");
+            break;
         case skip:
             // e: skip
             asm.add(ins.destino() + ":");
@@ -639,8 +677,8 @@ public class Ensamblador {
         case params:
             // params a
             a = tv.get(ins.destino());
-            if (a.tipo()==Tipo.CONST && a.tsub()==TSub.STRING) {
-                loadAddrReg("eax", a);                
+            if (a.tipo() == Tipo.CONST && a.tsub() == TSub.STRING) {
+                loadAddrReg("eax", a);
             } else {
                 loadMemReg("eax", a);
             }
@@ -689,7 +727,7 @@ public class Ensamblador {
         } else if (profp == profx) {
             // x es un parámetro local
             int dx = 8 + 4 * x.getNparam();
-            asm.add("\tmov "+R+", [ebp+"+dx+"]");
+            asm.add("\tmov " + R + ", [ebp+" + dx + "]");
         } else if (profp < profx && x.getDesp() < 0) {
             // x es una variable definida en otro ámbito
             int dx = x.getDesp();
@@ -703,7 +741,7 @@ public class Ensamblador {
             int prof4x = profx * 4;
             asm.add("\tmov esi, OFFSET DISP  ; ESI = @ DISP");
             asm.add("\tmov esi, [esi+" + prof4x + "]  ; ESI = DISP[profx] = BPx");
-            asm.add("\tmov "+R+", [esi+" + dx + "]");
+            asm.add("\tmov " + R + ", [esi+" + dx + "]");
         }
     }
 
