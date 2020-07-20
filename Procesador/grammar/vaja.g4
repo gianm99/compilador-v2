@@ -243,22 +243,6 @@ declArray:
 		dt.calcularB();
 	};
 
-numero
-	returns[int valor, boolean constante]:
-	LiteralInteger {
-		$valor=Integer.parseInt($LiteralInteger.getText());
-		$constante=true;
-	}
-	| referencia[false] {
-		if($referencia.s!=null && $referencia.s.getT()==Simbolo.Tipo.CONST) {
-			$valor=Integer.parseInt($referencia.s.getValor());
-			$constante=true;
-		} else {
-			$valor=0;
-			$constante=false;
-		}
-};
-
 declArray_[Tabla dt]:
 	']' '[' {
 		int li = 0;
@@ -283,6 +267,22 @@ declArray_[Tabla dt]:
 		$dt.nuevoIndice(li, lf);
 	} declArray_[$dt]
 	|; // lambda 
+
+numero
+	returns[int valor, boolean constante]:
+	LiteralInteger {
+		$valor=Integer.parseInt($LiteralInteger.getText());
+		$constante=true;
+	}
+	| referencia[false] {
+		if($referencia.s!=null && $referencia.s.getT()==Simbolo.Tipo.CONST) {
+			$valor=Integer.parseInt($referencia.s.getValor());
+			$constante=true;
+		} else {
+			$valor=0;
+			$constante=false;
+		}
+};
 
 encabezado[Simbolo.TSub tsub]
 	returns[Simbolo met]:
