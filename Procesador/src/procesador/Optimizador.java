@@ -137,7 +137,7 @@ public class Optimizador {
         }
         i = 0;
         borrado = false;
-        while (i < C3D.size() - 1) { // TODO Puede haber más gotos en este caso
+        while (i < C3D.size() - 1) {
             if (borrado)
                 C3DquitarInstruccion(i - 1);
             borrado = false;

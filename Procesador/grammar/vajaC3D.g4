@@ -282,7 +282,7 @@ declArray:
 
 declArray_:
 	']' '[' (numero '..')? numero declArray_
-	|; // lambda 
+	|; // lambda
 
 numero
 	returns[int valor, boolean constante]:
@@ -582,7 +582,7 @@ referencia
 	| idx ']' {
 		Variable t2;
 		String nbytes = String.valueOf($idx.dt.ocupacion());
-		if($idx.dt.b()==0) { // TODO Apuntar esto en la documentación
+		if($idx.dt.b()==0) {
 			t2 = tv.get(tv.nuevaVar(true, pproc.peek(), Tipo.VAR, TSub.INT));
 			genera(OP.mult, $idx.d.toString(), nbytes, t2.toString());
 		} else {
@@ -665,7 +665,6 @@ contIdx
 			s = ts.consulta($ID.getText());
 			$s = s;
 			$met = s.getNp();
-			// TODO Comprobar si esto funciona con booleans
 			$pparams.push($expr.r);
 			// Boolean parámetro
 			if($expr.cierto!=null || $expr.falso!=null) {
