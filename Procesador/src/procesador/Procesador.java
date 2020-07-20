@@ -79,9 +79,10 @@ public class Procesador {
         optimizador.optimizar();
         optimizador.getTv().tablaHTML(buildPath + "/tablavariables_OPT.html");
         // Ensamblado de código optimizado
-        // Ensamblador optimizado = new Ensamblador(buildPath + filename + "_OPT",
-        //         optimizador.getC3D(), optimizador.getTv(), optimizador.getTp(),
-        //         optimizador.getTe());
-        // optimizado.ensamblar();
-    }
+        Ensamblador optimizado = new Ensamblador(buildPath + filename + "_OPT",
+                optimizador.getC3D(), optimizador.getTv(), optimizador.getTp(),
+                optimizador.getTe());
+        optimizado.ensamblar();
+    }  
 }
+

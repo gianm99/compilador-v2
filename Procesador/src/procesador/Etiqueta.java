@@ -8,9 +8,11 @@ package procesador;
 public class Etiqueta {
     private int ne; // Número de etiqueta
     private int linea; // Número de línea
+    private boolean deproc;
 
-    public Etiqueta(int ne) {
+    public Etiqueta(int ne, boolean deproc) {
         this.ne = ne; // Asigna el número de etiqueta
+        this.deproc = deproc;
         this.linea= 0; // Al principio la línea no está asignada
     }
 
@@ -33,5 +35,13 @@ public class Etiqueta {
     @Override
     public String toString() {
         return "e" + ne;
+    }
+
+    public boolean isDeproc() {
+        return deproc;
+    }
+
+    public void setDeproc(boolean deproc) {
+        this.deproc = deproc;
     }
 }

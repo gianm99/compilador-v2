@@ -143,7 +143,7 @@ programa:
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
 	} decl* sents EOF {
-	Etiqueta e=te.get(te.nuevaEtiqueta());
+	Etiqueta e=te.get(te.nuevaEtiqueta(false));
 	genera(OP.skip, null, null, e.toString());
 	backpatch($sents.sents_seg,e);
 	tv.calculoDespOcupVL(tp);
@@ -165,9 +165,9 @@ decl:
 	} (
 		'=' expr {
 			if(s.tsub()==TSub.BOOLEAN) {
-				Etiqueta ec=te.get(te.nuevaEtiqueta());
-				Etiqueta ef=te.get(te.nuevaEtiqueta());
-				Etiqueta efin=te.get(te.nuevaEtiqueta());
+				Etiqueta ec=te.get(te.nuevaEtiqueta(false));
+				Etiqueta ef=te.get(te.nuevaEtiqueta(false));
+				Etiqueta efin=te.get(te.nuevaEtiqueta(false));
 				genera(OP.skip, null, null, ec.toString());
 				genera(OP.copy, "-1", null, tv.get(nv).toString());
 				genera(OP.jump, null, null, efin.toString());
@@ -216,7 +216,7 @@ decl:
 			aux=aux.getNext();
 			nparam++;
 		}
-		Etiqueta e=te.get(te.nuevaEtiqueta());
+		Etiqueta e=te.get(te.nuevaEtiqueta(true));
 		$encabezado.met.setInicio(e.getNe());
 		$encabezado.met.setNumParams(nparam-1);
 		genera(OP.skip, null, null, e.toString());
@@ -250,7 +250,7 @@ decl:
 			aux=aux.getNext();
 			nparam++;
 		}
-		Etiqueta e=te.get(te.nuevaEtiqueta());
+		Etiqueta e=te.get(te.nuevaEtiqueta(true));
 		$encabezado.met.setInicio(e.getNe());
 		$encabezado.met.setNumParams(nparam-1);
 		genera(OP.skip, null, null, e.toString());
@@ -286,7 +286,7 @@ parametro: tipo ID;
 sents
 	returns[Deque<Integer> sents_seg]:
 	sent[$sents_seg] {
-		Etiqueta ec = te.get(te.nuevaEtiqueta());
+		Etiqueta ec = te.get(te.nuevaEtiqueta(false));
 		genera(OP.skip, null, null, ec.toString());
 	} sents_[$sents_seg] {
 		backpatch($sent.sent_seg, ec);
@@ -300,7 +300,7 @@ sents
 sents_[Deque<Integer> sents_seg]
 	returns[Deque<Integer> sents_seg_]:
 	sent[$sents_seg] {
-		Etiqueta ec = te.get(te.nuevaEtiqueta());
+		Etiqueta ec = te.get(te.nuevaEtiqueta(false));
 		genera(OP.skip, null, null, ec.toString());
 	} sents_[$sents_seg] {
 		backpatch($sent.sent_seg, ec);
@@ -320,7 +320,7 @@ sent[Deque<Integer> sents_seg]
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
-		Etiqueta ec = te.get(te.nuevaEtiqueta());
+		Etiqueta ec = te.get(te.nuevaEtiqueta(false));
 		genera(OP.skip, null, null, ec.toString());
 	} decl* sents {
 		ts=ts.subeBloque();
@@ -333,14 +333,14 @@ sent[Deque<Integer> sents_seg]
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
-		Etiqueta ec = te.get(te.nuevaEtiqueta());
+		Etiqueta ec = te.get(te.nuevaEtiqueta(false));
 		genera(OP.skip, null, null, ec.toString());
 	} decl* sents {
 	} END {
 		Deque<Integer> sents_seg1 = new ArrayDeque<Integer>();
 		genera(OP.jump, null, null, null);
 		sents_seg1.add(pc);
-		Etiqueta ef = te.get(te.nuevaEtiqueta());
+		Etiqueta ef = te.get(te.nuevaEtiqueta(false));
 		genera(OP.skip, null, null, ef.toString());
 	} ELSE BEGIN {
 	} decl* sents END {
@@ -368,7 +368,7 @@ sent[Deque<Integer> sents_seg]
 			genera(OP.jump, null, null, $endcase.e.toString());
 			genera(OP.skip, null, null, $endcase.efi.toString());
 		}
-		Etiqueta efi = te.get(te.nuevaEtiqueta());
+		Etiqueta efi = te.get(te.nuevaEtiqueta(false));
 		backpatch($contcase.pilaefi, efi);
 		genera(OP.skip, null, null, efi.toString());
 	}
@@ -378,10 +378,10 @@ sent[Deque<Integer> sents_seg]
 		} catch(TablaSimbolos.TablaSimbolosException e) {
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
-		Etiqueta ei = te.get(te.nuevaEtiqueta());
+		Etiqueta ei = te.get(te.nuevaEtiqueta(false));
 		genera(OP.skip, null, null, ei.toString());
 	} expr BEGIN {
-		Etiqueta ec = te.get(te.nuevaEtiqueta());
+		Etiqueta ec = te.get(te.nuevaEtiqueta(false));
 		genera(OP.skip, null, null, ec.toString());
 	} decl* sents {
 		ts=ts.subeBloque();
@@ -392,9 +392,9 @@ sent[Deque<Integer> sents_seg]
 	} END
 	| RETURN expr ';' {
 		if($expr.cierto!=null || $expr.falso!=null) {//cambiar
-			Etiqueta ec=te.get(te.nuevaEtiqueta());
-			Etiqueta ef=te.get(te.nuevaEtiqueta());
-			Etiqueta efin=te.get(te.nuevaEtiqueta());
+			Etiqueta ec=te.get(te.nuevaEtiqueta(false));
+			Etiqueta ef=te.get(te.nuevaEtiqueta(false));
+			Etiqueta efin=te.get(te.nuevaEtiqueta(false));
 			genera(OP.skip, null, null, ec.toString());
 			genera(OP.copy, "-1", null, $expr.r.toString());
 			$expr.r.setValor("-1");
@@ -413,9 +413,9 @@ sent[Deque<Integer> sents_seg]
 	}
 	| referencia '=' expr ';' {
 		if($referencia.tsub==TSub.BOOLEAN) {
-			Etiqueta ec=te.get(te.nuevaEtiqueta());
-			Etiqueta ef=te.get(te.nuevaEtiqueta());
-			Etiqueta efin=te.get(te.nuevaEtiqueta());
+			Etiqueta ec=te.get(te.nuevaEtiqueta(false));
+			Etiqueta ef=te.get(te.nuevaEtiqueta(false));
+			Etiqueta efin=te.get(te.nuevaEtiqueta(false));
 			genera(OP.skip, null, null, ec.toString());
 			genera(OP.copy, "-1", null, $referencia.r.toString());
 			genera(OP.jump, null, null, efin.toString());
@@ -434,7 +434,7 @@ contcase
 	returns[Variable r, boolean acababreak, Etiqueta etest, Deque<Integer> pilaefi, Deque<Etiqueta> pilasent, Deque<Integer> pilavar, Deque<Etiqueta> pilacond, Deque<Etiqueta> pilatest]
 		:
 	SWITCH expr BEGIN {
-		$etest = te.get(te.nuevaEtiqueta());
+		$etest = te.get(te.nuevaEtiqueta(false));
 		genera(OP.jump, null, null, $etest.toString());
 		$r = $expr.r;
 		$pilaefi = new ArrayDeque<>();
@@ -469,12 +469,12 @@ caso
 	returns[Variable r, Etiqueta econd, Etiqueta etest, Etiqueta esent, int seg, boolean acababreak]
 		:
 	CASE {
-		$econd = te.get(te.nuevaEtiqueta());
+		$econd = te.get(te.nuevaEtiqueta(false));
 		genera(OP.skip, null, null, $econd.toString());
 	} expr ':' {
-		$etest = te.get(te.nuevaEtiqueta());
+		$etest = te.get(te.nuevaEtiqueta(false));
 		genera(OP.jump, null, null, $etest.toString());
-		$esent = te.get(te.nuevaEtiqueta());
+		$esent = te.get(te.nuevaEtiqueta(false));
 		genera(OP.skip, null, null, $esent.toString());
 	} sents {
 		$acababreak=false;
@@ -491,10 +491,10 @@ caso
 endcase
 	returns[Etiqueta e, Etiqueta efi]:
 	DEFAULT ':' {
-		$e = te.get(te.nuevaEtiqueta());
+		$e = te.get(te.nuevaEtiqueta(false));
 		genera(OP.skip, null, null, $e.toString());
 	} sents {
-		$efi = te.get(te.nuevaEtiqueta());
+		$efi = te.get(te.nuevaEtiqueta(false));
 		genera(OP.jump, null, null, $efi.toString());
 	}
 	|; // lambda
@@ -577,9 +577,9 @@ contIdx
 			$pparams.push($expr.r);
 			// Boolean parámetro
 			if($expr.cierto!=null || $expr.falso!=null) {
-				Etiqueta ec=te.get(te.nuevaEtiqueta());
-				Etiqueta ef=te.get(te.nuevaEtiqueta());
-				Etiqueta efin=te.get(te.nuevaEtiqueta());
+				Etiqueta ec=te.get(te.nuevaEtiqueta(false));
+				Etiqueta ef=te.get(te.nuevaEtiqueta(false));
+				Etiqueta efin=te.get(te.nuevaEtiqueta(false));
 				genera(OP.skip, null, null, ec.toString());
 				genera(OP.copy, "-1", null, $expr.r.toString());
 				genera(OP.jump, null, null, efin.toString());
@@ -599,9 +599,9 @@ contIdx_[Deque<Variable> pparams]:
 		$pparams.push($expr.r);
 		// Boolean parámetro
 		if($expr.cierto!=null || $expr.falso!=null) {
-			Etiqueta ec=te.get(te.nuevaEtiqueta());
-			Etiqueta ef=te.get(te.nuevaEtiqueta());
-			Etiqueta efin=te.get(te.nuevaEtiqueta());
+			Etiqueta ec=te.get(te.nuevaEtiqueta(false));
+			Etiqueta ef=te.get(te.nuevaEtiqueta(false));
+			Etiqueta efin=te.get(te.nuevaEtiqueta(false));
 			genera(OP.skip, null, null, ec.toString());
 			genera(OP.copy, "-1", null, $expr.r.toString());
 			genera(OP.jump, null, null, efin.toString());
@@ -640,7 +640,7 @@ exprOr
 exprOr_[Variable t1, Deque<Integer> cierto1, Deque<Integer> falso1]
 	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
 	OR {
-		Etiqueta e = te.get(te.nuevaEtiqueta());
+		Etiqueta e = te.get(te.nuevaEtiqueta(false));
 		genera(OP.skip, null, null, e.toString());
 	} exprAnd {
 		backpatch($falso1, e);
@@ -673,7 +673,7 @@ exprAnd
 exprAnd_[Variable t1, Deque<Integer> cierto1, Deque<Integer> falso1]
 	returns[Variable r, Deque<Integer> cierto, Deque<Integer> falso]:
 	AND {
-		Etiqueta e = te.get(te.nuevaEtiqueta());
+		Etiqueta e = te.get(te.nuevaEtiqueta(false));
 		genera(OP.skip, null, null, e.toString());
 	} exprNot {
 		backpatch($cierto1, e);

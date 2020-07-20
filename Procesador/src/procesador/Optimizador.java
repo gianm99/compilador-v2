@@ -111,7 +111,7 @@ public class Optimizador {
         ArrayList<String> gotos = new ArrayList<String>();
         for (int i = 0; i < C3D.size(); i++) {
             Instruccion ins = C3D.get(i);
-            if (ins.getOpCode() == Instruccion.OP.skip) {
+            if (ins.getOpCode() == Instruccion.OP.skip && !te.get(ins.destino()).isDeproc()) {
                 skips.add(ins.destino());
             } else if (ins.getOpCode() == Instruccion.OP.jump || esIf(ins)) {
                 gotos.add(ins.destino());

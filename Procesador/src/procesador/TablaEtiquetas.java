@@ -11,9 +11,9 @@ public class TablaEtiquetas {
         this.te = new ArrayList<Etiqueta>();
     }
 
-    public int nuevaEtiqueta() {
+    public int nuevaEtiqueta(boolean deproc) {
         ne++; // Aumenta el número de etiquetas
-        te.add(new Etiqueta(ne));
+        te.add(new Etiqueta(ne, deproc));
         return ne;
     }
 
@@ -22,11 +22,13 @@ public class TablaEtiquetas {
     }
 
     public Etiqueta get(String etiqueta) {
-        if (etiqueta != null) {
-            return get(Integer.parseInt(etiqueta.substring(1)));
-        } else {
+        if (etiqueta == null) {
+            return null;
+        } 
+        if(etiqueta.equals("")){
             return null;
         }
+        return te.get(Integer.parseInt(etiqueta.substring(1)) - 1);
     }
 
 }
