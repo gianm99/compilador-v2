@@ -10,7 +10,7 @@ public class Variable {
     private int nv; // Número de variable
     private boolean temporal; // Si la variable es temporal
     private int proc; // Número del procedimiento que la ha declarado
-    private Simbolo.Tipo tipo; // Tipo: variable, constante o argumento
+    private Simbolo.Tipo tipo; // Tipo: variable o constante
     private Simbolo.TSub tsub; // Tipo subyacente
     private String id; // Identificador de la variable (t si es temporal)
     private String valor; // Valor para constantes
@@ -18,6 +18,7 @@ public class Variable {
     private int desp; // Desplazamiento en el ámbito local
     private int nparam; // Número de parámetro
     private boolean borrada; // Si la variable ha sido borrada
+    private int elementos; // Es 1 a menos que sea una tabla. Para tablas puede ser mayor.
 
     public Variable(int nv, boolean temporal, int proc, Simbolo.Tipo tipo, Simbolo.TSub tsub) {
         this.nv = nv;
@@ -31,6 +32,15 @@ public class Variable {
         this.ocup = 4; // 32 bits
         this.borrada = false;
         this.desp = 0;
+        this.elementos = 1; // Por defecto es 1
+    }
+
+    public int getElementos() {
+        return elementos;
+    }
+
+    public void setElementos(int elementos) {
+        this.elementos = elementos;
     }
 
     public boolean isBorrada() {
