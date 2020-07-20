@@ -1,14 +1,15 @@
-string mensaje = " Hola mundo";
-int i = 2;
+int i = 3;
+prints("La variable 'i' vale: ");
 switch(i) {
     case 1:
         printi(1);
+        break;
     case 2:
         printi(2);
+        break;
     case 3:
         printi(3);
         break;
     default:
-        printi(i);
+        prints("error");
 }
-prints(mensaje);

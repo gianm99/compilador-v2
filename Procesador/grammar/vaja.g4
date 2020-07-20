@@ -247,6 +247,7 @@ declArray:
 declArray_[Tabla dt]:
 	']' '[' {
 		int li = 0;
+		boolean limites=false;
 	} (
 		numero '..' {
 		if(!$numero.constante) {
@@ -254,6 +255,7 @@ declArray_[Tabla dt]:
 			": los límites del índice deben ser valores constantes\n";
 		}
 		li = $numero.valor;
+		limites=true;
 	}
 	)? numero {
 		if(!$numero.constante) {
@@ -261,10 +263,22 @@ declArray_[Tabla dt]:
 			": los límites del índice deben ser valores constantes\n";
 		}
 		int lf = $numero.valor;
-		if(li>lf) {
-			errores+="Error semántico - Línea "+$numero.start.getLine()+
-			": el límite inferior no puede ser mayor al superior\n";
+		if(!limites) {
+			// Caso en el que se indica el tamaño
+			if(lf<1) {
+				errores+="Error semántico - Línea "+$numero.start.getLine()+
+				": una tabla no puede ser de tamaño 0\n";
+			} else {
+				lf--; // Si se indica el tamaño, hay que corregir el limite superior
+			}
+		} else {
+			// Caso en el que se indican los limites
+			if(li>lf) {
+				errores+="Error semántico - Línea "+$numero.start.getLine()+
+				": el límite inferior no puede ser mayor al superior\n";
+			}
 		}
+
 		$dt.nuevoIndice(li, lf);
 	} declArray_[$dt]
 	|; // lambda 
@@ -275,11 +289,19 @@ numero
 		$valor=Integer.parseInt($LiteralInteger.getText());
 		$constante=true;
 	}
-	| referencia[false] {
-		if($referencia.s!=null && $referencia.s.getT()==Simbolo.Tipo.CONST) {
-			$valor=Integer.parseInt($referencia.s.getValor());
+	| ID {
+		Simbolo s=null;
+		try {
+			s=ts.consulta($ID.getText());
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			errores+="Error semántico - Línea "+$ID.getLine()+": "+e.getMessage()+"\n";
+		}
+		if(s!=null && s.getT()==Simbolo.Tipo.CONST) {
+			$valor=Integer.parseInt(s.getValor());
 			$constante=true;
 		} else {
+			errores+="Error semántico - Línea "+$ID.getLine()+
+			": el limite debe ser un literal o una constante\n";
 			$valor=0;
 			$constante=false;
 		}
@@ -470,9 +492,11 @@ referencia[boolean asignacion]
 		}
 	}
 	| idx ']' {
-		if($idx.dt!=null) {
+		$dt = $idx.dt;
+		$s = $idx.t;
+		if($dt!=null) {
 			// Comprobar la cantidad de indirecciones usadas
-			int d = $idx.dt.dimensiones();
+			int d = $dt.dimensiones();
 			if($idx.dimensiones<d) {
 				errores+="Error semántico - Línea "+$idx.start.getLine()+
 				": la tabla tiene más dimensiones\n";

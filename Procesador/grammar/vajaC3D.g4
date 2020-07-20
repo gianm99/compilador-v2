@@ -264,7 +264,8 @@ decl:
 		ts=ts.subeBloque();
 	} END;
 
-declArray: tipo ID '[' ( numero '..')? numero declArray_ {
+declArray:
+	tipo ID '[' (numero '..')? numero declArray_ {
 	Simbolo s=null;
 	int nv=0;
 	try {
@@ -277,7 +278,7 @@ declArray: tipo ID '[' ( numero '..')? numero declArray_ {
 	} catch(TablaSimbolos.TablaSimbolosException e) {
 		System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 	}
-} ;
+};
 
 declArray_:
 	']' '[' (numero '..')? numero declArray_
@@ -286,7 +287,7 @@ declArray_:
 numero
 	returns[int valor, boolean constante]:
 	LiteralInteger
-	| referencia;
+	| ID;
 
 encabezado
 	returns[Procedimiento met, Simbolo s]:
@@ -436,7 +437,7 @@ sent[Deque<Integer> sents_seg]
 	| RETURN ';' {
 		genera(OP.ret, null, null, pproc.peek().toString());
 	}
-	| referencia '=' expr ';' { // TODO Adaptar esto a los arrays
+	| referencia '=' expr ';' {
 		if($referencia.d!=null) {
 			if($referencia.tsub==TSub.BOOLEAN) {
 				Etiqueta ec=te.get(te.nuevaEtiqueta());
@@ -451,7 +452,7 @@ sent[Deque<Integer> sents_seg]
 				backpatch($expr.cierto,ec);
 				backpatch($expr.falso,ef);
 			} else {
-				genera(OP.copy, $referencia.d.toString(), $expr.r.toString(), $referencia.r.toString());
+				genera(OP.ind_ass, $referencia.d.toString(), $expr.r.toString(), $referencia.r.toString());
 			}
 		} else {
 			if($referencia.tsub==TSub.BOOLEAN) {
@@ -579,12 +580,18 @@ referencia
 		}
 	}
 	| idx ']' {
-		String b = String.valueOf($idx.dt.b());
+		Variable t2;
 		String nbytes = String.valueOf($idx.dt.ocupacion());
-		Variable t1 = tv.get(tv.nuevaVar(true, pproc.peek(), Tipo.VAR, TSub.INT));
-		genera(OP.sub, $idx.d.toString(), b, t1.toString());
-		Variable t2 = tv.get(tv.nuevaVar(true, pproc.peek(), Tipo.VAR, TSub.INT));
-		genera(OP.mult, t1.toString(), nbytes, t2.toString());
+		if($idx.dt.b()==0) { // TODO Apuntar esto en la documentación
+			t2 = tv.get(tv.nuevaVar(true, pproc.peek(), Tipo.VAR, TSub.INT));
+			genera(OP.mult, $idx.d.toString(), nbytes, t2.toString());
+		} else {
+			String b = String.valueOf($idx.dt.b());
+			Variable t1 = tv.get(tv.nuevaVar(true, pproc.peek(), Tipo.VAR, TSub.INT));
+			genera(OP.sub, $idx.d.toString(), b, t1.toString());
+			t2 = tv.get(tv.nuevaVar(true, pproc.peek(), Tipo.VAR, TSub.INT));
+			genera(OP.mult, t1.toString(), nbytes, t2.toString());
+		}
 		$r = $idx.r;
 		$d = t2;
 	}
