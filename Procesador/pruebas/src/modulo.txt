@@ -1,0 +1,2 @@
+int a = 7 % 4;
+printi(a);
