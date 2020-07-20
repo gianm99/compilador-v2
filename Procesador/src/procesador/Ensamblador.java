@@ -469,6 +469,26 @@ public class Ensamblador {
             asm.add("\tidiv ebx");
             storeRegMem(a, "eax");
             break;
+        case mod:
+            // a = b % c
+            a = tv.get(ins.destino());
+            b = tv.get(ins.getOperando(1));
+            c = tv.get(ins.getOperando(2));
+            if (b != null) {
+                loadMemReg("eax", b);
+            } else {
+                asm.add("\tmov eax, " + ins.getOperando(1));
+            }
+            asm.add("\tmov edx, eax");
+            asm.add("\tsar edx, 31");
+            if (c != null) {
+                loadMemReg("ebx", c);
+            } else {
+                asm.add("\tmov ebx, " + ins.getOperando(2));
+            }
+            asm.add("\tidiv ebx");
+            storeRegMem(a, "edx");
+            break;
         case mult:
             // a = b * c
             a = tv.get(ins.destino());
