@@ -19,6 +19,7 @@ func boolean function1(string str, int i, boolean foo){
 		b = par;
 		par=false;
 		a = a-1;
+		printi(a);
 	}
 	foo = true;
 	return false;
@@ -33,12 +34,14 @@ proc main(){
 }
 var int z = 2+10;
 var int y = 0;
-if(3>5){
+if(6>5){
 	var boolean b;
 	a=78;
 	z=z/8+z+89*58;
+	printi(z);
 }
 printi(z);
+printb(par);
 main();
 par = function1("HOLA",89,true);
 y=funcion2();

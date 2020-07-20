@@ -83,6 +83,6 @@ public class Procesador {
                 optimizador.getC3D(), optimizador.getTv(), optimizador.getTp(),
                 optimizador.getTe());
         optimizado.ensamblar();
-    }  
+    }
 }
 
