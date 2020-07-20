@@ -46,6 +46,7 @@ public class Tabla {
         Indice i = primero;
         while (i != null) {
             entradas += i.d();
+            i=i.siguiente();
         }
         this.entradas = entradas;
     }
@@ -60,6 +61,7 @@ public class Tabla {
             Indice i = primero.siguiente();
             while (i != null) {
                 b = b * i.d() + i.li();
+                i=i.siguiente();
             }
         }
         this.b = b;
