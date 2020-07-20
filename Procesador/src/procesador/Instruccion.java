@@ -8,15 +8,16 @@ public class Instruccion {
     private String[] instruccion = new String[4];
     private boolean instFinal;
 
+    // TODO Adaptar las funciones para añadir las nuevas instrucciones
     public enum OP {
-        copy, add, sub, mult, div, neg, and, or, not, skip, ifLT, ifLE, ifEQ, ifNE, ifGE, ifGT, jump, pmb, call, ret, st, params
+        copy, add, sub, mult, div, neg, and, or, not, skip, ifLT, ifLE, ifEQ, ifNE, ifGE, ifGT, jump, pmb, call, ret, st, params, ind_val, ind_ass
     }
 
     public Instruccion(OP opCode, String op1, String op2, String op3) {
         setOpCode(opCode);
         this.instruccion[1] = op1;
         this.instruccion[2] = op2;
-        this.instruccion[3] = op3;   
+        this.instruccion[3] = op3;
     }
 
     public boolean isInstFinal() {
@@ -111,70 +112,70 @@ public class Instruccion {
     public void setOpCode(OP op) {
         this.opCode = op;
         switch (opCode) {
-            case add:
-                instruccion[0] = "+";
-                break;
-            case sub:
-            case neg:
-                instruccion[0] = "-";
-                break;
-            case mult:
-                instruccion[0] = "*";
-                break;
-            case div:
-                instruccion[0] = "/";
-                break;
-            case and:
-                instruccion[0] = "&&";
-                break;
-            case or:
-                instruccion[0] = "||";
-                break;
-            case copy:
-                instruccion[0] = "=";
-                break;
-            case not:
-                instruccion[0] = "!";
-                break;
-            case skip:
-                instruccion[0] = "skip";
-                break;
-            case ifLT:
-                instruccion[0] = "<";
-                break;
-            case ifLE:
-                instruccion[0] = "<=";
-                break;
-            case ifEQ:
-                instruccion[0] = "==";
-                break;
-            case ifNE:
-                instruccion[0] = "!=";
-                break;
-            case ifGE:
-                instruccion[0] = ">=";
-                break;
-            case ifGT:
-                instruccion[0] = ">";
-                break;
-            case jump:
-                instruccion[0] = "goto";
-                break;
-            case pmb:
-                instruccion[0] = "pmb";
-                break;
-            case call:
-                instruccion[0] = "call";
-                break;
-            case ret:
-                instruccion[0] = "rtn";
-                break;
-            case params:
-                instruccion[0] = "param_s";
-                break;
-            case st:
-                instruccion[0] = "store";
-                break;
+        case add:
+            instruccion[0] = "+";
+            break;
+        case sub:
+        case neg:
+            instruccion[0] = "-";
+            break;
+        case mult:
+            instruccion[0] = "*";
+            break;
+        case div:
+            instruccion[0] = "/";
+            break;
+        case and:
+            instruccion[0] = "&&";
+            break;
+        case or:
+            instruccion[0] = "||";
+            break;
+        case copy:
+            instruccion[0] = "=";
+            break;
+        case not:
+            instruccion[0] = "!";
+            break;
+        case skip:
+            instruccion[0] = "skip";
+            break;
+        case ifLT:
+            instruccion[0] = "<";
+            break;
+        case ifLE:
+            instruccion[0] = "<=";
+            break;
+        case ifEQ:
+            instruccion[0] = "==";
+            break;
+        case ifNE:
+            instruccion[0] = "!=";
+            break;
+        case ifGE:
+            instruccion[0] = ">=";
+            break;
+        case ifGT:
+            instruccion[0] = ">";
+            break;
+        case jump:
+            instruccion[0] = "goto";
+            break;
+        case pmb:
+            instruccion[0] = "pmb";
+            break;
+        case call:
+            instruccion[0] = "call";
+            break;
+        case ret:
+            instruccion[0] = "rtn";
+            break;
+        case params:
+            instruccion[0] = "param_s";
+            break;
+        case st:
+            instruccion[0] = "store";
+            break;
         }
     }
 
