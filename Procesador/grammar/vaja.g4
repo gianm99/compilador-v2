@@ -782,6 +782,16 @@ exprMult_
 		}
 		$tsub=Simbolo.TSub.INT;
 	}
+	| MOD exprNeg exprMult_ {
+		if($exprNeg.tsub!=Simbolo.TSub.INT) {
+			errores+="Error semántico - Línea "+$exprNeg.start.getLine()+
+			": tipos incompatibles (esperado INT, encontrado "+$exprNeg.tsub+")\n";
+		} else if($exprNeg.cero) {
+			errores+="Error semántico - Línea "+$exprNeg.start.getLine()+
+			": división por cero\n";
+		}
+		$tsub=Simbolo.TSub.INT;
+	}
 	|; //lambda
 
 // Expresión de negación
@@ -900,6 +910,7 @@ ADD: '+';
 SUB: '-';
 MULT: '*';
 DIV: '/';
+MOD: '%';
 AND: '&&';
 OR: '||';
 NOT: '!';

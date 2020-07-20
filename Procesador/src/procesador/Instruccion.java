@@ -10,7 +10,7 @@ public class Instruccion {
 
     // TODO Adaptar las funciones para añadir las nuevas instrucciones
     public enum OP {
-        copy, add, sub, mult, div, neg, and, or, not, skip, ifLT, ifLE, ifEQ, ifNE, ifGE, ifGT, jump, pmb, call, ret, st, params, ind_val, ind_ass
+        copy, add, sub, mod, mult, div, neg, and, or, not, skip, ifLT, ifLE, ifEQ, ifNE, ifGE, ifGT, jump, pmb, call, ret, st, params, ind_val, ind_ass
     }
 
     public Instruccion(OP opCode, String op1, String op2, String op3) {
@@ -36,6 +36,7 @@ public class Instruccion {
         case sub:
         case mult:
         case div:
+        case mod:
         case and:
         case or:
             s = instruccion[3] + " = " + instruccion[1] + " " + instruccion[0] + " "
@@ -132,6 +133,9 @@ public class Instruccion {
             break;
         case div:
             instruccion[0] = "/";
+            break;
+        case mod:
+            instruccion[0] = "%";
             break;
         case and:
             instruccion[0] = "&&";
