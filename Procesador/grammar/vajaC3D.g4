@@ -151,7 +151,7 @@ programa:
 };
 
 decl:
-	VARIABLE tipo ID {
+	tipo ID {
 		Simbolo s=new Simbolo();
 		int nv=0;
 		try {
@@ -193,6 +193,7 @@ decl:
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
 	}
+	| declArray ']' ';'
 	| FUNCTION tipo encabezado BEGIN {
 		profundidad++;
 		try{
@@ -262,6 +263,31 @@ decl:
 		profundidad--;
 		ts=ts.subeBloque();
 	} END;
+
+declArray:
+	tipo ID '[' (numero '..')? numero declArray_ {
+	Simbolo s=null;
+	int nv=0;
+	try {
+		s=ts.consulta($ID.getText());
+		Tabla dt = s.getDt();
+		nv=tv.nuevaVar(false,pproc.peek(),Tipo.VAR, dt.tsubt());
+		tv.get(nv).setId(s.getId());
+		s.setNv(nv);
+		tv.get(nv).setElementos(dt.entradas());
+	} catch(TablaSimbolos.TablaSimbolosException e) {
+		System.out.println("Error con la tabla de símbolos: "+e.getMessage());
+	}
+};
+
+declArray_:
+	']' '[' (numero '..')? numero declArray_
+	|; // lambda 
+
+numero
+	returns[int valor, boolean constante]:
+	LiteralInteger
+	| ID;
 
 encabezado
 	returns[Procedimiento met, Simbolo s]:
@@ -412,20 +438,38 @@ sent[Deque<Integer> sents_seg]
 		genera(OP.ret, null, null, pproc.peek().toString());
 	}
 	| referencia '=' expr ';' {
-		if($referencia.tsub==TSub.BOOLEAN) {
-			Etiqueta ec=te.get(te.nuevaEtiqueta(false));
-			Etiqueta ef=te.get(te.nuevaEtiqueta(false));
-			Etiqueta efin=te.get(te.nuevaEtiqueta(false));
-			genera(OP.skip, null, null, ec.toString());
-			genera(OP.copy, "-1", null, $referencia.r.toString());
-			genera(OP.jump, null, null, efin.toString());
-			genera(OP.skip, null, null, ef.toString());
-			genera(OP.copy, "0", null, $referencia.r.toString());
-			genera(OP.skip, null, null, efin.toString());
-			backpatch($expr.cierto,ec);
-			backpatch($expr.falso,ef);
+		if($referencia.d!=null) {
+			if($referencia.tsub==TSub.BOOLEAN) {
+				Etiqueta ec=te.get(te.nuevaEtiqueta(false));
+				Etiqueta ef=te.get(te.nuevaEtiqueta(false));
+				Etiqueta efin=te.get(te.nuevaEtiqueta(false));
+				genera(OP.skip, null, null, ec.toString());
+				genera(OP.ind_ass, $referencia.d.toString(),"-1", $referencia.r.toString());
+				genera(OP.jump, null, null, efin.toString());
+				genera(OP.skip, null, null, ef.toString());
+				genera(OP.ind_ass, $referencia.d.toString(), "0", $referencia.r.toString());
+				genera(OP.skip, null, null, efin.toString());
+				backpatch($expr.cierto,ec);
+				backpatch($expr.falso,ef);
+			} else {
+				genera(OP.ind_ass, $referencia.d.toString(), $expr.r.toString(), $referencia.r.toString());
+			}
 		} else {
-			genera(OP.copy, $expr.r.toString(), null, $referencia.r.toString());
+			if($referencia.tsub==TSub.BOOLEAN) {
+				Etiqueta ec=te.get(te.nuevaEtiqueta(false));
+				Etiqueta ef=te.get(te.nuevaEtiqueta(false));
+				Etiqueta efin=te.get(te.nuevaEtiqueta(false));
+				genera(OP.skip, null, null, ec.toString());
+				genera(OP.copy, "-1", null, $referencia.r.toString());
+				genera(OP.jump, null, null, efin.toString());
+				genera(OP.skip, null, null, ef.toString());
+				genera(OP.copy, "0", null, $referencia.r.toString());
+				genera(OP.skip, null, null, efin.toString());
+				backpatch($expr.cierto,ec);
+				backpatch($expr.falso,ef);
+			} else {
+				genera(OP.copy, $expr.r.toString(), null, $referencia.r.toString());
+			}
 		}
 	}
 	| referencia ';';
@@ -500,7 +544,7 @@ endcase
 	|; // lambda
 
 referencia
-	returns[Variable r, TSub tsub]:
+	returns[Variable r, Variable d, TSub tsub]:
 	ID {
 		Simbolo s;
 		int t;
@@ -535,6 +579,22 @@ referencia
 			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
 		}
 	}
+	| idx ']' {
+		Variable t2;
+		String nbytes = String.valueOf($idx.dt.ocupacion());
+		if($idx.dt.b()==0) { // TODO Apuntar esto en la documentación
+			t2 = tv.get(tv.nuevaVar(true, pproc.peek(), Tipo.VAR, TSub.INT));
+			genera(OP.mult, $idx.d.toString(), nbytes, t2.toString());
+		} else {
+			String b = String.valueOf($idx.dt.b());
+			Variable t1 = tv.get(tv.nuevaVar(true, pproc.peek(), Tipo.VAR, TSub.INT));
+			genera(OP.sub, $idx.d.toString(), b, t1.toString());
+			t2 = tv.get(tv.nuevaVar(true, pproc.peek(), Tipo.VAR, TSub.INT));
+			genera(OP.mult, t1.toString(), nbytes, t2.toString());
+		}
+		$r = $idx.r;
+		$d = t2;
+	}
 	| ID '(' ')' {
 		Simbolo s;
 		int t;
@@ -562,6 +622,38 @@ referencia
 			$tsub = $contIdx.s.tsub();
 			genera(OP.st, null, null, tv.get(t).toString());
 		}
+	};
+
+idx
+	returns[Tabla dt, Variable r, Variable d]:
+	ID '[' expr {
+		Simbolo dv = null;
+		try {
+			dv = ts.consulta($ID.getText());
+		} catch(TablaSimbolos.TablaSimbolosException e) {
+			System.out.println("Error con la tabla de símbolos: "+e.getMessage());
+		}
+		$dt = dv.getDt();
+		Indice idx = $dt.primerIndice();
+		$r = tv.get(dv.getNv());
+		Variable d = $expr.r;
+	} idx_[idx, d] {
+		$d = $idx_.d;
+	};
+
+idx_[Indice idx1, Variable d1]
+	returns[Variable d]:
+	']' '[' expr {
+		Indice idx = idx1.siguiente();
+		Variable t1 = tv.get(tv.nuevaVar(true, pproc.peek(), Tipo.VAR, TSub.INT));
+		genera(OP.mult, $d1.toString(), String.valueOf(idx.d()), t1.toString());
+		Variable t2 = tv.get(tv.nuevaVar(true, pproc.peek(), Tipo.VAR, TSub.INT));
+		genera(OP.add, t1.toString(), $expr.r.toString(), t2.toString());
+	} idx_[idx, t2] {
+		$d=$idx_.d;
+	}
+	| {
+		$d=$d1; // Devuelve la misma variable que recibe
 	};
 
 contIdx
@@ -857,7 +949,14 @@ primario
 		$falso = $expr.falso;
 	}
 	| referencia {
-		$r = $referencia.r;
+		if($referencia.d!=null) {
+			// Caso para cuando hay desplazamiento
+			Variable t = tv.get(tv.nuevaVar(true, pproc.peek(), Tipo.VAR, TSub.INT));
+			genera(OP.ind_val, $referencia.r.toString(), $referencia.d.toString(), t.toString());
+			$r = t;
+		} else {
+			$r = $referencia.r;
+		}
 		if($referencia.tsub==TSub.BOOLEAN) {
 			genera(OP.ifEQ, $r.toString(), "-1", null);
 			$cierto=new ArrayDeque<Integer>();
@@ -906,7 +1005,7 @@ primario
 tipo
 	returns[TSub tsub]:
 	INTEGER {
-	$tsub=TSub.INT;
+		$tsub=TSub.INT;
 	}
 	| BOOLEAN {
 		$tsub=TSub.BOOLEAN;

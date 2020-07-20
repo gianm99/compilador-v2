@@ -1,17 +1,16 @@
-var int a=3;
+int a=3;
 const string s1 = "Hola mundo";
 const int asdf=32;
 const boolean VERDAD=true;
-var string s2 = s1;
-var int c=a;
-# var boolean par = VERDAD && (false || true);
-var boolean par = VERDAD;
+string s2 = s1;
+int c=a;
+boolean par = VERDAD && (false || true);
 func boolean function1(string str, int i, boolean foo){
 	var int a = 2;
 	var boolean b;
 	var string straux = "HOLA";
 	proc prueba(){
-		var int asdf=89;
+		int asdf=89;
 		printi(5);
 	}
 	a = 5;

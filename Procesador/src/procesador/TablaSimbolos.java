@@ -107,6 +107,7 @@ public class TablaSimbolos {
         if (this.existe(id)) {
             throw new TablaSimbolosException("identificador repetido: " + id);
         }
+        // TODO Hacer algo para mostrar cuando son arrays
         tabla.put(id, s);
         try {
             // TS poner elemento
