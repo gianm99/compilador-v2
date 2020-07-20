@@ -53,6 +53,7 @@ Como detalles a destacar del lenguaje tenemos los siguientes:
   1. *Declaraciones*. Puede no haber ninguna declaración.
   2. *Sentencias*. Tiene que haber como mínimo una.
 - Se pueden hacer returns a mitad de función o a mitad de procedimiento. En el caso del procedimiento tiene que ser un return vacío que no devuelva ninguna expresión.
+- Se pueden declarar y utilizar arrays.
 ## Compilador
 
 ### Detalles del análisis
@@ -66,3 +67,4 @@ Como detalles a destacar del lenguaje tenemos los siguientes:
 
 - El proceso de compilación de hace en dos pasadas. Primero se realiza la comprobación de que el programa está bien escrito con el análisis léxico, sintáctico y semántico, y después se genera el código intermedio utilizando la información obtenida en la primera pasada y también volviendo a analizar el código.
 - Los strings del programa funcionan de la siguiente manera: los literales de string siempre se guardan en memoria al principio del programa (en la sección .data). Las variables de tipo string contienen realmente direcciones de memoria que apuntan a las posiciones en las que están almacenados realmente los literales. Esto permite que la ocupación de las variables de tipo string siempre sea la misma: 4 bytes.
+- Cuando se calcula el desplazamiento al usar una tabla con una indirección no se hace la operación de restar `b` si este vale 0.
