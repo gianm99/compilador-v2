@@ -77,6 +77,14 @@ public class Instruccion {
         case st:
             s = instruccion[0] + " " + instruccion[3];
             break;
+        case ind_val:
+            s = instruccion[3] + instruccion[0] + instruccion[1] + "[" + instruccion[2] + "]";
+            break;
+        case ind_ass:
+            s = instruccion[3] + "[" + instruccion[1] + "]" + instruccion[0] + instruccion[2];
+            break;
+        default:
+            break;
         }
         return s;
     }
@@ -175,6 +183,12 @@ public class Instruccion {
             break;
         case st:
             instruccion[0] = "store";
+            break;
+        case ind_ass:
+        case ind_val:
+            instruccion[0] = " = ";
+            break;
+        default:
             break;
         }
     }
