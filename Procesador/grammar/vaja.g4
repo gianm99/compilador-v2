@@ -921,4 +921,4 @@ fragment LETRADIGITO: [a-zA-Z$_0-9];
 // Comentarios y espacios en blanco
 WS: [ \r\n\t]+ -> skip;
 BLOCK_COMMENT: '/*' .*? '*/' -> skip;
-LINE_COMMENT: '#' ~[\r\n]* -> skip;
+LINE_COMMENT: '//' ~[\r\n]* -> skip;

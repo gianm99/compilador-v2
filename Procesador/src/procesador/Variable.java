@@ -32,6 +32,7 @@ public class Variable {
         this.ocup = 4; // 32 bits
         this.borrada = false;
         this.desp = 0;
+        this.nparam = 0; // Por defecto es 0. Si es un parámetro se actualizará.
         this.elementos = 1; // Por defecto es 1
     }
 

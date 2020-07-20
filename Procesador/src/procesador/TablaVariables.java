@@ -81,10 +81,14 @@ public class TablaVariables {
             Variable vx = tv.get(x);
             int p = vx.proc();
             if (vx.tipo() == Simbolo.Tipo.VAR && p != 0) {
-                int ocupx = vx.getOcup() * vx.getElementos(); // Por las tablas
-                Procedimiento pp = tp.get(p);
-                pp.setOcupVL(pp.getOcupVL() + ocupx);
-                vx.setDesp(-pp.getOcupVL());
+                if(vx.getNparam() == 0) {
+                    int ocupx = vx.getOcup() * vx.getElementos(); // Por las tablas
+                    Procedimiento pp = tp.get(p);
+                    pp.setOcupVL(pp.getOcupVL() + ocupx);
+                    vx.setDesp(-pp.getOcupVL());                        
+                } else {
+                    vx.setDesp(8+4*vx.getNparam());
+                }
             }
         }
     }
