@@ -105,4 +105,13 @@ public class Variable {
     public void setDesp(int desp) {
         this.desp = desp;
     }
+
+    public boolean isTemporal() {
+        return temporal;
+    }
+
+    public void setTemporal(boolean temporal) {
+        this.temporal = temporal;
+    }
+
 }
