@@ -435,7 +435,8 @@ public class Optimizador {
      */
     private boolean esArit(Instruccion ins) {
         return (ins.getOpCode() == Instruccion.OP.add || ins.getOpCode() == Instruccion.OP.sub
-                || ins.getOpCode() == Instruccion.OP.mult || ins.getOpCode() == Instruccion.OP.div);
+                || ins.getOpCode() == Instruccion.OP.mult || ins.getOpCode() == Instruccion.OP.div
+                || ins.getOpCode() == Instruccion.OP.mod);
     }
 
     /**

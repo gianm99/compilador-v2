@@ -9,6 +9,7 @@ var boolean par = VERDAD;
 func boolean function1(string str, int i, boolean foo){
 	var int a = 2;
 	var boolean b;
+	var string straux = "HOLA";
 	proc prueba(){
 		var int asdf=89;
 		printi(5);
@@ -20,6 +21,8 @@ func boolean function1(string str, int i, boolean foo){
 		par=false;
 		a = a-1;
 	}
+	prints(" ");
+	prints(straux);
 	foo = true;
 	return false;
 }
