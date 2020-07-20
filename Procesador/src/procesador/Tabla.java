@@ -15,6 +15,7 @@ public class Tabla {
     private int b; // Desplazamiento conocido en tiempo de compilación
     private int ocupacion; // Ocupación (bytes) de cada elemento
     private int dimensiones; // Número de dimensiones de la tabla
+    private int entradas; // Número de entradas de la tabla
 
     public Tabla(TSub tsubt) {
         // TSub.NULL porque la tabla no tiene tipo subyacente
@@ -35,6 +36,18 @@ public class Tabla {
             i = i.siguiente();
         }
         this.dimensiones = dimensiones;
+    }
+
+    /**
+     * Calcula el número de entradas que tiene la tabla.
+     */
+    public void calcularEntradas() {
+        int entradas = 0;
+        Indice i = primero;
+        while (i != null) {
+            entradas += i.d();
+        }
+        this.entradas = entradas;
     }
 
     /**
@@ -108,5 +121,15 @@ public class Tabla {
      */
     public int dimensiones() {
         return dimensiones;
+    }
+
+    /**
+     * Devuelve el número de entradas de la tabla. Una entrada es la unidad mínima o
+     * celda de la tabla.
+     * 
+     * @return El número de entradas de la tabla.
+     */
+    public int entradas() {
+        return entradas;
     }
 }

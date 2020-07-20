@@ -241,6 +241,7 @@ declArray:
 	} declArray_[dt] {
 		dt.calcularDimensiones();
 		dt.calcularB();
+		dt.calcularEntradas();
 	};
 
 declArray_[Tabla dt]:
