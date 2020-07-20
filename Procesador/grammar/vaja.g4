@@ -206,6 +206,7 @@ declArray:
 			"' redeclarada\n";
 		}
 		int li = 0;
+		boolean limites=false;
 	} (
 		numero '..' {
 		if(!$numero.constante) {
@@ -213,6 +214,7 @@ declArray:
 			": los límites del índice deben ser valores constantes\n";
 		}
 		li = $numero.valor;
+		limites=true;
 	}
 	)? numero {
 		if(!$numero.constante) {
@@ -220,9 +222,20 @@ declArray:
 			": los límites del índice deben ser valores constantes\n";
 		}
 		int lf = $numero.valor;
-		if(li>lf) {
-			errores+="Error semántico - Línea "+$numero.start.getLine()+
-			": el límite inferior no puede ser mayor al superior\n";
+		if(!limites) {
+			// Caso en el que se indica el tamaño
+			if(lf<1) {
+				errores+="Error semántico - Línea "+$ID.getLine()+
+				": una tabla no puede ser de tamaño 0\n";
+			} else {
+				lf--; // Si se indica el tamaño, hay que corregir el limite superior
+			}
+		} else {
+			// Caso en el que se indican los limites
+			if(li>lf) {
+				errores+="Error semántico - Línea "+$numero.start.getLine()+
+				": el límite inferior no puede ser mayor al superior\n";
+			}
 		}
 		dt.nuevoIndice(li, lf);
 	} declArray_[dt] {
