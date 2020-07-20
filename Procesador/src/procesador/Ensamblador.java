@@ -43,6 +43,7 @@ public class Ensamblador {
                     .exec("ml /Fo" + directorio + ".obj" + " /c /Zd /coff  " + directorio + ".asm");
             BufferedReader stdInput = new BufferedReader(
                     new InputStreamReader(compilado.getInputStream()));
+            // TODO Quitar todo el output de los comandos
             // Leer el output del comando
             System.out.println("Output:\n");
             String s = null;
@@ -726,7 +727,7 @@ public class Ensamblador {
             asm.add("\tmov " + R + ", [ebp" + dx + "]");
         } else if (profp == profx) {
             // x es un parámetro local
-            int dx = 8 + 4 * x.getNparam();
+            int dx = x.getDesp();
             asm.add("\tmov " + R + ", [ebp+" + dx + "]");
         } else if (profp < profx && x.getDesp() < 0) {
             // x es una variable definida en otro ámbito
@@ -737,7 +738,7 @@ public class Ensamblador {
             asm.add("\tmov " + R + ", [esi" + dx + "]");
         } else if (profx < profp) {
             // x es un parámetro definido en otro ámbito
-            int dx = 8 + 4 * x.getNparam();
+            int dx = x.getDesp();
             int prof4x = profx * 4;
             asm.add("\tmov esi, OFFSET DISP  ; ESI = @ DISP");
             asm.add("\tmov esi, [esi+" + prof4x + "]  ; ESI = DISP[profx] = BPx");
@@ -774,7 +775,7 @@ public class Ensamblador {
             asm.add("\tmov [ebp" + dx + "], " + R);
         } else if (profp == profx) {
             // x es un parámetro local
-            int dx = 8 + 4 * x.getNparam();
+            int dx = x.getDesp();
             asm.add("\tmov [ebp+" + dx + "], " + R);
         } else if (profp < profx && x.getDesp() < 0) {
             // x es una variable definida en otro ámbito
@@ -785,7 +786,7 @@ public class Ensamblador {
             asm.add("\tmov [edi" + dx + "], R");
         } else if (profx < profp) {
             // x es un parámetro definido en otro ámbito
-            int dx = 8 + 4 * x.getNparam();
+            int dx = x.getDesp();
             int prof4x = profx * 4;
             asm.add("\tmov edi, OFFSET DISP  ; EDI = @ DISP");
             asm.add("\tmov edi, [edi+" + prof4x + "]  ; edi = BPx");
@@ -825,7 +826,7 @@ public class Ensamblador {
             asm.add("\tlea " + R + ", [ebp" + dx + "]");
         } else if (profp == profx) {
             // x es un parámetro local
-            int dx = 8 + 4 * x.getNparam();
+            int dx = x.getDesp();
             asm.add("\tlea " + R + ", [ebp+" + dx + "]");
         } else if (profp < profx && x.getDesp() < 0) {
             // x es una variable definida en otro ámbito
@@ -836,7 +837,7 @@ public class Ensamblador {
             asm.add("\tlea " + R + ", [esi" + dx + "]");
         } else if (profx < profp) {
             // x es un parámetro definido en otro ámbito
-            int dx = 8 + 4 * x.getNparam();
+            int dx = x.getDesp();
             int prof4x = profx * 4;
             asm.add("\tmov esi, OFFSET DISP  ; ESI = @ DISP");
             asm.add("\tmov esi, [esi+" + prof4x + "]  ; ESI = DISP[profx] = BPx");
