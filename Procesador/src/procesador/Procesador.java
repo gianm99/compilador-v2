@@ -67,7 +67,7 @@ public class Procesador {
                     ConsoleColors.RED_BOLD + "Error al generar código:" + ConsoleColors.RESET);
             throw e;
         }
-        // Ensamblado de código sin optimizar
+        //Ensamblado de código sin optimizar
         Ensamblador normal = new Ensamblador(buildPath + filename, parserC3D.getC3D(),
                 parserC3D.getTv(), parserC3D.getTp(), parserC3D.getTe());
         normal.ensamblar();

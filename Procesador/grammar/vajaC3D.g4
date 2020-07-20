@@ -818,6 +818,19 @@ exprMult_[Variable t1]
 			$falso=$exprMult_.falso;
 		}
 	}
+	| MOD exprNeg{
+		int t = tv.nuevaVar(true,pproc.peek(),Tipo.VAR,TSub.INT);
+		genera(OP.mod, $t1.toString(), $exprNeg.r.toString(), tv.get(t).toString());
+		$r=tv.get(t);
+		$cierto=$exprNeg.cierto;
+		$falso=$exprNeg.falso;
+	} exprMult_[$r] {
+		if($exprMult_.r!=null || $exprMult_.cierto!=null || $exprMult_.falso!=null) {
+			$r=$exprMult_.r;
+			$cierto=$exprMult_.cierto;
+			$falso=$exprMult_.falso;
+		}
+	}
 	|; //lambda
 
 // Expresión de negación
