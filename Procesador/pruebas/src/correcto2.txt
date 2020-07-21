@@ -1,1 +1,55 @@
-#Paso de parámetros con boolean
+int x = 10;
+int a[10];
+int d = 0;
+
+
+proc ordenarArray(){
+	int i = 0;
+	int j;
+	int min_idx;
+	int temp;
+
+	while(i< x - 1){
+		min_idx = i;
+		j = i + 1;
+		while(j<x){
+			if(a[j]<a[min_idx]){
+				min_idx = j;
+			}
+			j = j + 1;
+		}
+		temp = a[min_idx];
+		a[min_idx] = a[i];
+		a[i] = temp;
+		i = i + 1;
+	}
+}
+
+a[0] = 7;
+a[1] = 1;
+a[2] = 6;
+a[3] = 9;
+a[4] = 8;
+a[5] = 2;
+a[6] = 4;
+a[7] = 5;
+a[8] = 3;
+a[9] = 10;
+
+while(d<10) {
+	printi(a[d]);
+	prints(" ");
+	d = d + 1;
+}
+prints("----- ");
+ordenarArray();
+
+d = 0;
+while(d<10) {
+	printi(a[d]);
+	prints(" ");
+	d = d + 1;
+}
+
+
+
