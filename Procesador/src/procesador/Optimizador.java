@@ -163,7 +163,6 @@ public class Optimizador {
         int j;
         for (int i = 0; i < C3D.size(); i++) {
             if (C3D.get(i).getOpCode() == Instruccion.OP.jump) {
-                aux.add(C3D.get(i));
                 j = i;
                 while (j < C3D.size()) {
                     if (C3D.get(j).getOpCode() == Instruccion.OP.skip) {
@@ -171,8 +170,9 @@ public class Optimizador {
                             reemplazaCodigo(null, i, i + aux.size() - 1);
                         break;
                     }
-                    j++;
-                    aux.add(C3D.get(j));
+                     
+                    aux.add(C3D.get(j));     
+                    j++; 
                 }
                 aux.clear();
             }

@@ -1,16 +1,4 @@
-func int main(){
-	var boolean b = true &&(false||true+5);
-	var int c = true;
-	const string d = "false";
-	var string e = false;
-	if(d){
-		c=false;
-	}
+int a = 10;
+int c;
 
-	c = procedure();
-}
-
-main();
-if(5){
-	printSTRING("ADIÓS");
-}
+c = a/0;
