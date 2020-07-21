@@ -7,37 +7,42 @@ int a[10];
 boolean b = false;
 
 
-proc calculo(int i){
-	switch(i){
+proc calculo(){
+	switch(a[i]){
 		case 1:
 			x = x + 1;
 			printi(x);
+			prints("),  ");
 			break;
 		case 2:
 			x = x + 5;
 			printi(x);
+			prints("),  ");
 			break;
 		case 3:
 			x = x - 1;
 			printi(x);
+			prints("),  ");
 			break;
 		case 4:
 			x = x - 5;
 			printi(x);
+			prints("),  ");
 			break;
 		case 5:
 			x = x * 3;
 			printi(x);
+			prints("),  ");
 			break;
 		case 6:
 			x = x % 2;
 			printi(x);
+			prints("),  ");
 			break;
 		case 7:
 			prints("Fin");
 			break;
-	}
-	prints("),  ");
+	}	
 }
 
 a[0] = 2;
@@ -50,26 +55,26 @@ a[6] = 4;
 a[7] = 7;
 a[8] = 1;
 a[9] = 3;
-prints("Hola");
+
 while(!b){
 	switch(a[i]){
 		case 1:
 			prints("Suma 1 (");
 			break;
 		case 2:
-			prints("Suma 5, (");
+			prints("Suma 5 (");
 			break;
 		case 3:
-			prints("Resta 1, (");
+			prints("Resta 1 (");
 			break;
 		case 4:
-			prints("Resta 5, (");
+			prints("Resta 5 (");
 			break;
 		case 5:
-			prints("Multiplica por 3, (");
+			prints("Multiplica por 3 (");
 			break;
 		case 6:
-			prints("Modulo 2, (");
+			prints("Modulo 2 (");
 			break;
 		case 7:
 			b = true;
@@ -77,7 +82,7 @@ while(!b){
 		default:
 			prints(" (No existe esa opción.) ");
 	}
-	calculo(a[i]);
+	calculo();
 	i = i + 1;
 }
 
