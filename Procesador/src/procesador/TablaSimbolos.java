@@ -5,7 +5,8 @@ import java.util.Hashtable;
 import java.io.*;
 
 /**
- * TablaSimbolos. Clase que sirve para gestionar los símbolos que aparecen en el código fuente.
+ * TablaSimbolos. Clase que sirve para gestionar los símbolos que aparecen en el
+ * código fuente.
  * 
  * @author Gian Lucas Martín Chamorro
  * @author Jordi Antoni Sastre Moll
@@ -37,12 +38,17 @@ public class TablaSimbolos {
             // TS output
             File tsFile = new File(directorio + "/tablasimbolos.html");
             buffer = new BufferedWriter(new FileWriter(tsFile));
-            buffer.write("<!DOCTYPE html>" + "<html>" + "<head>" + "<style>"
-                    + "table, th, td {border: 1px solid black;background-color: aqua;}" + "</style>"
-                    + "</head>" + "<body>" + "<table style='width:100%'>" + "<tr>" + "<th>Nivel "
-                    + niveltabla + "</th>" + "<td>" + "<table style='width:100%'>" + "<tr>"
-                    + "<th>Id</th>" + "<th>Tipo</th>" + "<th>Tipo Subyacente</th>" + "<th>Next</th>"
-                    + "</tr>" + "<tr>\n");
+            buffer.write(
+                    "<!DOCTYPE html><html><head><head><style>table, th, td {  border: 1px solid\n"
+                            + " black;  border-collapse: collapse;}th, td {padding: 5px;text-align:\n"
+                            + " center;}</style>" + "</head>" + "<body style >"
+                            + "<table style=\"width:100%; \n"
+                            + "background-color:#DDDDDD; font-family:'Courier New'\">" + "<tr>"
+                            + "<th>Nivel " + niveltabla + "</th>" + "<td>"
+                            + "<table style=\"width:100%; \n"
+                            + "background-color:#DDDDDD; font-family:'Courier New'\">" + "<tr>"
+                            + "<th>Id</th>" + "<th>Tipo</th>" + "<th>Tipo Subyacente</th>"
+                            + "<th>Next</th>" + "</tr>" + "<tr>\n");
         } catch (IOException e) {
             System.out.println("error escribiendo la tabla de símbolos: " + e.getMessage());
         }
@@ -59,7 +65,8 @@ public class TablaSimbolos {
         try {
             // TS entre bloque output
             buffer.write("</tr>" + "</table>" + "</td>" + "</tr>" + "<tr>" + "<th>Nivel "
-                    + (niveltabla + 1) + "</th>" + "<td>" + "<table style='width:100%'>" + "<tr>"
+                    + (niveltabla + 1) + "</th>" + "<td>" + "<table style=\"width:100%; \n"
+                    + "background-color:#DDDDDD; font-family:'Courier New'\">" + "<tr>"
                     + "<th>Id</th>" + "<th>Tipo</th>" + "<th>Tipo Subyacente</th>" + "<th>Next</th>"
                     + "</tr>" + "<tr>\n");
         } catch (IOException e) {
@@ -89,7 +96,8 @@ public class TablaSimbolos {
             } else {
                 // TS reduce un nivel en el bloque
                 buffer.write("</tr>" + "</table>" + "</td>" + "</tr>" + "<tr>" + "<th>Nivel "
-                        + niveltabla + "</th>" + "<td>" + "<table style='width:100%'>" + "<tr>"
+                        + niveltabla + "</th>" + "<td>" + "<table style=\"width:100%; \n"
+                        + "background-color:#DDDDDD; font-family:'Courier New'\">" + "<tr>"
                         + "<th>Id</th>" + "<th>Tipo</th>" + "<th>Tipo Subyacente</th>"
                         + "<th>Next</th>" + "</tr>" + "<tr>\n");
             }
@@ -107,7 +115,6 @@ public class TablaSimbolos {
         if (this.existe(id)) {
             throw new TablaSimbolosException("identificador repetido: " + id);
         }
-        // TODO Hacer algo para mostrar cuando son arrays
         tabla.put(id, s);
         try {
             // TS poner elemento
@@ -115,8 +122,10 @@ public class TablaSimbolos {
                     + s.tsub() + "</td>\n");
             if (s.getNext() != null) {
                 Simbolo sn = s.getNext();
-                buffer.write("<td>" + "<table style='width:100%'>" + "<tr>" + "<th>Id</th>"
-                        + "<th>Tipo</th>" + "<th>Tipo Subyacente</th>" + "</tr>" + "<tr>\n");
+                buffer.write("<td>" + "<table style=\"width:100%; \n"
+                        + "background-color:#DDDDDD; font-family:'Courier New'\">" + "<tr>"
+                        + "<th>Id</th>" + "<th>Tipo</th>" + "<th>Tipo Subyacente</th>" + "</tr>"
+                        + "<tr>\n");
                 while (sn != null) {
                     buffer.write("<td>" + sn.getId() + "</td>" + "<td>" + sn.getT() + "</td>"
                             + "<td>" + sn.tsub() + "</td></tr>\n");

@@ -1,0 +1,12 @@
+int numero=5;
+boolean logico=true;
+string palabra="hola";
+proc foo(int i, boolean b, string s) {
+    printi(i);
+    prints(" ");
+    printb(b);
+    prints(" ");
+    prints(s);
+}
+
+foo(numero, logico, palabra);

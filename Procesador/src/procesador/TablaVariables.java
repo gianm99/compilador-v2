@@ -6,6 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import procesador.Simbolo.TSub;
+import procesador.Simbolo.Tipo;
 
 /**
  * TablaVariable. Clase que sirve para almacenar las variables que aparecen en
@@ -24,7 +26,7 @@ public class TablaVariables {
         nv = 0;
     }
 
-    public int nuevaVar(boolean temporal, Integer proc, Simbolo.Tipo tipo, Simbolo.TSub tsub) {
+    public int nuevaVar(boolean temporal, Integer proc, Tipo tipo, TSub tsub) {
         Variable var;
         nv++;
         if (proc == null) {
@@ -44,7 +46,7 @@ public class TablaVariables {
     public void quitarVar(ArrayList<Instruccion> var) {
         int i = 0;
         while (i < var.size()) {
-            if (get(var.get(i).destino()).tsub() != Simbolo.TSub.STRING) {
+            if (get(var.get(i).destino()).tsub() != TSub.STRING) {
                 quitarVar(var.get(i).destino());
                 var.remove(i);
             } else {
@@ -80,11 +82,15 @@ public class TablaVariables {
         for (int x = 0; x < tv.size(); x++) {
             Variable vx = tv.get(x);
             int p = vx.proc();
-            if (vx.tipo() == Simbolo.Tipo.VAR && p != 0) {
-                int ocupx = vx.getOcup() * vx.getElementos(); // Por las tablas
-                Procedimiento pp = tp.get(p);
-                pp.setOcupVL(pp.getOcupVL() + ocupx);
-                vx.setDesp(-pp.getOcupVL());
+            if (vx.tipo() == Tipo.VAR && p != 0) {
+                if (vx.getNparam() == 0) {
+                    int ocupx = vx.getOcup() * vx.getElementos(); // Por las tablas
+                    Procedimiento pp = tp.get(p);
+                    pp.setOcupVL(pp.getOcupVL() + ocupx);
+                    vx.setDesp(-pp.getOcupVL());
+                } else {
+                    vx.setDesp(8 + 4 * vx.getNparam());
+                }
             }
         }
     }
@@ -106,10 +112,10 @@ public class TablaVariables {
                     + " center;}</style></head><body><table style=\"width:100%; \n"
                     + "background-color:#727272; font-family:'Courier New'\"><tr \n"
                     + "style=\"color:white\"><th>tsub</th><th>nombre</th><th>temporal</th>\n"
-                    + " <th>proc</th><th>tipo</th><th>valor</th><th>ocup</th>\n"
+                    + " <th>proc</th><th>tipo</th><th>valor</th><th>elementos</th><th>ocup</th>\n"
                     + "<th>desp</th><th>nparam</th></tr>";
             Variable var;
-            String valor, proc, nparam, desp;
+            String valor, proc, nparam, desp, elementos;
             for (int i = 0; i < tv.size(); i++) {
                 var = tv.get(i);
                 tabla += "<tr style=\"background-color:";
@@ -128,7 +134,15 @@ public class TablaVariables {
                     break;
                 }
                 if (var.getValor() != null) {
-                    valor = var.getValor();
+                    if(var.tsub()==TSub.BOOLEAN) {
+                        if (var.getValor().equals("-1")) {
+                            valor = "true";
+                        } else {
+                            valor = "false";
+                        }
+                    } else {
+                        valor = var.getValor();
+                    }
                 } else {
                     valor = "-";
                 }
@@ -147,11 +161,17 @@ public class TablaVariables {
                 } else {
                     desp = "-";
                 }
+                if (var.getElementos() != 1) {
+                    elementos = String.valueOf(var.getElementos());
+                } else {
+                    elementos = "-";
+                }
                 if (!var.isBorrada())
                     tabla += "<td>" + var.tsub() + "</td><td>" + var.toString() + "</td><td>"
                             + var.temporal() + "</td><td>" + proc + "</td><td>" + var.tipo()
-                            + "</td><td>" + valor + "</td><td>" + var.getOcup() + "</td><td>" + desp
-                            + "</td><td>" + nparam + "</td></tr>";
+                            + "</td><td>" + valor + "</td><td>" + elementos + "</td><td>"
+                            + var.getOcup() + "</td><td>" + desp + "</td><td>" + nparam
+                            + "</td></tr>";
             }
             tabla += "</table></body></html>";
             buffer.write(tabla);
