@@ -118,6 +118,7 @@ public class TablaVariables {
                 var = tv.get(i);
                 tabla += "<tr style=\"background-color:";
                 switch (var.tsub()) {
+                // TODO Hacer algo para cuando son arrays
                 case STRING:
                     tabla += "#D1BCFF\">";
                     break;
