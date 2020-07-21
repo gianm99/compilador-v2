@@ -6,6 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import procesador.Simbolo.TSub;
+import procesador.Simbolo.Tipo;
 
 /**
  * TablaVariable. Clase que sirve para almacenar las variables que aparecen en
@@ -24,7 +26,7 @@ public class TablaVariables {
         nv = 0;
     }
 
-    public int nuevaVar(boolean temporal, Integer proc, Simbolo.Tipo tipo, Simbolo.TSub tsub) {
+    public int nuevaVar(boolean temporal, Integer proc, Tipo tipo, TSub tsub) {
         Variable var;
         nv++;
         if (proc == null) {
@@ -44,7 +46,7 @@ public class TablaVariables {
     public void quitarVar(ArrayList<Instruccion> var) {
         int i = 0;
         while (i < var.size()) {
-            if (get(var.get(i).destino()).tsub() != Simbolo.TSub.STRING) {
+            if (get(var.get(i).destino()).tsub() != TSub.STRING) {
                 quitarVar(var.get(i).destino());
                 var.remove(i);
             } else {
@@ -80,7 +82,7 @@ public class TablaVariables {
         for (int x = 0; x < tv.size(); x++) {
             Variable vx = tv.get(x);
             int p = vx.proc();
-            if (vx.tipo() == Simbolo.Tipo.VAR && p != 0) {
+            if (vx.tipo() == Tipo.VAR && p != 0) {
                 if (vx.getNparam() == 0) {
                     int ocupx = vx.getOcup() * vx.getElementos(); // Por las tablas
                     Procedimiento pp = tp.get(p);
@@ -118,7 +120,6 @@ public class TablaVariables {
                 var = tv.get(i);
                 tabla += "<tr style=\"background-color:";
                 switch (var.tsub()) {
-                // TODO Hacer algo para cuando son arrays
                 case STRING:
                     tabla += "#D1BCFF\">";
                     break;
@@ -133,7 +134,15 @@ public class TablaVariables {
                     break;
                 }
                 if (var.getValor() != null) {
-                    valor = var.getValor();
+                    if(var.tsub()==TSub.BOOLEAN) {
+                        if (var.getValor().equals("-1")) {
+                            valor = "true";
+                        } else {
+                            valor = "false";
+                        }
+                    } else {
+                        valor = var.getValor();
+                    }
                 } else {
                     valor = "-";
                 }
