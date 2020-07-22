@@ -1,27 +1,15 @@
-var int a = 10;
-var boolean b = true;
-const string c = "Hola, ";
+string s[3];
 
-func int operacion(int d){
-    d = d*5+10-23/5;
-    return d;
-}
-proc imprimir(){
-    printSTRING(c);
-    printSTRING("el resultado de la operación para el valor 8 es ");
-    printINT(operacion(8));
-}
+prints("Introduce tu nombre: ");
+s[0] = read();
+prints("Introduce tu edad: ");
+s[1] = read();
+prints("Introduce tu DNI: ");
+s[2] = read();
 
-if (b){
-    imprimir();
-}
-
-if (a>10) {
-    const int b = 100;
-    printINT(b);
-} else {
-    while(a>0){
-        printINT(a);
-        a = a - 1;
-    }
-}
+prints("Estos son tus datos: ");
+prints(s[0]);
+prints(", ");
+prints(s[1]);
+prints(", ");
+prints(s[2]);

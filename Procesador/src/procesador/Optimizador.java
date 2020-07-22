@@ -49,12 +49,13 @@ public class Optimizador {
     }
 
     public void optimizar() {
-        optimizarIfBoolean();
+        optimizarAssigBoolean();
         eliminaCodigoInaccesibleIf();
         optimizarIfNegandoCond();
         eliminaEtiquetasInnecesarias();
         eliminaCodigoInaccesibleEntreEtiquetas();
         eliminaAsignacionesInnecesarias();
+        eliminaCodigoInaccesibleEntreEtiquetas();
         reasignarLineaEtiqueta();
         tv.calculoDespOcupVL(tp);
         imprimirC3D();
@@ -93,12 +94,17 @@ public class Optimizador {
         }
     }
 
-    private void optimizarIfBoolean() {
+    /**
+     * Detecta y optimiza la assignación de un boolean.
+     */
+
+    private void optimizarAssigBoolean() {
         for (int i = 0; i < C3D.size(); i++) {
             Instruccion ins = C3D.get(i);
             if (esIf(ins)) {
                 Variable operando1 = tv.get(ins.getOperando(1));
-                if (operando1.tsub() == Simbolo.TSub.BOOLEAN && operando1 != null) {
+                if (operando1.tsub() == Simbolo.TSub.BOOLEAN && operando1 != null
+                        && C3D.get(i).destino().equals(C3D.get(i + 2).destino())) {
                     ArrayList<Instruccion> arrayaux = new ArrayList<Instruccion>();
                     arrayaux.add(new Instruccion(OP.copy, C3D.get(i).getOperando(1), "",
                             C3D.get(i + 3).destino()));
@@ -179,8 +185,9 @@ public class Optimizador {
                             reemplazaCodigo(null, i, i + aux.size() - 1);
                         break;
                     }
+                    if (aux.size() > 1)
+                        aux.add(C3D.get(j));
                     j++;
-                    aux.add(C3D.get(j));
                 }
                 aux.clear();
             }
@@ -194,14 +201,18 @@ public class Optimizador {
      * función.
      */
     private void eliminaAsignacionesInnecesarias() {
+        // Lista de asignaciones de variables temporales
         ArrayList<Instruccion> InstrucVars = new ArrayList<Instruccion>();
+        // Lista de parámetros
         ArrayList<Instruccion> InstrucParams = new ArrayList<Instruccion>();
+        // Lista de operaciones aritméticas
         ArrayList<Instruccion> InstrucArit = new ArrayList<Instruccion>();
+        // Se añade a cada lista lo que le corresponde
         int i = 0;
         while (i < C3D.size()) {
             if (C3D.get(i).destino().charAt(0) == 't' && C3D.get(i).destino().charAt(1) == '$') {
                 if ((C3D.get(i).getOpCode() == Instruccion.OP.copy)) {
-                    if (!InstrucVars.contains(C3D.get(i))
+                    if (!contieneVariableDestino(InstrucVars, C3D.get(i).destino())
                             && !(tv.get(C3D.get(i).destino()).tsub() == Simbolo.TSub.STRING)) {
                         InstrucVars.add(C3D.get(i));
                     }
@@ -213,17 +224,20 @@ public class Optimizador {
             }
             i++;
         }
+        // Evita que las variables temporales generadas para parámetros sean borradas
         int j = 0;
         for (i = 0; i < InstrucParams.size(); i++) {
             j = 0;
             while (j < InstrucVars.size()) {
                 if (InstrucParams.get(i).destino().equals(InstrucVars.get(j).destino())) {
                     InstrucVars.remove(j);
-                    j = InstrucVars.size();
+                    break;
                 }
                 j++;
             }
         }
+        // Quita de la lista de variables temporales todas las que tengan más de una asignación,
+        // evitando que se borren más tarde
         boolean primerEncuentro;
         for (i = 0; i < InstrucVars.size(); i++) {
             primerEncuentro = false;
@@ -243,6 +257,7 @@ public class Optimizador {
                 j++;
             }
         }
+        // Se borran las variables de la lista de InstrucVars y se asigna directamente su contenido
         i = 0;
         int k;
         while (i < InstrucVars.size()) {
@@ -261,6 +276,7 @@ public class Optimizador {
             C3DquitarInstruccion(InstrucVars.get(i));
             i++;
         }
+        // Se borran las variables de la lista de InstrucArit y se asigna directamente su contenido
         i = 0;
         while (i < InstrucArit.size()) {
             k = devolverLineaVariableUsada(InstrucArit.get(i).destino());
@@ -296,7 +312,8 @@ public class Optimizador {
             }
             i++;
         }
-
+        // Si hay asignaciones repetidas contiguas (por como funciona las optimizaciones), se borra
+        // una de ellas
         i = 0;
         while (i < C3D.size() - 1) {
             if (C3D.get(i).equals(C3D.get(i + 1))) {
@@ -307,6 +324,9 @@ public class Optimizador {
         }
     }
 
+    /**
+     * Reasigna la linea de cada etiqueta al final de las optimizaciones
+     */
     private void reasignarLineaEtiqueta() {
         for (int i = 0; i < C3D.size(); i++) {
             Instruccion ins = C3D.get(i);
@@ -316,6 +336,9 @@ public class Optimizador {
         }
     }
 
+    /**
+     * Optimiza un IF negando la condición, reduciendo el número de etiquetas necesarias.
+     */
     private void optimizarIfNegandoCond() {
         for (int i = 0; i < C3D.size(); i++) {
             Instruccion ins = C3D.get(i);
@@ -362,8 +385,23 @@ public class Optimizador {
      *
      */
 
+    /**
+     * Comprueba que el IF generado no pertenece al codigo de un SWITCH
+     * 
+     * @param i Línea de la instrucción C3D
+     * @return
+     */
     private boolean noEsIfSwitch(int i) {
         return C3D.get(i).destino().equals(C3D.get(i + 2).destino());
+    }
+
+    private boolean contieneVariableDestino(ArrayList<Instruccion> arr, String destino){
+        boolean b = false;
+        for(int i = 0; i<arr.size();i++){
+            if(arr.get(i).destino().equals(destino))
+                b = true;
+        }
+        return b;
     }
 
     /**

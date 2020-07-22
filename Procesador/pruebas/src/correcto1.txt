@@ -6,9 +6,9 @@ string s2 = s1;
 int c=a;
 boolean par = VERDAD && (false || true);
 func boolean function1(string str, int i, boolean foo){
-	var int a = 2;
-	var boolean b;
-	var string straux = "HOLA";
+	int a = 2;
+	boolean b;
+	string straux = "HOLA";
 	proc prueba(){
 		int asdf=89;
 		printi(5);
@@ -23,8 +23,10 @@ func boolean function1(string str, int i, boolean foo){
 	}
 	prints(" ");
 	prints(straux);
+	prints(" ");
+	prints(str);
 	foo = true;
-	return false;
+	return foo;
 }
 
 func int funcion2() {
@@ -34,10 +36,10 @@ func int funcion2() {
 proc main(){
 	printi(c);
 }
-var int z = 2+10;
-var int y = 0;
+int z = 2+10;
+int y = 0;
 if(6>5){
-	var boolean b;
+	boolean b;
 	a=78;
 	z=z/8+z+89*58;
 	printi(z);
@@ -46,4 +48,6 @@ printi(z);
 printb(par);
 main();
 par = function1("HOLA",89,true);
-y=funcion2();
+y = funcion2();
+printb(par);
+printi(y);

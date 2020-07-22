@@ -1,6 +1,8 @@
-var int t=1;
-if(t==1) {
-    printi(t);
-} else {
-    printi(0);
+int i = 1;
+
+while(i<1000000000){
+    i = i + 1;
 }
+
+printi(i);
+prints(" ");

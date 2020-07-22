@@ -1,21 +1,7 @@
-var int a = 10;
-var boolean b = true;
-var string c = "casa";
-
-func boolean function(int a, boolean b, string c){
-	var int d = 10;
-    var string e;
-    if(b){
-        d = a;
-        return d;
-    } else {
-        e = c;
+proc hello(){
+    string s;
+    s = "Hola";
     }
-}
+hello();
 
-proc main(){
-    const int i = function(a,b,c);
-	printSTRING("Hola mundo");
-}
-
-main();
+prints(s);

@@ -1,8 +1,3 @@
-var string b;
-const int a24=89;
-var int numero;
-proc main() {
-	a24=b;
-	numero=b;
-}
-main();
+int a[5];
+
+a[6] = 2;
