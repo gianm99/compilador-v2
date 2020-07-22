@@ -1,21 +1,25 @@
 package procesador;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.ArrayList;
 import procesador.Instruccion.OP;
 import procesador.Simbolo.TSub;
 import procesador.Simbolo.Tipo;
 
+/**
+ * Ensamblador. Clase que implementa la generación de código ensamblador x86 a
+ * partir del código intermedio.
+ * 
+ * @author Gian Lucas Martín Chamorro
+ */
 public class Ensamblador {
     private String directorio;
-    private ArrayList<Instruccion> C3D;
-    private ArrayList<String> asm;
+    private ArrayList<Instruccion> C3D; // Código intermedio
+    private ArrayList<String> asm; // Código ensamblador
     private TablaVariables tv;
     private TablaProcedimientos tp;
     private TablaEtiquetas te;
@@ -32,36 +36,25 @@ public class Ensamblador {
         this.npActual = 0;
     }
 
+    /**
+     * Genera el código ensamblador y el ejecutable.
+     */
     public void ensamblar() {
         generarASM();
         generarEXE();
     }
 
+    /**
+     * Ensambla y enlaza el código ensamblador generado para conseguir el ejecutable
+     * del programa.
+     */
     public void generarEXE() {
         try {
             Process compilado = Runtime.getRuntime()
                     .exec("ml /Fo" + directorio + ".obj" + " /c /Zd /coff  " + directorio + ".asm");
-            BufferedReader stdInput = new BufferedReader(
-                    new InputStreamReader(compilado.getInputStream()));
-            // TODO Quitar todo el output de los comandos
-            // Leer el output del comando
-            System.out.println("Output:\n");
-            String s = null;
-            while ((s = stdInput.readLine()) != null) {
-                System.out.println(s);
-            }
             compilado.waitFor();
-
             Process enlazado = Runtime.getRuntime().exec(
                     "link /out:" + directorio + ".exe /subsystem:console " + directorio + ".obj");
-
-            stdInput = new BufferedReader(new InputStreamReader(enlazado.getInputStream()));
-            // Leer el output del comando
-            System.out.println("Output:\n");
-            s = null;
-            while ((s = stdInput.readLine()) != null) {
-                System.out.println(s);
-            }
             enlazado.waitFor();
             System.out.println(ConsoleColors.YELLOW_BOLD_BRIGHT + "Proceso de ensamblado ("
                     + directorio + ") completado con éxito" + ConsoleColors.RESET);
@@ -70,6 +63,10 @@ public class Ensamblador {
         }
     }
 
+    /**
+     * Genera el código ensamblador x86 a partir de código intermedio y lo guarda en
+     * un fichero.
+     */
     public void generarASM() {
         Writer buffer;
         File asmFile = new File(directorio + ".asm");
@@ -84,6 +81,10 @@ public class Ensamblador {
         }
     }
 
+    /**
+     * Añade el código de preámbulo necesario para el funcionamiento del programa y
+     * traduce las instrucciones de código intermedio a código ensamblador.
+     */
     public void traducir() {
         asm.add(".386");
         asm.add(".model flat, stdcall");
@@ -354,6 +355,13 @@ public class Ensamblador {
         asm.add("END start");
     }
 
+    /**
+     * Convierte una instrucción de código intermedio a una instrucción de código
+     * ensamblador.
+     * 
+     * @param i
+     *              La línea de código intermedio a convertir.
+     */
     private void conversion(int i) {
         Variable a, b, c;
         Instruccion ins = C3D.get(i);
