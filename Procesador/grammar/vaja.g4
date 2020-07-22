@@ -422,7 +422,7 @@ sent:
 		if($referencia.s!=null) {
 			if($referencia.s.getT()==Simbolo.Tipo.CONST) {
 				errores+="Error semántico - Línea "+$ASSIGN.getLine()+": "+$referencia.s.getId()+
-				"es una constante\n";
+				" es una constante\n";
 			} else{
 				Simbolo.TSub tsubyacente;
 				if($referencia.dt!=null && $referencia.dimCorrectas) {
@@ -786,10 +786,7 @@ exprMult_
 		if($exprNeg.tsub!=Simbolo.TSub.INT) {
 			errores+="Error semántico - Línea "+$exprNeg.start.getLine()+
 			": tipos incompatibles (esperado INT, encontrado "+$exprNeg.tsub+")\n";
-		} else if($exprNeg.cero) {
-			errores+="Error semántico - Línea "+$exprNeg.start.getLine()+
-			": división por cero\n";
-		}
+		} 
 		$tsub=Simbolo.TSub.INT;
 	}
 	|; //lambda

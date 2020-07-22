@@ -1,7 +1,22 @@
-proc hello(){
-    string s;
-    s = "Hola";
-    }
-hello();
+int a;
+int a;
+const int b = 3;
+int d = 5;
+boolean e = true;
+int f[a];
 
-prints(s);
+func int func1(){
+    int a = 5;
+    return;
+}
+proc proc1(){
+    int a = 5;
+    return a;
+}
+
+
+b = d;
+d = e;
+func1();
+
+
