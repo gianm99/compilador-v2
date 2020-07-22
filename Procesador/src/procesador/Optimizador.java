@@ -49,6 +49,7 @@ public class Optimizador {
         eliminaEtiquetasInnecesarias();
         eliminaCodigoInaccesibleEntreEtiquetas();
         eliminaAsignacionesInnecesarias();
+        eliminaCodigoInaccesibleEntreEtiquetas();
         reasignarLineaEtiqueta();
         tv.calculoDespOcupVL(tp);
         imprimirC3D();
@@ -202,7 +203,7 @@ public class Optimizador {
         while (i < C3D.size()) {
             if (C3D.get(i).destino().charAt(0) == 't' && C3D.get(i).destino().charAt(1) == '$') {
                 if ((C3D.get(i).getOpCode() == Instruccion.OP.copy)) {
-                    if (!InstrucVars.contains(C3D.get(i))
+                    if (!contieneVariableDestino(InstrucVars, C3D.get(i).destino())
                             && !(tv.get(C3D.get(i).destino()).tsub() == Simbolo.TSub.STRING)) {
                         InstrucVars.add(C3D.get(i));
                     }
@@ -221,12 +222,12 @@ public class Optimizador {
             while (j < InstrucVars.size()) {
                 if (InstrucParams.get(i).destino().equals(InstrucVars.get(j).destino())) {
                     InstrucVars.remove(j);
-                    j = InstrucVars.size();
+                    break;
                 }
                 j++;
             }
         }
-        // Quita de la lista de variables temporales todas las que tengan más de asignación,
+        // Quita de la lista de variables temporales todas las que tengan más de una asignación,
         // evitando que se borren más tarde
         boolean primerEncuentro;
         for (i = 0; i < InstrucVars.size(); i++) {
@@ -383,6 +384,15 @@ public class Optimizador {
      */
     private boolean noEsIfSwitch(int i) {
         return C3D.get(i).destino().equals(C3D.get(i + 2).destino());
+    }
+
+    private boolean contieneVariableDestino(ArrayList<Instruccion> arr, String destino){
+        boolean b = false;
+        for(int i = 0; i<arr.size();i++){
+            if(arr.get(i).destino().equals(destino))
+                b = true;
+        }
+        return b;
     }
 
     /**

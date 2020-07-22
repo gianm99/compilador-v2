@@ -1,5 +1,4 @@
 /*Esto es un comentario*/
-# Esto también es un comentario
 
 int x = 0;
 int i = 0;
