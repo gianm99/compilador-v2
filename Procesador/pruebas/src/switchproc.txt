@@ -1,0 +1,23 @@
+int i=0;
+
+while(i<4) {
+    switch (i) {
+        case 1:
+            printi(i);
+            prints(" ");
+            break;
+        case 2:
+            printi(i);
+            prints(" ");
+            break;
+        case 3:
+            printi(i);
+            prints(" ");
+            break;
+        default:
+            prints("Error");
+            prints(" ");
+    }
+    i=i+1;
+}
+

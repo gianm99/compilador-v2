@@ -2,14 +2,18 @@ package procesador;
 
 import java.util.Arrays;
 
+/**
+ * La clase Instruccion representa una insttrucción de código de tres direcciones.
+ */
 public class Instruccion {
 
-    private OP opCode;
-    private String[] instruccion = new String[4];
-    private boolean instFinal;
+    private OP opCode; // El código de la operación
+    private String[] instruccion = new String[4]; // Los componentes de la instruccion
+    private boolean instFinal; // Si es la instrucción final de una subrutina
 
     public enum OP {
-        copy, add, sub, mod, mult, div, neg, and, or, not, skip, ifLT, ifLE, ifEQ, ifNE, ifGE, ifGT, jump, pmb, call, ret, st, params, ind_val, ind_ass
+        copy, add, sub, mod, mult, div, neg, and, or, not, skip, ifLT, ifLE, ifEQ, ifNE, ifGE, ifGT,
+        jump, pmb, call, ret, st, params, ind_val, ind_ass
     }
 
     public Instruccion(OP opCode, String op1, String op2, String op3) {

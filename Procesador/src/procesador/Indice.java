@@ -4,7 +4,7 @@ package procesador;
  * La clase Indice representa un índice de una tabla y contiene la información
  * relacionada.
  * 
- * @author @gianm99
+ * @author Gian Lucas Martín Chamorro
  */
 public class Indice {
     private int li; // Límite inferior

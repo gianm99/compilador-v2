@@ -9,4 +9,8 @@ proc foo(int i, boolean b, string s) {
     prints(s);
 }
 
+func int bar() {
+    return 8;
+}
+numero=bar();
 foo(numero, logico, palabra);

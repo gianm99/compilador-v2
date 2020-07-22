@@ -1,21 +1,25 @@
 package procesador;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.ArrayList;
 import procesador.Instruccion.OP;
 import procesador.Simbolo.TSub;
 import procesador.Simbolo.Tipo;
 
+/**
+ * Ensamblador. Clase que implementa la generación de código ensamblador x86 a
+ * partir del código intermedio.
+ * 
+ * @author Gian Lucas Martín Chamorro
+ */
 public class Ensamblador {
     private String directorio;
-    private ArrayList<Instruccion> C3D;
-    private ArrayList<String> asm;
+    private ArrayList<Instruccion> C3D; // Código intermedio
+    private ArrayList<String> asm; // Código ensamblador
     private TablaVariables tv;
     private TablaProcedimientos tp;
     private TablaEtiquetas te;
@@ -32,36 +36,25 @@ public class Ensamblador {
         this.npActual = 0;
     }
 
+    /**
+     * Genera el código ensamblador y el ejecutable.
+     */
     public void ensamblar() {
         generarASM();
         generarEXE();
     }
 
+    /**
+     * Ensambla y enlaza el código ensamblador generado para conseguir el ejecutable
+     * del programa.
+     */
     public void generarEXE() {
         try {
             Process compilado = Runtime.getRuntime()
                     .exec("ml /Fo" + directorio + ".obj" + " /c /Zd /coff  " + directorio + ".asm");
-            BufferedReader stdInput = new BufferedReader(
-                    new InputStreamReader(compilado.getInputStream()));
-            // TODO Quitar todo el output de los comandos
-            // Leer el output del comando
-            System.out.println("Output:\n");
-            String s = null;
-            while ((s = stdInput.readLine()) != null) {
-                System.out.println(s);
-            }
             compilado.waitFor();
-
             Process enlazado = Runtime.getRuntime().exec(
                     "link /out:" + directorio + ".exe /subsystem:console " + directorio + ".obj");
-
-            stdInput = new BufferedReader(new InputStreamReader(enlazado.getInputStream()));
-            // Leer el output del comando
-            System.out.println("Output:\n");
-            s = null;
-            while ((s = stdInput.readLine()) != null) {
-                System.out.println(s);
-            }
             enlazado.waitFor();
             System.out.println(ConsoleColors.YELLOW_BOLD_BRIGHT + "Proceso de ensamblado ("
                     + directorio + ") completado con éxito" + ConsoleColors.RESET);
@@ -70,6 +63,10 @@ public class Ensamblador {
         }
     }
 
+    /**
+     * Genera el código ensamblador x86 a partir de código intermedio y lo guarda en
+     * un fichero.
+     */
     public void generarASM() {
         Writer buffer;
         File asmFile = new File(directorio + ".asm");
@@ -84,6 +81,10 @@ public class Ensamblador {
         }
     }
 
+    /**
+     * Añade el código de preámbulo necesario para el funcionamiento del programa y
+     * traduce las instrucciones de código intermedio a código ensamblador.
+     */
     public void traducir() {
         asm.add(".386");
         asm.add(".model flat, stdcall");
@@ -169,6 +170,8 @@ public class Ensamblador {
         asm.add("\tcall strlen");
         asm.add("\tmov [ebp-4], eax        ; guardar resultado de strlen");
         asm.add("\tmov eax, inputPtr       ; guardar el inputPtr");
+        asm.add("\tmov ebx, [ebp-4]");
+        asm.add("\tadd inputPtr, ebx");
         asm.add("\tmov ebx, eax            ; preparar comprobacion");
         asm.add("\tadd ebx, [ebp-4]        ; sumar longitud del string");
         asm.add("\tsub ebx, OFFSET inputBuffer");
@@ -319,10 +322,6 @@ public class Ensamblador {
                 } else {
                     if (ins.getOpCode() == OP.ret) {
                         // Caso del return
-                        asm.add("\tmov esp, ebp  ; SP = BP");
-                        asm.add("\tpop ebp  ; BP = antiguo BP");
-                        asm.add("\tlea edi, DISP  ; EDI = @DISP");
-                        asm.add("\tpop [edi+" + prof4x + "]  ; DISP[prof] = antiguo valor");
                         if (ins.getOperando(1) != null) {
                             // Guardar el valor de retorno en %eax
                             Variable var = tv.get(ins.getOperando(1));
@@ -334,6 +333,10 @@ public class Ensamblador {
                                 asm.add("\tmov eax, " + ins.getOperando(1));
                             }
                         }
+                        asm.add("\tmov esp, ebp  ; SP = BP");
+                        asm.add("\tpop ebp  ; BP = antiguo BP");
+                        asm.add("\tlea edi, DISP  ; EDI = @DISP");
+                        asm.add("\tpop [edi+" + prof4x + "]  ; DISP[prof] = antiguo valor");
                         asm.add("\tret");
                     } else {
                         // El resto de instrucciones
@@ -352,6 +355,13 @@ public class Ensamblador {
         asm.add("END start");
     }
 
+    /**
+     * Convierte una instrucción de código intermedio a una instrucción de código
+     * ensamblador.
+     * 
+     * @param i
+     *              La línea de código intermedio a convertir.
+     */
     private void conversion(int i) {
         Variable a, b, c;
         Instruccion ins = C3D.get(i);
