@@ -1,3 +1,23 @@
-int a[5];
+int a = 2;
+boolean b = false;
+string c;
+int d = 3;
+int f = "10";
 
-a[6] = 2;
+proc proc1(int e){
+    a = d;
+}
+proc proc2(){
+    c = "Hola";
+}
+
+if(a){
+    if(b<3){
+        c = a;
+    }
+}
+
+proc1();
+proc2(d);
+d[2] = 5;
+d = b + a;

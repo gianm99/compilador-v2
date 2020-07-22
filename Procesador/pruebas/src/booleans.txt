@@ -1,6 +1,0 @@
-var string stringprueba;
-const boolean VERDAD = true;
-var boolean b = VERDAD && (false || false) || !(2>5 && true);
-printb(b);
-stringprueba=read();
-prints(stringprueba);
