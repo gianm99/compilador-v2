@@ -2,6 +2,5 @@ int a = 10;
 int c;
 
 c = a/0;
+/*Aunque hacer el módulo por 0 es correcto en realidad, se ha optado por dejarlo como error*/
 c = a%0;
-
-

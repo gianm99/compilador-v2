@@ -14,9 +14,7 @@ proc proc1(){
     return a;
 }
 
-
 b = d;
 d = e;
+f = a;
 func1();
-
-
