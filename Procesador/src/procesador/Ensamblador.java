@@ -169,11 +169,13 @@ public class Ensamblador {
         asm.add("\tcall strlen");
         asm.add("\tmov [ebp-4], eax        ; guardar resultado de strlen");
         asm.add("\tmov eax, inputPtr       ; guardar el inputPtr");
+        asm.add("\tmov ebx, [ebp-4]");
+        asm.add("\tadd inputPtr, ebx");
         asm.add("\tmov ebx, eax            ; preparar comprobacion");
         asm.add("\tadd ebx, [ebp-4]        ; sumar longitud del string");
         asm.add("\tsub ebx, OFFSET inputBuffer");
         asm.add("\tcmp ebx, SIZEOF inputBuffer");
-        asm.add("\tjge @F                   ; comprobar direccion");
+        asm.add("\tjl @F                   ; comprobar direccion");
         asm.add("\tmov ebx, OFFSET inputBuffer");
         asm.add("\tmov inputPtr, ebx       ; reiniciar puntero");
         asm.add("@@:");
