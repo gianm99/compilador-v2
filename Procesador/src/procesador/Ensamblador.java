@@ -322,10 +322,6 @@ public class Ensamblador {
                 } else {
                     if (ins.getOpCode() == OP.ret) {
                         // Caso del return
-                        asm.add("\tmov esp, ebp  ; SP = BP");
-                        asm.add("\tpop ebp  ; BP = antiguo BP");
-                        asm.add("\tlea edi, DISP  ; EDI = @DISP");
-                        asm.add("\tpop [edi+" + prof4x + "]  ; DISP[prof] = antiguo valor");
                         if (ins.getOperando(1) != null) {
                             // Guardar el valor de retorno en %eax
                             Variable var = tv.get(ins.getOperando(1));
@@ -337,6 +333,10 @@ public class Ensamblador {
                                 asm.add("\tmov eax, " + ins.getOperando(1));
                             }
                         }
+                        asm.add("\tmov esp, ebp  ; SP = BP");
+                        asm.add("\tpop ebp  ; BP = antiguo BP");
+                        asm.add("\tlea edi, DISP  ; EDI = @DISP");
+                        asm.add("\tpop [edi+" + prof4x + "]  ; DISP[prof] = antiguo valor");
                         asm.add("\tret");
                     } else {
                         // El resto de instrucciones
