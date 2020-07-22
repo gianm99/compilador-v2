@@ -4,11 +4,12 @@ package procesador;
  * Etiqueta. Clase que sirve para gestionar las etiquetas que se generan.
  * 
  * @author Gian Lucas Martín Chamorro
+ * @author Jordi Antoni Sastre Moll
  */
 public class Etiqueta {
     private int ne; // Número de etiqueta
     private int linea; // Número de línea
-    private boolean deproc;
+    private boolean deproc; // Si es la etiqueta de inicio de un procedimiento
 
     public Etiqueta(int ne, boolean deproc) {
         this.ne = ne; // Asigna el número de etiqueta

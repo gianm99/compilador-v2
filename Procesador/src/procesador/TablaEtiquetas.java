@@ -2,6 +2,12 @@ package procesador;
 
 import java.util.ArrayList;
 
+/**
+ * TablaEtiquetas. Clase que sirve para almacenar las etiquetas que se generan
+ * al analizar el código.
+ * 
+ * @author Jordi Antoni Sastre Moll
+ */
 public class TablaEtiquetas {
     private int ne; // Número de etiquetas
     private ArrayList<Etiqueta> te; // Tabla de etiquetas
@@ -18,14 +24,14 @@ public class TablaEtiquetas {
     }
 
     public Etiqueta get(int etiqueta) {
-        return te.get(etiqueta-1);
+        return te.get(etiqueta - 1);
     }
 
     public Etiqueta get(String etiqueta) {
         if (etiqueta == null) {
             return null;
-        } 
-        if(etiqueta.equals("")){
+        }
+        if (etiqueta.equals("")) {
             return null;
         }
         return te.get(Integer.parseInt(etiqueta.substring(1)) - 1);

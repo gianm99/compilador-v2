@@ -1,5 +1,8 @@
 package procesador;
 
+/**
+ * Clase para imprimir texto con colores por la terminal.
+ */
 public class ConsoleColors {
     // Reset
     public static final String RESET = "\033[0m";  // Text Reset
