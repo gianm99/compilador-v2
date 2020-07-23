@@ -5,52 +5,52 @@ El proyecto consiste en el desarrollo de la parte *back-end* de un procesador pa
 Nuestro lenguaje tiene el nombre de Vaja y es una versión simplificada de Java con elementos propios de lenguajes como C o Python que tiene las siguientes características:
 
 ##	Tipos de datos
-- Entero. El conjunto de números enteros en formato decimal.
-- String. Cadena de caracteres básica. En este lenguaje se hace de manera similar a Java, no exactamente porque no son objetos, en vez de C, porque en C se implementan como arrays de caracteres. 
-- Boolean. Dato lógico que puede representar únicamente dos valores, cierto o falso.
-- Tablas (Arrays). Agrupación de variables de un tipo en concreto (entero, string o boolean) que puede ser de varias dimensiones de tamaño.
+- **Entero**. El conjunto de números enteros en formato decimal.
+- **String**. Cadena de caracteres básica. En este lenguaje se hace de manera similar a Java, no exactamente porque no son objetos, en vez de C, porque en C se implementan como arrays de caracteres. 
+- **Boolean**. Dato lógico que puede representar únicamente dos valores, cierto o falso.
+- **Tablas** (Arrays). Agrupación de variables de un tipo en concreto (entero, string o boolean) que puede ser de varias dimensiones de tamaño.
 
 ## Operaciones
 - Operaciones aritméticas
-  - Negación: a = -b.
-  - Multiplicación: a = b * c.
-  - División: a = b / c.
-  - Módulo: a = b % c.
-  - Suma: a = b + c.
-  - Resta: a = b – c.
+  - **Negación**: `a = -b`
+  - **Multiplicación**: `a = b * c`
+  - **División**: `a = b / c`
+  - **Módulo**: `a = b % c`
+  - **Suma**: `a = b + c`
+  - **Resta**: `a = b – c`
 - Operaciones lógicas
-  - Not: a = !b
-  - And: a = b && c
-  - Or: a = b || c
+  - **Not**: `a = !b`
+  - **And**: `a = b && c`
+  - **Or**: `a = b || c`
 - Operaciones relacionales:
-  - Igual: a == b
-  - Diferente: a != b
-  - Mayor: a > b
-  - Menor: a < b
-  - Mayor o igual: a >= b
-  - Menor o igual: a <= b
+  - **Igual**: `a == b`
+  - **Diferente**: `a != b`
+  - **Mayor**: `a > b`
+  - **Menor**: `a < b`
+  - **Mayor o igual**: `a >= b`
+  - **Menor o igual**: `a <= b`
 - Operaciones de entrada y salida. Todas estas operaciones se realizan por consola.
-  - proc printi(int i). Para imprimir integers positivos y negativos.
-  - proc prints(string s). Para imprimir strings.
-  - proc printb(boolean b). Para imprimir booleans.
-  - func string read(). Para leer el input de teclado del usuario. Devuelve como valor de la función el string con el input leído.
-- Asignación: a = b
+  - `proc printi(int i)`. Para imprimir integers positivos y negativos.
+  - `proc prints(string s)`. Para imprimir strings.
+  - `proc printb(boolean b)`. Para imprimir booleans.
+  - `func string read()`. Para leer el input de teclado del usuario. Devuelve como valor de la función el string con el input leído.
+- Asignación: `a = b`
 - Estructura condicional
-  - If. Estructura básica en la que se comprueba el valor de una expresión lógica y si se cumple, se ejecutan las sentencias que están dentro.
-  - If else. Estructura en la que se comprueba el valor de una expresión lógica y si se cumple, se ejecutan las sentencias que están dentro del if. Y si no, se ejecutan las del else.
-  - Switch. Estructura en la que se evalúa una expresión numérica (entero) y se ejecutan las sentencias del caso asignado a la misma. Los casos pueden ser expresiones y no solamente literales. Se puede definir un caso por defecto que se ejecutará siempre que no se cumpla alguno del resto de los casos con la directiva default. Esta directiva tiene que ser la última del switch. Al final de las sentencias de cada caso (menos el default) se puede indicar con la directiva break; si se quiere terminal el switch o se quiere seguir ejecutando las sentencias del caso siguiente.
+  - `if {...}`. Estructura básica en la que se comprueba el valor de una expresión lógica y si se cumple, se ejecutan las sentencias que están dentro.
+  - `if {...} else {...}`. Estructura en la que se comprueba el valor de una expresión lógica y si se cumple, se ejecutan las sentencias que están dentro del if. Y si no, se ejecutan las del else.
+  - `switch { case expr: ... [break;] [default: ...]}`. Estructura en la que se evalúa una expresión numérica (entero) y se ejecutan las sentencias del caso asignado a la misma. Los casos pueden ser expresiones y no solamente literales. Se puede definir un caso por defecto que se ejecutará siempre que no se cumpla alguno del resto de los casos con la directiva default. Esta directiva tiene que ser la última del switch. Al final de las sentencias de cada caso (menos el default) se puede indicar con la directiva break; si se quiere terminal el switch o se quiere seguir ejecutando las sentencias del caso siguiente.
 - Estructura iterativa
-  - While. Estructura en la que se comprueba en cada iteración si se cumple una condición y, si se cumple, se ejecutan sus sentencias.
+  - `while {...}`. Estructura en la que se comprueba en cada iteración si se cumple una condición y, si se cumple, se ejecutan sus sentencias.
 - Llamada a método. Si se está haciendo una llamada a un procedimiento, simplemente se ejecuta su código. Si se trata de una función, además se puede usar su valor de retorno como parte de una expresión.
-- Return. En los procedimientos se puede usar el return para salirse de la ejecución antes de que se ejecuten el resto de las sentencias. En ese caso el return no tiene ningún valor asociado y solo termina la ejecución de la subrutina. Si es una función, es obligatorio que tenga asociado un valor del mismo tipo que la función. Este valor se devolverá como resultado de la función.
+- `return`. En los procedimientos se puede usar el return para salirse de la ejecución antes de que se ejecuten el resto de las sentencias. En ese caso el return no tiene ningún valor asociado y solo termina la ejecución de la subrutina. Si es una función, es obligatorio que tenga asociado un valor del mismo tipo que la función. Este valor se devolverá como resultado de la función.
 
 ## Detalles
 Como detalles a destacar del lenguaje tenemos los siguientes:
 - Se pueden definir variables y constantes dentro de funciones, procedimientos, estructuras condicionales e iterativas.
 - Se pueden definir funciones y procedimientos dentro de funciones y procedimientos.
 - La estructura de los programas, subprogramas y sentencias complejas (if, if else y while) tiene que ser esta:
-  1. Declaraciones. Puede no haber ninguna declaración.
-  2. Sentencias. Tiene que haber como mínimo una.
+  1. *Declaraciones*. Puede no haber ninguna declaración.
+  2. *Sentencias*. Tiene que haber como mínimo una.
 - Se pueden hacer returns a mitad de función o a mitad de procedimiento. En el caso del procedimiento tiene que ser un return vacío que no devuelva ninguna expresión.
 - Se pueden declarar y utilizar tablas. Estas tablas o arrays se pueden definir con varias dimensiones. Para cada dimensión se debe indicar o su tamaño, o sus límites inferior y superior. Estos valores tienen que ser conocidos en tiempo de compilación, por lo tanto, tienen que ser literales o constantes de tipo integer.
 - No es necesario un subprograma main. Lo que está fuera de subrutinas se ejecutará, de manera similar a los programas escritos en Python. 
@@ -70,12 +70,12 @@ Un componente que hemos incluido y que pensamos que es importante destacar es la
 Para la optimización de código de 3 direcciones se ha creado una clase llamada Optimizador.java donde se recogen todas las optimizaciones de código creadas para esta práctica. Todas las optimizaciones se ejecutan en una copia de la lista de instrucciones de 3 direcciones sin optimizar que salen de la generación de código intermedio. Además, también se crean copias de las tablas de variables, de procedimientos y de etiquetas, y se actualizan conforme se ejecutan las optimizaciones.
 
 Las optimizaciones realizadas (en este orden) son:
-- Optimización de asignaciones de booleanos. Se aplica la optimización definida en los apuntes de la asignatura, donde se sustituye la compleja asignación entre booleanos por una asignación simple.
-- Eliminación de código en un if con valores constantes. Se aplica la optimización definida en los apuntes de la asignatura, donde, cuando se puede saber el valor del condicional de un if en tiempo de compilación, se reducen las expresiones al valor que sale del condicional, y desaparece el if.
-- Optimización de un if negando la condición. Se aplica la optimización definida en los apuntes de la asignatura, donde se niega la condición de un if, reduciendo el número de etiquetas necesarias para producir el código de 3 direcciones.
-- Eliminación de etiquetas innecesarias. Se eliminan todas las etiquetas generadas que no tengan un goto o procedimiento asociado.
-- Eliminación de código, si es inaccesible, entre un goto y su skip. Se elimina el código entre un goto, incluido, y su skip, no incluido, si no hay un skip con otra etiqueta dentro. Después se vuelve a ejecutar la función anterior para quitar todos los skips que se hayan quedado sin goto y no tengan otro goto en el código.
-- Optimización de asignaciones de variables temporales y eliminación de las innecesarias. Se reduce el código generado por variables temporales al hacer asignaciones de los literales que se copian en ellas directamente, comprobando que no se necesitarán en ningún otro sitio. También se hace para operaciones aritméticas y elimina asignaciones repetidas contiguas que surgen al aplicar las optimizaciones.
+- **Optimización de asignaciones de booleanos**. Se aplica la optimización definida en los apuntes de la asignatura, donde se sustituye la compleja asignación entre booleanos por una asignación simple.
+- **Eliminación de código en un if con valores constantes**. Se aplica la optimización definida en los apuntes de la asignatura, donde, cuando se puede saber el valor del condicional de un if en tiempo de compilación, se reducen las expresiones al valor que sale del condicional, y desaparece el if.
+- **Optimización de un if negando la condición**. Se aplica la optimización definida en los apuntes de la asignatura, donde se niega la condición de un if, reduciendo el número de etiquetas necesarias para producir el código de 3 direcciones.
+- **Eliminación de etiquetas innecesarias**. Se eliminan todas las etiquetas generadas que no tengan un goto o procedimiento asociado.
+- **Eliminación de código, si es inaccesible, entre un goto y su skip**. Se elimina el código entre un goto, incluido, y su skip, no incluido, si no hay un skip con otra etiqueta dentro. Después se vuelve a ejecutar la función anterior para quitar todos los skips que se hayan quedado sin goto y no tengan otro goto en el código.
+- **Optimización de asignaciones de variables temporales y eliminación de las innecesarias**. Se reduce el código generado por variables temporales al hacer asignaciones de los literales que se copian en ellas directamente, comprobando que no se necesitarán en ningún otro sitio. También se hace para operaciones aritméticas y elimina asignaciones repetidas contiguas que surgen al aplicar las optimizaciones.
 
 Después de las optimizaciones, se vuelven a recalcular las líneas donde se encuentran las etiquetas y también la ocupación de las variables locales, además del desplazamiento de las variables locales y parámetros de los subprogramas.
 
@@ -87,7 +87,7 @@ El proceso de generación de código ensamblador tiene varias secciones:
 
 ## Preámbulo
 
-En esta parte se incluyen las librerías necesarias para el funcionamiento de los programas. También se declara el instruction set que se usa (.386), el modelo de memoria (.model flat, stdcall) que usará el ejecutable y detalles como que las etiquetas distinguen mayúsculas y minúsculas (option casemap:none).
+En esta parte se incluyen las librerías necesarias para el funcionamiento de los programas. También se declara el instruction set que se usa (`.386`), el modelo de memoria (`.model flat, stdcall`) que usará el ejecutable y detalles como que las etiquetas distinguen mayúsculas y minúsculas (`option casemap:none`).
 
 ## Datos
 
@@ -95,31 +95,31 @@ Aquí se declaran los diferentes tipos de datos que están presentes en el códi
 
 ## Constantes
 
-Primero está la sección .const. En esta sección es donde se declaran todas las constantes de tipo integer y boolean que se definen en el código, sin importar si son locales o globales, ya que el proceso de análisis del código ya se ha encargado de determinar que el ámbito en el que se usa cada referencia es el correcto. Aquí no se definen las constantes de tipo string porque el estándar en MASM es declararlas en la sección de datos inicializados.
+Primero está la sección `.const`. En esta sección es donde se declaran todas las constantes de tipo integer y boolean que se definen en el código, sin importar si son locales o globales, ya que el proceso de análisis del código ya se ha encargado de determinar que el ámbito en el que se usa cada referencia es el correcto. Aquí no se definen las constantes de tipo string porque el estándar en MASM es declararlas en la sección de datos inicializados.
 
 ## Datos inicializados
 
-En la sección .data es donde se declaran los strings constantes que aparecen en el programa, ya sean realmente constantes definidas por el usuario o literales de tipo string. El motivo es que los strings de nuestros programas funcionan únicamente como punteros a posiciones de memoria. Una variable string solo tiene dos posibles orígenes de los que conseguir su valor, y estos son los literales (y también constantes) o el input del usuario, del que hablaremos después en la sección de subrutinas del sistema. Por lo tanto se puede hacer que las variables de tipo string contengan únicamente la dirección de memoria a la cadena de caracteres. Esto simplifica la gestión de los strings, ya que todas las variables de tipo string tienen la misma ocupación en memoria (4 bytes) pero pueden tener un tamaño distinto, e incluso cambiar de tamaño. En esta sección también se declara una variable de 4 bytes de tamaño que servirá para la gestión del input de usuario (inputPtr). Todo lo definido en esta sección se añadirá al tamaño final del ejecutable, ya que es información que se conoce antes de ejecutar el programa.
+En la sección `.data` es donde se declaran los strings constantes que aparecen en el programa, ya sean realmente constantes definidas por el usuario o literales de tipo string. El motivo es que los strings de nuestros programas funcionan únicamente como punteros a posiciones de memoria. Una variable string solo tiene dos posibles orígenes de los que conseguir su valor, y estos son los literales (y también constantes) o el input del usuario, del que hablaremos después en la sección de subrutinas del sistema. Por lo tanto se puede hacer que las variables de tipo string contengan únicamente la dirección de memoria a la cadena de caracteres. Esto simplifica la gestión de los strings, ya que todas las variables de tipo string tienen la misma ocupación en memoria (4 bytes) pero pueden tener un tamaño distinto, e incluso cambiar de tamaño. En esta sección también se declara una variable de 4 bytes de tamaño que servirá para la gestión del input de usuario (`inputPtr`). Todo lo definido en esta sección se añadirá al tamaño final del ejecutable, ya que es información que se conoce antes de ejecutar el programa.
 
 ## Datos no inicializados
 
-En la sección .data? se encuentran las variables globales del programa. Sin importar su tipo subyacente, aquí se reserva sus espacio en memoria y se le asigna una etiqueta, que es el identificador usado en el código fuente. Para las tablas se reserva la ocupación de cada celda multiplicada por la cantidad de celdas que las conforman. También se definen en esta sección el buffer que se utiliza para almacenar el input de los usuarios, inputBuffer, y el display vector, DISP, que sirve para mantener un registro de las llamadas a subrutinas y la información involucrada en cada nivel de profundidad. Los datos definidos en esta sección no afectan al tamaño final del ejecutable, únicamente se reflejan en la memoria que puede llegar a necesitar el programa a la hora de ejecutarse. Esto es porque no se asigna ningún valor a la posición de memoria. Las variables globales que si son inicializadas en el programa original escrito por el usuario se inicializan con una asignación en el mismo orden en el que se hace en el código original.
+En la sección `.data?` se encuentran las variables globales del programa. Sin importar su tipo subyacente, aquí se reserva sus espacio en memoria y se le asigna una etiqueta, que es el identificador usado en el código fuente. Para las tablas se reserva la ocupación de cada celda multiplicada por la cantidad de celdas que las conforman. También se definen en esta sección el buffer que se utiliza para almacenar el input de los usuarios, `inputBuffer`, y el display vector,` DISP`, que sirve para mantener un registro de las llamadas a subrutinas y la información involucrada en cada nivel de profundidad. Los datos definidos en esta sección no afectan al tamaño final del ejecutable, únicamente se reflejan en la memoria que puede llegar a necesitar el programa a la hora de ejecutarse. Esto es porque no se asigna ningún valor a la posición de memoria. Las variables globales que si son inicializadas en el programa original escrito por el usuario se inicializan con una asignación en el mismo orden en el que se hace en el código original.
 
 ## Programa principal
 
-A esta sección se le asigna la etiqueta start y se define como un subprograma. Esto se hace por convención de MASM, porque así es como se determina cuál es el punto de entrada del programa. Para señalizar que esa etiqueta es el punto de entrada se marca al final del programa con END start. Aquí es donde se incluyen todas las sentencias que están fuera de subrutinas definidas por el usuario.
+A esta sección se le asigna la etiqueta `start` y se define como un subprograma. Esto se hace por convención de MASM, porque así es como se determina cuál es el punto de entrada del programa. Para señalizar que esa etiqueta es el punto de entrada se marca al final del programa con `END start`. Aquí es donde se incluyen todas las sentencias que están fuera de subrutinas definidas por el usuario.
 
-## Subrutina del sistema
+## Subrutinas del sistema
 
 Aquí es donde se definen las subrutinas de input y output que proporciona el lenguaje. Además también se definen las subrutinas necesarias para el funcionamiento de estas.
 
 ### Input
 
-El funcionamiento de esta subrutina llamada read se basa en la llamada del sistema StdIn, que tiene como parámetros el tamaño del buffer de lectura y la dirección de memoria en la que se guardará la información. El buffer que se usa es de 254 bytes porque es el máximo tamaño con el que se puede operar, ya que tiene que haber espacio para el salto de línea que lo termina y para el byte que marca el fin del string. La manera en la que se almacena el resultado de la lectura por teclado es guardando la información en el buffer inputBuffer desde la posición indicada por inputPtr y devolviendo la dirección del inicio del string. Para que no se sobreescriba la información leída, se mueve el puntero inputPtr al final del string que se acaba de leer. Para realizar esta operación se utiliza una subrutina que calcula la longitud de un string (strlen). Si la posición de memoria a la que apunta se sale del buffer definido, se vuelve a apuntar al inicio del buffer y se comenzará a sobreescribir la información leída. Esto realmente no es un problema ya que gracias al principio de localidad, las variables que se inicializan a un valor se suelen usar inmediatamente después. En cualquier caso, se pueden llegar a almacenar como mínimo 256 strings de tamaño máximo que provengan del input de teclado.
+El funcionamiento de esta subrutina llamada `read` se basa en la llamada del sistema `StdIn`, que tiene como parámetros el tamaño del buffer de lectura y la dirección de memoria en la que se guardará la información. El buffer que se usa es de 254 bytes porque es el máximo tamaño con el que se puede operar, ya que tiene que haber espacio para el salto de línea que lo termina y para el byte que marca el fin del string. La manera en la que se almacena el resultado de la lectura por teclado es guardando la información en el buffer inputBuffer desde la posición indicada por `inputPtr` y devolviendo la dirección del inicio del string. Para que no se sobreescriba la información leída, se mueve el puntero `inputPtr` al final del string que se acaba de leer. Para realizar esta operación se utiliza una subrutina que calcula la longitud de un string (`strlen`). Si la posición de memoria a la que apunta se sale del buffer definido, se vuelve a apuntar al inicio del buffer y se comenzará a sobreescribir la información leída. Esto realmente no es un problema ya que gracias al principio de localidad, las variables que se inicializan a un valor se suelen usar inmediatamente después. En cualquier caso, se pueden llegar a almacenar como mínimo 256 strings de tamaño máximo que provengan del input de teclado.
 
 ### Output
 
-El funcionamiento de las tres subrutinas (printi, printb y prints) se basa en la llamada del sistema StdOut, que tiene como único parámetro la dirección del string a imprimir por pantalla. Para la subrutina prints, que imprime un string, la operación es prácticamente directa, ya que solo hay que pasar los parámetros a StdOut. Para printi y para printb , que imprimen un integer y un boolean respectivamente, hay que realizar una conversión a string. Para el caso de los integers se usa una subrutina llamada EAX_to_DEC, que convierte un integer a un string. El procedimiento printi funciona también con números negativos. Para printb lo que se hace es imprimir true si es cierto y false si es falso.
+El funcionamiento de las tres subrutinas (`printi`, `printb` y `prints`) se basa en la llamada del sistema `StdOut`, que tiene como único parámetro la dirección del string a imprimir por pantalla. Para la subrutina `prints`, que imprime un string, la operación es prácticamente directa, ya que solo hay que pasar los parámetros a `StdOut`. Para printi y para `printb` , que imprimen un integer y un boolean respectivamente, hay que realizar una conversión a string. Para el caso de los integers se usa una subrutina llamada `EAX_to_DEC`, que convierte un integer a un string. El procedimiento printi funciona también con números negativos. Para printb lo que se hace es imprimir `true` si es cierto y `false` si es falso.
 
 ## Subrutinas definidas por el usuario
 
@@ -470,14 +470,14 @@ Como hemos dicho antes, el entorno en el que hemos desarrollado este proyecto es
 
 1.	Instalar el editor de código Visual Studio Code desde la página oficial.
 2.	Instalar el paquete de extensiones Java Extension Pack desde su página en el marketplace de Visual Studio Code. Este paquete de extensiones añade la capacidad de ejecutar el proyecto desde la terminal del editor.
-3.	Comprobar que las librerías externas se han importado de forma correcta. Esto se puede verificar desde el panel “Explorer/Java Dependencies/Referenced Libraries” (para que aparezca este panel se tiene que abrir un archivo .java y se activen las extensiones), en este tienen que aparecer las dos librerías externas que se importan en el proyecto:
+3.	Comprobar que las librerías externas se han importado de forma correcta. Esto se puede verificar desde el panel `Explorer/Java Dependencies/Referenced Libraries` (para que aparezca este panel se tiene que abrir un archivo .java y se activen las extensiones), en este tienen que aparecer las dos librerías externas que se importan en el proyecto:
 
     ![panel](img/instalación.png)
     
-    > Estas dos librerías están en la carpeta /lib, dentro de la carpeta del proyecto de java. Si no se incluyen correctamente hay que hacerlo de forma manual, dándole al botón “+” en el panel de “Referenced Libraries” y añadir de manera individual los dos archivos.
+    > Estas dos librerías están en la carpeta `/lib`, dentro de la carpeta del proyecto de java. Si no se incluyen correctamente hay que hacerlo de forma manual, dándole al botón `+` en el panel de `Referenced Libraries` y añadir de manera individual los dos archivos.
 4.	Configurar la ejecución del proyecto desde el archivo launch.json. Para hacer esto hay que crear uno nuevo, que VS Code ya completará por defecto, y añadirle que pida al usuario los argumentos del programa, que en este caso será la dirección del archivo de código fuente que se quiera compilar. Para que VS Code cree el archivo hay que abrir el panel de comandos con el atajo de teclado `Ctrl+Shift+P`, y luego escribir launch.json. Hay que seleccionar la opción que dice Open launch.json. Hay que añadir la configuración `"args": "${command:SpecifyProgramArgs}"`.
-5.	Instalar MASM32 SDK (entorno de desarrollo para Microsoft Macro Assembler) desde la página oficial. Hay que seleccionar un servidor desde el que realizar la descarga, en nuestro caso elegimos “US Site 1”. Después de realizar la descarga hay que seguir el proceso de instalación, que es autoexplicativo y relativamente rápido y sencillo. Es necesario instalarlo en la raíz del sistema en la unidad que contenga el sistema operativo (C:\masm32), que en nuestro caso es C, para que los includes del código ensamblador funcionen correctamente.
-6.	Añadir la carpeta /masm32/bin y /masm32 al PATH del sistema o del usuario modificando las variables de entorno del sistema. Esto es necesario para que los comandos ml y link que hacen que se ensamblen y enlacen los programas generados y produzcan ejecutables, respectivamente. Después de añadir esas carpetas al PATH hay que reiniciar Visual Studio Code para que los cambios surjan efecto.
+5.	Instalar MASM32 SDK (entorno de desarrollo para Microsoft Macro Assembler) desde la página oficial. Hay que seleccionar un servidor desde el que realizar la descarga, en nuestro caso elegimos “US Site 1”. Después de realizar la descarga hay que seguir el proceso de instalación, que es autoexplicativo y relativamente rápido y sencillo. Es necesario instalarlo en la raíz del sistema en la unidad que contenga el sistema operativo (`C:\masm32`), que en nuestro caso es C, para que los includes del código ensamblador funcionen correctamente.
+6.	Añadir la carpeta `/masm32/bin` y `/masm32` al PATH del sistema o del usuario modificando las variables de entorno del sistema. Esto es necesario para que los comandos `ml` y `link` que hacen que se ensamblen y enlacen los programas generados y produzcan ejecutables, respectivamente. Después de añadir esas carpetas al PATH hay que reiniciar Visual Studio Code para que los cambios surjan efecto.
 
 # Ejecución
 
